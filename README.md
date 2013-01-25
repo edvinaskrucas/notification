@@ -59,6 +59,7 @@ Notification::container('myContainer', function($container)
     $container->info('Test info message');
     $container->error('Error');
 });
+```
 
 Also you can access container like this
 ```php
