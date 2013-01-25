@@ -1,8 +1,6 @@
 {
     "name": "edvinaskrucas/notification",
-    "description": "Notification management package for Laravel.",
-    "keywords": ["notification", "laravel"],
-    "license": "BSD-2-Clause",
+    "description": "",
     "authors": [
         {
             "name": "Edvinas Kručas",
@@ -11,12 +9,14 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/container": "4.*",
-        "illuminate/support": "4.*"
+        "illuminate/support": "4.0.x"
     },
     "autoload": {
+        "classmap": [
+            "src/migrations"
+        ],
         "psr-0": {
-            "Notification": "src/"
+            "Edvinaskrucas\\Notification": "src/"
         }
     },
     "minimum-stability": "dev"
