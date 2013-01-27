@@ -86,6 +86,30 @@ If you want to use default container just use ```null``` as container name. Name
 Notification::container()->info('Info message');
 ```
 
+### Instant notifications (shown in same request)
+
+Library supports not only flash messages, you just need to pass an extra param to define that message is not flashed
+```php
+Notification::success('Instant success message', false);
+```
+
+### Custom single message format
+
+Want a custom format for single message? No problem
+```php
+Notification::success('Success message', true, 'Custom format :message');
+```
+
+### Accessing first notification from container
+
+You can access and show just first notification in container
+```php
+{{ Notification::container('myContainer')->first('success')->render() }}
+```
+
+Accessing first notification from all types
+{{ Notification::container('myContainer')->all()->first()->render() }}
+
 ### Displaying notifications
 
 To display notifications in a default container you need to add just one line to your view file
@@ -108,5 +132,3 @@ public function show($type = null, $container = null, $format = null)
     return $this->container($container)->show($type, $format);
 }
 ```
-
-More coming this weekend.
