@@ -48,6 +48,16 @@ If you want to edit default config file, just publish it to your app folder.
 
 ## Usage
 
+### Default usage
+
+Adding message to default container.
+```php
+Notification::success('Success message');
+Notification::error('Error message');
+Notification::info('Info message');
+Notification::waring('Warning message');
+```
+
 ### Containers
 
 Containers allows you to set up different containers for different placeholders.
@@ -64,6 +74,39 @@ Notification::container('myContainer', function($container)
 Also you can access container like this
 ```php
 Notification::container('myContainer')->info('Info message');
+```
+
+Method chaining
+```php
+Notification::container('myContainer')->info('Info message')->error('Error message');
+```
+
+If you want to use default container just use ```null``` as container name. Name will be taken from config file.
+```php
+Notification::container()->info('Info message');
+```
+
+### Displaying notifications
+
+To display notifications in a default container you need to add just one line to your view file
+```php
+{{ Notification::show() }}
+```
+
+Also there are some params to display notifications
+```php
+/**
+ * Renders each message by given type (or all) in container.
+ *
+ * @param null $type - notification type to show (error, success, warning, info), if is null, all notifications will be shown
+ * @param null $container - container name (if is null, default container will be used)
+ * @param null $format - format for messages, if is null, default formats will be used
+ * @return mixed
+ */
+public function show($type = null, $container = null, $format = null)
+{
+    return $this->container($container)->show($type, $format);
+}
 ```
 
 More coming this weekend.
