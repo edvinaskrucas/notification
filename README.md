@@ -88,16 +88,16 @@ Notification::container()->info('Info message');
 
 ### Instant notifications (shown in same request)
 
-Library supports not only flash messages, you just need to pass an extra param to define that message is not flashed
+Library supports not only flash messages, if you want to show notifications in same request just use
 ```php
-Notification::success('Instant success message', false);
+Notification::successInstant('Instant success message');
 ```
 
 ### Custom single message format
 
 Want a custom format for single message? No problem
 ```php
-Notification::success('Success message', true, 'Custom format :message');
+Notification::success('Success message', 'Custom format :message');
 ```
 
 ### Accessing first notification from container
