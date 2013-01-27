@@ -35,10 +35,11 @@ class Notification
      *
      * @param $message
      * @param null $format
+     * @return NotificationBag
      */
     public function success($message, $format = null)
     {
-        $this->addMessage(null, 'success', $message, true, $format);
+        return $this->addMessage(null, 'success', $message, true, $format);
     }
 
     /**
@@ -46,10 +47,11 @@ class Notification
      *
      * @param $message
      * @param null $format
+     * @return NotificationBag
      */
     public function successInstant($message, $format = null)
     {
-        $this->addMessage(null, 'success', $message, false, $format);
+        return $this->addMessage(null, 'success', $message, false, $format);
     }
 
     /**
@@ -57,10 +59,11 @@ class Notification
      *
      * @param $message
      * @param null $format
+     * @return NotificationBag
      */
     public function error($message, $format = null)
     {
-        $this->addMessage(null, 'error', $message, true, $format);
+        return $this->addMessage(null, 'error', $message, true, $format);
     }
 
     /**
@@ -68,10 +71,11 @@ class Notification
      *
      * @param $message
      * @param null $format
+     * @return NotificationBag
      */
     public function errorInstant($message, $format = null)
     {
-        $this->addMessage(null, 'error', $message, false, $format);
+        return $this->addMessage(null, 'error', $message, false, $format);
     }
 
     /**
@@ -79,10 +83,11 @@ class Notification
      *
      * @param $message
      * @param null $format
+     * @return NotificationBag
      */
     public function warning($message, $format = null)
     {
-        $this->addMessage(null, 'warning', $message, true, $format);
+        return $this->addMessage(null, 'warning', $message, true, $format);
     }
 
     /**
@@ -90,10 +95,11 @@ class Notification
      *
      * @param $message
      * @param null $format
+     * @return NotificationBag
      */
     public function warningInstant($message, $format = null)
     {
-        $this->addMessage(null, 'warning', $message, false, $format);
+        return $this->addMessage(null, 'warning', $message, false, $format);
     }
 
     /**
@@ -101,10 +107,11 @@ class Notification
      *
      * @param $message
      * @param null $format
+     * @return NotificationBag
      */
     public function info($message, $format = null)
     {
-        $this->addMessage(null, 'info', $message, true, $format);
+        return $this->addMessage(null, 'info', $message, true, $format);
     }
 
     /**
@@ -112,10 +119,11 @@ class Notification
      *
      * @param $message
      * @param null $format
+     * @return NotificationBag
      */
     public function infoInstant($message, $format = null)
     {
-        $this->addMessage(null, 'info', $message, false, $format);
+        return $this->addMessage(null, 'info', $message, false, $format);
     }
 
     /**
@@ -140,7 +148,7 @@ class Notification
      */
     protected function addMessage($container, $type, $message, $flash = true, $format = null)
     {
-        $this->container($container)->add($type, $message, $flash, $format);
+        return $this->container($container)->add($type, $message, $flash, $format);
     }
 
     /**
