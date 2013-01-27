@@ -100,6 +100,18 @@ Want a custom format for single message? No problem
 Notification::success('Success message', 'Custom format :message');
 ```
 
+### Add multiple messages
+
+If you want to add multiple notifications you can pass notication message as array
+```php
+Notification::success(array(
+    'Message one',
+    array('Message two with its format', 'My format: :message')
+));
+```
+
+Also you can still pass second param (format), to format messages, but you can format individual messages as shown above.
+
 ### Accessing first notification from container
 
 You can access and show just first notification in container
