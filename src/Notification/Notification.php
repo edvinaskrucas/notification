@@ -34,48 +34,88 @@ class Notification
      * Adds success message to default container.
      *
      * @param $message
-     * @param bool $flash
      * @param null $format
      */
-    public function success($message, $flash = true, $format = null)
+    public function success($message, $format = null)
     {
-        $this->addMessage(null, 'success', $message, $flash, $format);
+        $this->addMessage(null, 'success', $message, true, $format);
+    }
+
+    /**
+     * Adds instant success message. It will be shown in same request.
+     *
+     * @param $message
+     * @param null $format
+     */
+    public function successInstant($message, $format = null)
+    {
+        $this->addMessage(null, 'success', $message, false, $format);
     }
 
     /**
      * Adds error message to default container.
      *
      * @param $message
-     * @param bool $flash
      * @param null $format
      */
-    public function error($message, $flash = true, $format = null)
+    public function error($message, $format = null)
     {
-        $this->addMessage(null, 'error', $message, $flash, $format);
+        $this->addMessage(null, 'error', $message, true, $format);
+    }
+
+    /**
+     * Adds instant error message. It will be shown in same request.
+     *
+     * @param $message
+     * @param null $format
+     */
+    public function errorInstant($message, $format = null)
+    {
+        $this->addMessage(null, 'error', $message, false, $format);
     }
 
     /**
      * Adds warning message to default container.
      *
      * @param $message
-     * @param bool $flash
      * @param null $format
      */
-    public function warning($message, $flash = true, $format = null)
+    public function warning($message, $format = null)
     {
-        $this->addMessage(null, 'warning', $message, $flash, $format);
+        $this->addMessage(null, 'warning', $message, true, $format);
+    }
+
+    /**
+     * Adds instant warning message. It will be shown in same request.
+     *
+     * @param $message
+     * @param null $format
+     */
+    public function warningInstant($message, $format = null)
+    {
+        $this->addMessage(null, 'warning', $message, false, $format);
     }
 
     /**
      * Adds info message to default container.
      *
      * @param $message
-     * @param bool $flash
      * @param null $format
      */
-    public function info($message, $flash = true, $format = null)
+    public function info($message, $format = null)
     {
-        $this->addMessage(null, 'info', $message, $flash, $format);
+        $this->addMessage(null, 'info', $message, true, $format);
+    }
+
+    /**
+     * Adds instant info message. It will be shown in same request.
+     *
+     * @param $message
+     * @param null $format
+     */
+    public function infoInstant($message, $format = null)
+    {
+        $this->addMessage(null, 'info', $message, false, $format);
     }
 
     /**

@@ -84,52 +84,96 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      * Shortcut to add success message.
      *
      * @param $message
-     * @param bool $flashable
      * @param null $format
      * @return NotificationsBag
      */
-    public function success($message, $flashable = true, $format = null)
+    public function success($message, $format = null)
     {
-        return $this->add('success', $message, $flashable, $format);
+        return $this->add('success', $message, true, $format);
+    }
+
+    /**
+     * Adds instant success message. It will be shown in same request.
+     *
+     * @param $message
+     * @param null $format
+     * @return NotificationsBag
+     */
+    public function successInstant($message, $format = null)
+    {
+        return $this->add('success', $message, false, $format);
     }
 
     /**
      * Shortcut to add error message.
      *
      * @param $message
-     * @param bool $flashable
      * @param null $format
      * @return NotificationsBag
      */
-    public function error($message, $flashable = true, $format = null)
+    public function error($message, $format = null)
     {
-        return $this->add('error', $message, $flashable, $format);
+        return $this->add('error', $message, true, $format);
+    }
+
+    /**
+     * Adds instant error message. It will be shown in same request.
+     *
+     * @param $message
+     * @param null $format
+     * @return NotificationsBag
+     */
+    public function errorInstant($message, $format = null)
+    {
+        return $this->add('error', $message, false, $format);
     }
 
     /**
      * Shortcut to add info message.
      *
      * @param $message
-     * @param bool $flashable
      * @param null $format
      * @return NotificationsBag
      */
-    public function info($message, $flashable = true, $format = null)
+    public function info($message, $format = null)
     {
-        return $this->add('info', $message, $flashable, $format);
+        return $this->add('info', $message, true, $format);
+    }
+
+    /**
+     * Adds instant info message. It will be shown in same request.
+     *
+     * @param $message
+     * @param null $format
+     * @return NotificationsBag
+     */
+    public function infoInstant($message, $format = null)
+    {
+        return $this->add('info', $message, false, $format);
     }
 
     /**
      * Shortcut to add warning message.
      *
      * @param $message
-     * @param bool $flashable
      * @param null $format
      * @return NotificationsBag
      */
-    public function warning($message, $flashable = true, $format = null)
+    public function warning($message, $format = null)
     {
-        return $this->add('warning', $message, $flashable, $format);
+        return $this->add('warning', $message, true, $format);
+    }
+
+    /**
+     * Adds instant warning message. It will be shown in same request.
+     *
+     * @param $message
+     * @param null $format
+     * @return NotificationsBag
+     */
+    public function warningInstant($message, $format = null)
+    {
+        return $this->add('warning', $message, false, $format);
     }
 
     /**
