@@ -63,17 +63,36 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
 
     /**
      * Adds new notification message to one of collections.
+     * If message is array, adds multiple messages.
+     * Message can be string, array (array can contain string for message, or array of message and format).
      * Flashes flashable messages.
      *
      * @param $type
-     * @param $message
+     * @param string|array $message
      * @param bool $flashable
      * @param null $format
      * @return NotificationsBag
      */
     public function add($type, $message, $flashable = true, $format = null)
     {
-        $this->get($type)->addUnique(new Message($type, $message, $flashable, $this->checkFormat($format, $type)));
+        if(is_array($message))
+        {
+            foreach($message as $m)
+            {
+                if(is_array($m) && count($m) == 2)
+                {
+                    $this->get($type)->addUnique(new Message($type, $m[0], $flashable, $this->checkFormat($m[1], $type)));
+                }
+                else
+                {
+                    $this->get($type)->addUnique(new Message($type, $m, $flashable, $this->checkFormat($format, $type)));
+                }
+            }
+        }
+        else
+        {
+            $this->get($type)->addUnique(new Message($type, $message, $flashable, $this->checkFormat($format, $type)));
+        }
 
         $this->flash();
 
