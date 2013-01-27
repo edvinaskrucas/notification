@@ -55,7 +55,7 @@ Adding message to default container.
 Notification::success('Success message');
 Notification::error('Error message');
 Notification::info('Info message');
-Notification::waring('Warning message');
+Notification::warning('Warning message');
 ```
 
 ### Containers
