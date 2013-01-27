@@ -108,7 +108,9 @@ You can access and show just first notification in container
 ```
 
 Accessing first notification from all types
+```php
 {{ Notification::container('myContainer')->all()->first()->render() }}
+```
 
 ### Displaying notifications
 
