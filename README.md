@@ -116,12 +116,12 @@ Also you can still pass second param (format), to format messages, but you can f
 
 You can access and show just first notification in container
 ```php
-{{ Notification::container('myContainer')->first('success')->render() }}
+{{ Notification::container('myContainer')->first('success') }}
 ```
 
 Accessing first notification from all types
 ```php
-{{ Notification::container('myContainer')->all()->first()->render() }}
+{{ Notification::container('myContainer')->all()->first() }}
 ```
 
 ### Displaying notifications
