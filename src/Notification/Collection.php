@@ -216,6 +216,6 @@ class Collection implements ArrayAccess, ArrayableInterface, Countable, Iterator
      */
     public function __toString()
     {
-        return $this->toJson();
+        return $this->render();
     }
 }

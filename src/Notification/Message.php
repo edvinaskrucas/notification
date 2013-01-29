@@ -186,7 +186,7 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
      */
     public function __toString()
     {
-        return $this->toJson();
+        return $this->render();
     }
 
 
