@@ -183,9 +183,69 @@ class Notification
      * @param null $format
      * @return mixed
      */
-    public function show($type = null, $container = null, $format = null)
+    protected function show($type = null, $container = null, $format = null)
     {
         return $this->container($container)->show($type, $format);
+    }
+
+    /**
+     * Renders error messages in given container.
+     *
+     * @param null $container
+     * @param null $format
+     * @return mixed
+     */
+    public function showError($container = null, $format = null)
+    {
+        return $this->show('error', $container, $format);
+    }
+
+    /**
+     * Renders success messages in given container.
+     *
+     * @param null $container
+     * @param null $format
+     * @return mixed
+     */
+    public function showSuccess($container = null, $format = null)
+    {
+        return $this->show('success', $container, $format);
+    }
+
+    /**
+     * Renders info messages in given container.
+     *
+     * @param null $container
+     * @param null $format
+     * @return mixed
+     */
+    public function showInfo($container = null, $format = null)
+    {
+        return $this->show('info', $container, $format);
+    }
+
+    /**
+     * Renders warning messages in given container.
+     *
+     * @param null $container
+     * @param null $format
+     * @return mixed
+     */
+    public function showWarning($container = null, $format = null)
+    {
+        return $this->show('warning', $container, $format);
+    }
+
+    /**
+     * Renders all messages in given container.
+     *
+     * @param null $container
+     * @param null $format
+     * @return mixed
+     */
+    public function showAll($container = null, $format = null)
+    {
+        return $this->show(null, $container, $format);
     }
 
 }
