@@ -420,7 +420,14 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     public function __toString()
     {
-        return $this->toJson();
+        $html = '';
+
+        foreach($this->collections as $collection)
+        {
+            $html .= $collection;
+        }
+
+        return $html;
     }
 
 
