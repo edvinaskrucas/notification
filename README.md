@@ -126,23 +126,20 @@ Accessing first notification from all types
 
 ### Displaying notifications
 
-To display notifications in a default container you need to add just one line to your view file
+To display all notifications in a default container you need to add just one line to your view file
 ```php
-{{ Notification::show() }}
+{{ Notification::showAll() }}
 ```
 
-Also there are some params to display notifications
+Display notifications by type in default container
 ```php
-/**
- * Renders each message by given type (or all) in container.
- *
- * @param null $type - notification type to show (error, success, warning, info), if is null, all notifications will be shown
- * @param null $container - container name (if is null, default container will be used)
- * @param null $format - format for messages, if is null, default formats will be used
- * @return mixed
- */
-public function show($type = null, $container = null, $format = null)
-{
-    return $this->container($container)->show($type, $format);
-}
+{{ Notification::showError() }}
+{{ Notification::showInfo() }}
+{{ Notification::showWarning() }}
+{{ Notification::showSuccess() }}
+```
+
+Displaying notifications you can pass container and format
+```php
+{{ Notification::showInfo('myContainer', ':message') }}
 ```
