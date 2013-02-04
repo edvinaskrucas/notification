@@ -1,11 +1,11 @@
-<?php namespace Notification;
+<?php namespace EdvinasKrucas\Notification;
 
 use Countable;
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Session;
-use Notification\Message;
-use Notification\Collection;
+use EdvinasKrucas\Notification\Message;
+use EdvinasKrucas\Notification\Collection;
 
 class NotificationsBag implements ArrayableInterface, JsonableInterface, Countable
 {

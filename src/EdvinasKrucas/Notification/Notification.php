@@ -1,6 +1,6 @@
-<?php namespace Notification;
+<?php namespace EdvinasKrucas\Notification;
 
-use Notification\NotificationsBag;
+use EdvinasKrucas\Notification\NotificationsBag;
 use Session;
 use Closure;
 

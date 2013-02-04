@@ -1,4 +1,4 @@
-<?php namespace Notification\Facades;
+<?php namespace EdvinasKrucas\Notification\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
