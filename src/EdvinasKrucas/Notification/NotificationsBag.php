@@ -241,9 +241,11 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     {
         $this->setFormat($this->app['config']->get('notification::default_format'));
 
-        $formats = isset($this->app['config']->get('notification::default_formats')[$this->container]) ?
-            $this->app['config']->get('notification::default_formats')[$this->container] :
-            $this->app['config']->get('notification::default_formats')['__'];
+        $config = $this->app['config']->get('notification::default_formats');
+
+        $formats = isset($config[$this->container]) ?
+            $config[$this->container] :
+            $config['__'];
 
         foreach($formats as $type => $format)
         {
