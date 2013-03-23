@@ -1,6 +1,7 @@
 <?php namespace EdvinasKrucas\Notification;
 
 use Countable;
+use Illuminate\Config\Repository;
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Session\Store as SessionStore;
@@ -9,13 +10,12 @@ use EdvinasKrucas\Notification\Collection;
 
 class NotificationsBag implements ArrayableInterface, JsonableInterface, Countable
 {
-
     /**
-     * Illuminate application instance.
+     * Config repository.
      *
-     * @var Illuminate\Foundation\Application
+     * @var \Illuminate\Config\Repository
      */
-    protected $app;
+    protected $configRepository;
 
     /**
      * NotificationBag container name.
@@ -57,12 +57,12 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      *
      * @param $container
      * @param SessionStore $sessionStore
-     * @param $app
+     * @param Repository $configRepository
      */
-    public function __construct($container, SessionStore $sessionStore, $app)
+    public function __construct($container, SessionStore $sessionStore, Repository $configRepository)
     {
         $this->container = $container;
-        $this->app = $app;
+        $this->configRepository = $configRepository;
         $this->sessionStore = $sessionStore;
 
         $this->loadFormats();
@@ -248,9 +248,9 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     protected function loadFormats()
     {
-        $this->setFormat($this->app['config']->get('notification::default_format'));
+        $this->setFormat($this->configRepository->get('notification::default_format'));
 
-        $config = $this->app['config']->get('notification::default_formats');
+        $config = $this->configRepository->get('notification::default_formats');
 
         $formats = isset($config[$this->container]) ?
             $config[$this->container] :
@@ -422,6 +422,26 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     public function count()
     {
         return count($this->collections);
+    }
+
+    /**
+     * Returns session store instance.
+     *
+     * @return SessionStore
+     */
+    public function getSessionStore()
+    {
+        return $this->sessionStore;
+    }
+
+    /**
+     * Returns config repository instance.
+     *
+     * @return Repository
+     */
+    public function getConfigRepository()
+    {
+        return $this->configRepository;
     }
 
     /**

@@ -2,15 +2,24 @@
 
 use EdvinasKrucas\Notification\NotificationsBag;
 use Closure;
+use Illuminate\Config\Repository;
+use Illuminate\Session\Store as SessionStore;
 
 class Notification
 {
     /**
-     * Illuminate application instance.
+     * Config repository.
      *
-     * @var Illuminate\Foundation\Application
+     * @var \Illuminate\Config\Repository
      */
-    protected $app;
+    protected $configRepository;
+
+    /**
+     * Session store instance.
+     *
+     * @var \Illuminate\Session\Store
+     */
+    protected $sessionStore;
 
     /**
      * List of instantiated containers.
@@ -22,11 +31,13 @@ class Notification
     /**
      * Creates new instance.
      *
-     * @param null $app
+     * @param Repository $configRepository
+     * @param SessionStore $sessionStore
      */
-    public function __construct($app = null)
+    public function __construct(Repository $configRepository, SessionStore $sessionStore)
     {
-        $this->app = $app;
+        $this->configRepository = $configRepository;
+        $this->sessionStore = $sessionStore;
     }
 
     /**
@@ -159,11 +170,11 @@ class Notification
      */
     public function container($container = null, Closure $callback = null)
     {
-        $container = is_null($container) ? $this->app['config']->get('notification::default_container') : $container;
+        $container = is_null($container) ? $this->configRepository->get('notification::default_container') : $container;
 
         if(!isset($this->containers[$container]))
         {
-            $this->containers[$container] = new NotificationsBag($container, $this->app['session'], $this->app);
+            $this->containers[$container] = new NotificationsBag($container, $this->sessionStore, $this->configRepository);
         }
 
         if(is_callable($callback))
@@ -245,6 +256,26 @@ class Notification
     public function showAll($container = null, $format = null)
     {
         return $this->show(null, $container, $format);
+    }
+
+    /**
+     * Returns config repository instance.
+     *
+     * @return Repository
+     */
+    public function getConfigRepository()
+    {
+        return $this->configRepository;
+    }
+
+    /**
+     * Returns session store instance.
+     *
+     * @return SessionStore
+     */
+    public function getSessionStore()
+    {
+        return $this->sessionStore;
     }
 
 }
