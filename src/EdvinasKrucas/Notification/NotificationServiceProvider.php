@@ -30,7 +30,7 @@ class NotificationServiceProvider extends ServiceProvider {
 	{
 		$this->app['notification'] = $this->app->share(function($app)
         {
-            return new Notification($this->app['config']);
+            return new Notification($this->app['config'], $this->app['session']);
         });
 
         $this->app['config']->package('edvinaskrucas/notification', __DIR__.'/../config');
