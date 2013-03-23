@@ -3,7 +3,7 @@
 use Countable;
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Illuminate\Support\Contracts\JsonableInterface;
-use Session;
+use Illuminate\Session\Store as SessionStore;
 use EdvinasKrucas\Notification\Message;
 use EdvinasKrucas\Notification\Collection;
 
@@ -23,6 +23,13 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      * @var string
      */
     protected $container;
+
+    /**
+     * Session store instance.
+     *
+     * @var \Illuminate\Session\Store
+     */
+    protected $sessionStore;
 
     /**
      * Messages collections by type.
@@ -49,12 +56,14 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      * Creates new NotificationBag object.
      *
      * @param $container
+     * @param SessionStore $sessionStore
      * @param $app
      */
-    public function __construct($container, $app)
+    public function __construct($container, SessionStore $sessionStore, $app)
     {
         $this->container = $container;
         $this->app = $app;
+        $this->sessionStore = $sessionStore;
 
         $this->loadFormats();
 
@@ -302,7 +311,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     protected function load()
     {
-        $flashed = Session::get('notifications_'.$this->container);
+        $flashed = $this->sessionStore->get('notifications_'.$this->container);
 
         if($flashed)
         {
@@ -323,7 +332,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     protected function flash()
     {
-        Session::flash('notifications_'.$this->container, $this->getFlashable()->toJson());
+        $this->sessionStore->flash('notifications_'.$this->container, $this->getFlashable()->toJson());
     }
 
     /**

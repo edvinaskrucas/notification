@@ -1,7 +1,6 @@
 <?php namespace EdvinasKrucas\Notification;
 
 use EdvinasKrucas\Notification\NotificationsBag;
-use Session;
 use Closure;
 
 class Notification
@@ -164,7 +163,7 @@ class Notification
 
         if(!isset($this->containers[$container]))
         {
-            $this->containers[$container] = new NotificationsBag($container, $this->app);
+            $this->containers[$container] = new NotificationsBag($container, $this->app['session'], $this->app);
         }
 
         if(is_callable($callback))
