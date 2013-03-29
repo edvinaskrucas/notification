@@ -14,6 +14,9 @@
         "illuminate/session": "4.0.x",
         "illuminate/config": "4.0.x"
     },
+    "require-dev": {
+        "mockery/mockery": "0.7.*"
+    },
     "autoload": {
         "psr-0": {
             "Krucas\\Notification": "src/"
