@@ -1,4 +1,4 @@
-<?php namespace EdvinasKrucas\Notification;
+<?php namespace Krucas\Notification;
 
 use Illuminate\Support\Contracts\RenderableInterface;
 use Illuminate\Support\Contracts\JsonableInterface;

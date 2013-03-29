@@ -1,4 +1,4 @@
-<?php namespace EdvinasKrucas\Notification;
+<?php namespace Krucas\Notification;
 
 use Illuminate\Support\ServiceProvider;
 

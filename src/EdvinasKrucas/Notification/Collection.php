@@ -1,10 +1,10 @@
-<?php namespace EdvinasKrucas\Notification;
+<?php namespace Krucas\Notification;
 
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\RenderableInterface;
 use Illuminate\Support\Collection as BaseCollection;
-use EdvinasKrucas\Notification\Message;
+use Krucas\Notification\Message;
 use Session;
 
 class Collection extends BaseCollection implements RenderableInterface

@@ -1,6 +1,6 @@
-<?php namespace EdvinasKrucas\Notification;
+<?php namespace Krucas\Notification;
 
-use EdvinasKrucas\Notification\NotificationsBag;
+use Krucas\Notification\NotificationsBag;
 use Closure;
 use Illuminate\Config\Repository;
 use Illuminate\Session\Store as SessionStore;

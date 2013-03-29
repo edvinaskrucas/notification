@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-0": {
-            "EdvinasKrucas\\Notification": "src/"
+            "Krucas\\Notification": "src/"
         }
     },
     "minimum-stability": "dev"
