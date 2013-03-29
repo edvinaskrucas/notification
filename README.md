@@ -149,11 +149,14 @@ Displaying notifications you can pass container and format
 Want to add message in a view file and display it? Its very simple:
 
 ```php
-{{ Notification::container('myInstant')->infoInstant('Instant message added i a view and displayed!') }}
+{{ Notification::container('myInstant')
+        ->infoInstant('Instant message added i a view and displayed!') }}
 ```
 
 You can also add multiple messages
 
 ```php
-{{ Notification::container('myInstant')->infoInstant('Instant message added i a view and displayed!')->errorInstant('Error...') }}
+{{ Notification::container('myInstant')
+        ->infoInstant('Instant message added i a view and displayed!')
+        ->errorInstant('Error...') }}
 ```
