@@ -30,12 +30,12 @@ Add following lines to ```app/config/app.php```
 ServiceProvider array
 
 ```php
-'EdvinasKrucas\Notification\NotificationServiceProvider'
+'Krucas\Notification\NotificationServiceProvider'
 ```
 
 Alias array
 ```php
-'Notification' => 'EdvinasKrucas\Notification\Facades\Notification'
+'Notification' => 'Krucas\Notification\Facades\Notification'
 ```
 
 Now you are able to use it with Laravel4.
