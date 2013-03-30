@@ -417,4 +417,67 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         return $bag;
     }
+
+    public function testAddingMessageArray()
+    {
+        $this->bag->infoInstant(array(
+            'first',
+            'second'
+        ));
+
+        $this->assertCount(2, $this->bag->get('info'));
+        $this->assertInstanceOf('Krucas\Notification\Message', $this->bag->get('info')->first());
+        $this->assertEquals('first', $this->bag->get('info')->first()->getMessage());
+        $this->assertEquals('info', $this->bag->get('info')->first()->getType());
+        $this->assertEquals('<div class="alert alert-:type">:message</div>', $this->bag->get('info')->first()->getFormat());
+        $this->assertFalse($this->bag->get('info')->first()->isFlashable());
+    }
+
+    public function testAddingMessageArrayWithCustomFormat()
+    {
+        $this->bag->infoInstant(array(
+            array('first', ':message'),
+            'second'
+        ));
+
+        $this->assertCount(2, $this->bag->get('info'));
+        $this->assertInstanceOf('Krucas\Notification\Message', $this->bag->get('info')->first());
+        $this->assertEquals('first', $this->bag->get('info')->first()->getMessage());
+        $this->assertEquals('info', $this->bag->get('info')->first()->getType());
+        $this->assertEquals(':message', $this->bag->get('info')->first()->getFormat());
+        $this->assertFalse($this->bag->get('info')->first()->isFlashable());
+
+        $this->assertInstanceOf('Krucas\Notification\Message', $this->bag->get('info')[1]);
+        $this->assertEquals('second', $this->bag->get('info')[1]->getMessage());
+        $this->assertEquals('info', $this->bag->get('info')[1]->getType());
+        $this->assertEquals('<div class="alert alert-:type">:message</div>', $this->bag->get('info')[1]->getFormat());
+        $this->assertFalse($this->bag->get('info')[1]->isFlashable());
+    }
+
+    public function testSetCustomFormatAndDisplayAMessage()
+    {
+        $this->bag->setFormat('no format');
+
+        $this->bag->infoInstant(array(
+            array('first', ':message'),
+            'second'
+        ));
+
+        $this->assertEquals('no format', $this->bag->getFormat());
+
+        $this->assertCount(2, $this->bag->get('info'));
+        $this->assertInstanceOf('Krucas\Notification\Message', $this->bag->get('info')->first());
+        $this->assertEquals('first', $this->bag->get('info')->first()->getMessage());
+        $this->assertEquals('info', $this->bag->get('info')->first()->getType());
+        $this->assertEquals(':message', $this->bag->get('info')->first()->getFormat());
+        $this->assertFalse($this->bag->get('info')->first()->isFlashable());
+
+        $this->assertInstanceOf('Krucas\Notification\Message', $this->bag->get('info')[1]);
+        $this->assertEquals('second', $this->bag->get('info')[1]->getMessage());
+        $this->assertEquals('info', $this->bag->get('info')[1]->getType());
+        $this->assertEquals('no format', $this->bag->get('info')[1]->getFormat());
+        $this->assertFalse($this->bag->get('info')[1]->isFlashable());
+
+        $this->assertEquals('test error!test warning...firstno format', $this->bag->show());
+    }
 }
