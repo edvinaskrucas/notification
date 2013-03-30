@@ -19,7 +19,7 @@ A simple notification management package for Laravel4.
 
 Just place require new package for your laravel installation via composer.json
 
-    "edvinaskrucas/notification": "dev-master"
+    "edvinaskrucas/notification": "1.0"
 
 Then hit ```composer update```
 

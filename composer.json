@@ -21,6 +21,5 @@
         "psr-0": {
             "Krucas\\Notification": "src/"
         }
-    },
-    "minimum-stability": "dev"
+    }
 }
