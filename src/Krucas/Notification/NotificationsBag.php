@@ -103,7 +103,10 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
             $this->get($type)->addUnique(new Message($type, $message, $flashable, $this->checkFormat($format, $type)));
         }
 
-        $this->flash();
+        if($flashable)
+        {
+            $this->flash();
+        }
 
         return $this;
     }
