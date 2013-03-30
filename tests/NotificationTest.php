@@ -190,4 +190,15 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('<div class="alert alert-info">instant</div>', (string) $this->n->container('instant')->infoInstant('instant'));
     }
+
+    public function testAddingMessagesInAClosure()
+    {
+        $this->n->container('a', function($bag)
+        {
+            $bag->infoInstant('info');
+            $bag->errorInstant('error');
+        });
+
+        $this->assertCount(2, $this->n->container('a'));
+    }
 }
