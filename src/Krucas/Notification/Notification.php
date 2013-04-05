@@ -65,6 +65,16 @@ class Notification
     }
 
     /**
+     * Clears success messages in a given container.
+     *
+     * @return \Krucas\Notification\NotificationBag
+     */
+    public function clearSuccess()
+    {
+        return $this->container(null)->clearSuccess();
+    }
+
+    /**
      * Adds error message to default container.
      *
      * @param $message
@@ -86,6 +96,16 @@ class Notification
     public function errorInstant($message, $format = null)
     {
         return $this->addMessage(null, 'error', $message, false, $format);
+    }
+
+    /**
+     * Clears error messages in a given container.
+     *
+     * @return \Krucas\Notification\NotificationBag
+     */
+    public function clearError()
+    {
+        return $this->container(null)->clearError();
     }
 
     /**
@@ -113,6 +133,16 @@ class Notification
     }
 
     /**
+     * Clears warning messages in a given container.
+     *
+     * @return \Krucas\Notification\NotificationBag
+     */
+    public function clearWarning()
+    {
+        return $this->container(null)->clearWarning();
+    }
+
+    /**
      * Adds info message to default container.
      *
      * @param $message
@@ -134,6 +164,26 @@ class Notification
     public function infoInstant($message, $format = null)
     {
         return $this->addMessage(null, 'info', $message, false, $format);
+    }
+
+    /**
+     * Clears info messages in a given container.
+     *
+     * @return \Krucas\Notification\NotificationBag
+     */
+    public function clearInfo()
+    {
+        return $this->container(null)->clearInfo();
+    }
+
+    /**
+     * Clears all messages in a given container.
+     *
+     * @return \Krucas\Notification\NotificationBag
+     */
+    public function clearAll()
+    {
+        return $this->container(null)->clearAll();
     }
 
     /**

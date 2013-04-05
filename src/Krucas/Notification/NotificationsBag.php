@@ -141,6 +141,17 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
+     * Clears all messages.
+     * Alias for clear(null).
+     *
+     * @return \Krucas\Notification\NotificationBag
+     */
+    public function clearAll()
+    {
+        return $this->clear(null);
+    }
+
+    /**
      * Shortcut to add success message.
      *
      * @param $message
