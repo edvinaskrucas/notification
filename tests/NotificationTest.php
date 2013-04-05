@@ -201,4 +201,72 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
         $this->assertCount(2, $this->n->container('a'));
     }
+
+    public function testClearSuccessMessages()
+    {
+        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
+
+        $this->n->successInstant('test');
+        $this->assertCount(1, $this->n->container()->get('success'));
+
+        $this->n->clearSuccess();
+        $this->assertCount(0, $this->n->container()->get('success'));
+    }
+
+    public function testClearInfoMessages()
+    {
+        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
+
+        $this->n->infoInstant('test');
+        $this->assertCount(1, $this->n->container()->get('info'));
+
+        $this->n->clearInfo();
+        $this->assertCount(0, $this->n->container()->get('info'));
+    }
+
+    public function testClearWarningMessages()
+    {
+        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
+
+        $this->n->warningInstant('test');
+        $this->assertCount(1, $this->n->container()->get('warning'));
+
+        $this->n->clearWarning();
+        $this->assertCount(0, $this->n->container()->get('warning'));
+    }
+
+    public function testClearErrorMessages()
+    {
+        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
+
+        $this->n->errorInstant('test');
+        $this->assertCount(1, $this->n->container()->get('error'));
+
+        $this->n->clearError();
+        $this->assertCount(0, $this->n->container()->get('error'));
+    }
+
+    public function testClearAllMessages()
+    {
+        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
+
+        $this->n->errorInstant('test');
+        $this->n->infoInstant('test');
+        $this->n->warningInstant('test');
+        $this->n->successInstant('test');
+        $this->assertCount(4, $this->n->container()->all());
+
+        $this->n->clearAll();
+        $this->assertCount(0, $this->n->container()->all());
+    }
+
+    public function testClearMessagesWhenNoMessagesSet()
+    {
+        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
+
+        $this->assertCount(0, $this->n->container()->all());
+
+        $this->n->clearAll();
+        $this->assertCount(0, $this->n->container()->all());
+    }
 }
