@@ -6,12 +6,13 @@ class MessageTest extends PHPUnit_Framework_TestCase
 {
     public function testMessageConstructor()
     {
-        $message = new \Krucas\Notification\Message('error', 'test message', false, ':type: :message');
+        $message = new \Krucas\Notification\Message('error', 'test message', false, ':type: :message', 'test');
 
         $this->assertInstanceOf('Krucas\Notification\Message', $message);
         $this->assertEquals('error', $message->getType());
         $this->assertEquals('test message', $message->getMessage());
         $this->assertEquals(':type: :message', $message->getFormat());
+        $this->assertEquals('test', $message->getAlias());
         $this->assertFalse($message->isFlashable());
     }
 
@@ -24,16 +25,19 @@ class MessageTest extends PHPUnit_Framework_TestCase
         $this->assertNull($message->getMessage());
         $this->assertNull($message->getFormat());
         $this->assertTrue($message->isFlashable());
+        $this->assertNull($message->getAlias());
 
         $message->setFlashable(false)
             ->setFormat('Test: :message')
             ->setType('warning')
-            ->setMessage('test');
+            ->setMessage('test')
+            ->setAlias('test');
 
         $this->assertEquals('warning', $message->getType());
         $this->assertEquals('test', $message->getMessage());
         $this->assertEquals('Test: :message', $message->getFormat());
         $this->assertFalse($message->isFlashable());
+        $this->assertEquals('test', $message->getAlias());
     }
 
     public function testToStringMethod()
@@ -58,7 +62,8 @@ class MessageTest extends PHPUnit_Framework_TestCase
             'message' => 'test message',
             'format' => ':type: :message',
             'type' => 'error',
-            'flashable' => false
+            'flashable' => false,
+            'alias' => null
         ), $message->toArray());
     }
 
@@ -66,6 +71,6 @@ class MessageTest extends PHPUnit_Framework_TestCase
     {
         $message = new \Krucas\Notification\Message('error', 'test message', false, ':type: :message');
 
-        $this->assertEquals('{"message":"test message","format":":type: :message","type":"error","flashable":false}', $message->toJson());
+        $this->assertEquals('{"message":"test message","format":":type: :message","type":"error","flashable":false,"alias":null}', $message->toJson());
     }
 }
