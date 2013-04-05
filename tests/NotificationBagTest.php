@@ -490,4 +490,66 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('test error!test warning...firstno format', $this->bag->show());
     }
+
+    public function testClearSuccessMessages()
+    {
+        $this->bag->successInstant('test');
+        $this->bag->successInstant('test2');
+
+        $this->assertCount(2, $this->bag->get('success'));
+
+        $this->bag->clearSuccess();
+
+        $this->assertCount(0, $this->bag->get('success'));
+    }
+
+    public function testClearErrorMessages()
+    {
+        $this->bag->errorInstant('test');
+        $this->bag->errorInstant('test2');
+
+        $this->assertCount(3, $this->bag->get('error'));
+
+        $this->bag->clearError();
+
+        $this->assertCount(0, $this->bag->get('error'));
+    }
+
+    public function testClearInfoMessages()
+    {
+        $this->bag->infoInstant('test');
+        $this->bag->infoInstant('test2');
+
+        $this->assertCount(2, $this->bag->get('info'));
+
+        $this->bag->clearInfo();
+
+        $this->assertCount(0, $this->bag->get('info'));
+    }
+
+    public function testClearWarningMessages()
+    {
+        $this->bag->warningInstant('test');
+        $this->bag->warningInstant('test2');
+
+        $this->assertCount(3, $this->bag->get('warning'));
+
+        $this->bag->clearWarning();
+
+        $this->assertCount(0, $this->bag->get('warning'));
+    }
+
+    public function testClearAllMessages()
+    {
+        $this->bag->warningInstant('test');
+        $this->bag->errorInstant('test');
+        $this->bag->successInstant('test');
+        $this->bag->infoInstant('test');
+
+        $this->assertCount(6, $this->bag->all());
+
+        $this->bag->clear();
+
+        $this->assertCount(0, $this->bag->all());
+    }
 }
