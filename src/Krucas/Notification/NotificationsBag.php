@@ -248,6 +248,8 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
 
     /**
      * Loads default formats for messages.
+     *
+     * @return void
      */
     protected function loadFormats()
     {
@@ -311,6 +313,8 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
 
     /**
      * Loads flashed messages.
+     *
+     * @return void
      */
     protected function load()
     {
@@ -332,6 +336,8 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
 
     /**
      * Flashes all flashable messages.
+     *
+     * @return void
      */
     protected function flash()
     {
