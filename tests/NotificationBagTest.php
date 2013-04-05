@@ -552,4 +552,19 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $this->assertCount(0, $this->bag->all());
     }
+
+    public function testsClearMethodsWhenBagIsEmpty()
+    {
+        $this->bag->clear();
+
+        $this->assertCount(0, $this->bag->all());
+
+        $this->bag->clear();
+
+        $this->assertCount(0, $this->bag->all());
+
+        $this->bag->clear('success');
+
+        $this->assertCount(0, $this->bag->get('success'));
+    }
 }
