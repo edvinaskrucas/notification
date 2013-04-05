@@ -53,6 +53,13 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     protected $formats = array();
 
     /**
+     * Instance of lastly added message.
+     *
+     * @var \Krucas\Notification\Message|null
+     */
+    protected $lastMessage = null;
+
+    /**
      * Creates new NotificationBag object.
      *
      * @param $container
@@ -100,7 +107,9 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
         }
         else
         {
-            $this->get($type)->addUnique(new Message($type, $message, $flashable, $this->checkFormat($format, $type)));
+            $this->lastMessage = new Message($type, $message, $flashable, $this->checkFormat($format, $type));
+
+            $this->get($type)->addUnique($this->lastMessage);
         }
 
         if($flashable)
@@ -469,6 +478,4 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
 
         return $html;
     }
-
-
 }
