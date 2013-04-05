@@ -548,7 +548,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $this->assertCount(6, $this->bag->all());
 
-        $this->bag->clear();
+        $this->bag->clearAll();
 
         $this->assertCount(0, $this->bag->all());
     }
