@@ -41,19 +41,28 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
     protected $flashable = true;
 
     /**
+     * Message allias.
+     *
+     * @var string|null
+     */
+    protected $alias = null;
+
+    /**
      * Construct default message object.
      *
      * @param null $type
      * @param null $message
      * @param bool $flashable
      * @param null $format
+     * @param null $alias
      */
-    public function __construct($type = null, $message = null, $flashable = true, $format = null)
+    public function __construct($type = null, $message = null, $flashable = true, $format = null, $alias = null)
     {
         $this->setType($type);
         $this->setMessage($message);
         $this->setFlashable($flashable);
         $this->setFormat($format);
+        $this->setAlias($alias);
     }
 
     /**
@@ -70,7 +79,7 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
      * Sets message value, and returns message object.
      *
      * @param $message
-     * @return Message
+     * @return \Krucas\Notification\Message
      */
     public function setMessage($message)
     {
@@ -93,7 +102,7 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
      * Sets flashable value, and returns message object.
      *
      * @param $flashable
-     * @return Message
+     * @return \Krucas\Notification\Message
      */
     public function setFlashable($flashable)
     {
@@ -116,7 +125,7 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
      * Sets message format, and returns message object.
      *
      * @param $format
-     * @return Message
+     * @return \Krucas\Notification\Message
      */
     public function setFormat($format)
     {
@@ -139,11 +148,34 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
      * Sets message type, and returns message object.
      *
      * @param $type
-     * @return Message
+     * @return \Krucas\Notification\Message
      */
     public function setType($type)
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Returns message alias.
+     *
+     * @return null|string
+     */
+    public function getAlias()
+    {
+        return $this->alias;
+    }
+
+    /**
+     * Sets message alias.
+     *
+     * @param $alias
+     * @return \Krucas\Notification\Message
+     */
+    public function setAlias($alias)
+    {
+        $this->alias = $alias;
 
         return $this;
     }
@@ -188,6 +220,4 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
     {
         return $this->render();
     }
-
-
 }
