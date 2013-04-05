@@ -121,6 +121,26 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
+     * Clears message for a given type.
+     *
+     * @param null $type
+     * @return \Krucas\Notification\NotificationBag
+     */
+    public function clear($type = null)
+    {
+        if(is_null($type))
+        {
+            $this->collections = array();
+        }
+        else
+        {
+            unset($this->collections[$type]);
+        }
+
+        return $this;
+    }
+
+    /**
      * Shortcut to add success message.
      *
      * @param $message
@@ -142,6 +162,16 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     public function successInstant($message, $format = null)
     {
         return $this->add('success', $message, false, $format);
+    }
+
+    /**
+     * Clears success messages.
+     *
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function clearSuccess()
+    {
+        return $this->clear('success');
     }
 
     /**
@@ -169,6 +199,16 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
+     * Clears error messages.
+     *
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function clearError()
+    {
+        return $this->clear('error');
+    }
+
+    /**
      * Shortcut to add info message.
      *
      * @param $message
@@ -193,6 +233,16 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
+     * Clears info messages.
+     *
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function clearInfo()
+    {
+        return $this->clear('info');
+    }
+
+    /**
      * Shortcut to add warning message.
      *
      * @param $message
@@ -214,6 +264,16 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     public function warningInstant($message, $format = null)
     {
         return $this->add('warning', $message, false, $format);
+    }
+
+    /**
+     * Clears warning messages.
+     *
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function clearWarning()
+    {
+        return $this->clear('warning');
     }
 
     /**
