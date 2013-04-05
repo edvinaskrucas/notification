@@ -31,8 +31,8 @@ class Notification
     /**
      * Creates new instance.
      *
-     * @param Repository $configRepository
-     * @param SessionStore $sessionStore
+     * @param \Illuminate\Config\Repository $configRepository
+     * @param \Illuminate\Session\Store $sessionStore
      */
     public function __construct(Repository $configRepository, SessionStore $sessionStore)
     {
@@ -45,7 +45,7 @@ class Notification
      *
      * @param $message
      * @param null $format
-     * @return NotificationBag
+     * @return \Krucas\Notification\NotificationBag
      */
     public function success($message, $format = null)
     {
@@ -57,7 +57,7 @@ class Notification
      *
      * @param $message
      * @param null $format
-     * @return NotificationBag
+     * @return \Krucas\Notification\NotificationBag
      */
     public function successInstant($message, $format = null)
     {
@@ -69,7 +69,7 @@ class Notification
      *
      * @param $message
      * @param null $format
-     * @return NotificationBag
+     * @return \Krucas\Notification\NotificationBag
      */
     public function error($message, $format = null)
     {
@@ -81,7 +81,7 @@ class Notification
      *
      * @param $message
      * @param null $format
-     * @return NotificationBag
+     * @return \Krucas\Notification\NotificationBag
      */
     public function errorInstant($message, $format = null)
     {
@@ -93,7 +93,7 @@ class Notification
      *
      * @param $message
      * @param null $format
-     * @return NotificationBag
+     * @return \Krucas\Notification\NotificationBag
      */
     public function warning($message, $format = null)
     {
@@ -105,7 +105,7 @@ class Notification
      *
      * @param $message
      * @param null $format
-     * @return NotificationBag
+     * @return \Krucas\Notification\NotificationBag
      */
     public function warningInstant($message, $format = null)
     {
@@ -117,7 +117,7 @@ class Notification
      *
      * @param $message
      * @param null $format
-     * @return NotificationBag
+     * @return \Krucas\Notification\NotificationBag
      */
     public function info($message, $format = null)
     {
@@ -129,7 +129,7 @@ class Notification
      *
      * @param $message
      * @param null $format
-     * @return NotificationBag
+     * @return \Krucas\Notification\NotificationBag
      */
     public function infoInstant($message, $format = null)
     {
@@ -261,7 +261,7 @@ class Notification
     /**
      * Returns config repository instance.
      *
-     * @return Repository
+     * @return \Illuminate\Config\Repository
      */
     public function getConfigRepository()
     {
@@ -271,7 +271,7 @@ class Notification
     /**
      * Returns session store instance.
      *
-     * @return SessionStore
+     * @return \Illuminate\Session\Store
      */
     public function getSessionStore()
     {

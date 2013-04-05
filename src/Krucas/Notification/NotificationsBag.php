@@ -56,8 +56,8 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      * Creates new NotificationBag object.
      *
      * @param $container
-     * @param SessionStore $sessionStore
-     * @param Repository $configRepository
+     * @param \Illuminate\Session\Store $sessionStore
+     * @param \Illuminate\Config\Repository $configRepository
      */
     public function __construct($container, SessionStore $sessionStore, Repository $configRepository)
     {
@@ -80,7 +80,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      * @param string|array $message
      * @param bool $flashable
      * @param null $format
-     * @return NotificationsBag
+     * @return \Krucas\Notification\NotificationsBag
      */
     public function add($type, $message, $flashable = true, $format = null)
     {
@@ -116,7 +116,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      *
      * @param $message
      * @param null $format
-     * @return NotificationsBag
+     * @return \Krucas\Notification\NotificationsBag
      */
     public function success($message, $format = null)
     {
@@ -128,7 +128,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      *
      * @param $message
      * @param null $format
-     * @return NotificationsBag
+     * @return \Krucas\Notification\NotificationsBag
      */
     public function successInstant($message, $format = null)
     {
@@ -140,7 +140,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      *
      * @param $message
      * @param null $format
-     * @return NotificationsBag
+     * @return \Krucas\Notification\NotificationsBag
      */
     public function error($message, $format = null)
     {
@@ -152,7 +152,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      *
      * @param $message
      * @param null $format
-     * @return NotificationsBag
+     * @return \Krucas\Notification\NotificationsBag
      */
     public function errorInstant($message, $format = null)
     {
@@ -164,7 +164,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      *
      * @param $message
      * @param null $format
-     * @return NotificationsBag
+     * @return \Krucas\Notification\NotificationsBag
      */
     public function info($message, $format = null)
     {
@@ -176,7 +176,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      *
      * @param $message
      * @param null $format
-     * @return NotificationsBag
+     * @return \Krucas\Notification\NotificationsBag
      */
     public function infoInstant($message, $format = null)
     {
@@ -188,7 +188,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      *
      * @param $message
      * @param null $format
-     * @return NotificationsBag
+     * @return \Krucas\Notification\NotificationsBag
      */
     public function warning($message, $format = null)
     {
@@ -200,7 +200,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      *
      * @param $message
      * @param null $format
-     * @return NotificationsBag
+     * @return \Krucas\Notification\NotificationsBag
      */
     public function warningInstant($message, $format = null)
     {
@@ -211,7 +211,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      * Returns first message object for given type.
      *
      * @param $type
-     * @return Message
+     * @return \Krucas\Notification\Message
      */
     public function first($type)
     {
@@ -222,7 +222,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      * Returns all messages for given type.
      *
      * @param $type
-     * @return Collection
+     * @return \Krucas\Notification\Collection
      */
     public function get($type)
     {
@@ -232,7 +232,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     /**
      * Returns all messages in bag.
      *
-     * @return Collection
+     * @return \Krucas\Notification\Collection
      */
     public function all()
     {
@@ -270,7 +270,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      *
      * @param $format
      * @param null $type
-     * @return NotificationsBag
+     * @return \Krucas\Notification\NotificationsBag
      */
     public function setFormat($format, $type = null)
     {
@@ -341,7 +341,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     /**
      * Returns all flashable messages.
      *
-     * @return Collection
+     * @return \Krucas\Notification\Collection
      */
     protected function getFlashable()
     {
@@ -430,7 +430,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     /**
      * Returns session store instance.
      *
-     * @return SessionStore
+     * @return \Illuminate\Session\Store
      */
     public function getSessionStore()
     {
@@ -440,7 +440,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     /**
      * Returns config repository instance.
      *
-     * @return Repository
+     * @return \Illuminate\Config\Repository
      */
     public function getConfigRepository()
     {

@@ -13,7 +13,7 @@ class Collection extends BaseCollection implements RenderableInterface
      * Add message to collection.
      *
      * @param Message $message
-     * @return Collection
+     * @return \Krucas\Notification\Collection
      */
     public function add(Message $message)
     {
@@ -26,7 +26,7 @@ class Collection extends BaseCollection implements RenderableInterface
      * Adds message to collection only if it is unique.
      *
      * @param Message $message
-     * @return Collection
+     * @return \Krucas\Notification\Collection
      */
     public function addUnique(Message $message)
     {
