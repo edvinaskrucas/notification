@@ -756,4 +756,25 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('second', $this->bag->get('info')->getAtPosition(0)->getMessage());
         $this->assertEquals('m2', $this->bag->get('info')->getAtPosition(5)->getMessage());
     }
+
+    public function testMessagesLoadedFromFlashWithAliasAndPositions()
+    {
+        $session = m::mock('Illuminate\Session\Store');
+        $config = m::mock('Illuminate\Config\Repository');
+
+        $session->shouldReceive('get')
+            ->once()
+            ->andReturn('[{"type":"error","message":"test error","format":":message!","alias":"a","position":5},{"type":"warning","message":"test warning","format":":message...","alias":null,"position":3}]');
+
+        $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
+        $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
+
+        $bag = new \Krucas\Notification\NotificationsBag('test',$session, $config);
+
+        $this->assertCount(1, $bag->get('error'));
+        $this->assertEquals('a', $bag->get('error')->getAtPosition(5)->getAlias());
+
+        $this->assertCount(1, $bag->get('warning'));
+        $this->assertNull($bag->get('warning')->getAtPosition(3)->getAlias());
+    }
 }

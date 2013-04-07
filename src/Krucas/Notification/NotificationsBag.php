@@ -525,7 +525,17 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
             {
                 foreach($messages as $key => $message)
                 {
-                    $this->get($message->type)->addUnique(new Message($message->type, $message->message, false, $message->format));
+                    $this->add($message->type, $message->message, false, $message->format);
+
+                    if(isset($message->alias) && !is_null($message->alias))
+                    {
+                        $this->alias($message->alias);
+                    }
+
+                    if(isset($message->position) && !is_null($message->position))
+                    {
+                        $this->atPosition($message->position);
+                    }
                 }
             }
         }
