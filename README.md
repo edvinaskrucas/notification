@@ -144,6 +144,37 @@ Displaying notifications you can pass container and format
 {{ Notification::showInfo('myContainer', ':message') }}
 ```
 
+### Message aliasing
+
+You can add message with an alias, then if you want to override that message just add new one with same alias.
+It works in a same type scope.
+```php
+Notification::success('ok')->alias('okMsg');
+
+// We need to override first success message, just alias it with same alias name.
+Notification::success('ok2')->alias('okMsg');
+```
+
+### Message positioning
+
+There is ability to add message to certain position.
+It works in same type scope.
+```php
+// This will add message at 5th position
+Notification::info('info')->atPosition(5);
+Notification::info('info2')->atPosition(1);
+```
+
+### Aliasing with a position
+
+You can alias message and add it to a certain position.
+It works in same type scope.
+```php
+Notification::info('info')->alias('infoMsg')->atPosition(4);
+// If we want to override and set other position
+Notification::info('info2')->alias('infoMsg')->atPosition(1);
+```
+
 ### Add message and display it instantly in a view file
 
 Want to add message in a view file and display it? Its very simple:
