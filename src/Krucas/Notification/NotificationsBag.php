@@ -126,7 +126,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     {
         foreach($messages as $message)
         {
-            $text = $format = $alias = null;
+            $text = $format = $alias = $position = null;
 
             if(!is_null($defaultFormat))
             {
@@ -146,6 +146,11 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
                 {
                     $format = $message['format'];
                 }
+
+                if(isset($message['position']))
+                {
+                    $position = $message['position'];
+                }
             }
             elseif(is_array($message) && count($message) == 2)
             {
@@ -162,6 +167,11 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
             if(!is_null($alias))
             {
                 $this->alias($alias);
+            }
+
+            if(!is_null($position))
+            {
+                $this->atPosition($position);
             }
         }
     }
