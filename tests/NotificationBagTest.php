@@ -18,7 +18,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $session->shouldReceive('get')
             ->once()
-            ->andReturn('[{"type":"error","message":"test error","format":":message!"},{"type":"warning","message":"test warning","format":":message..."}]');
+            ->andReturn('[{"type":"error","message":"test error","format":":message!","alias":null,"position":null},{"type":"warning","message":"test warning","format":":message...","alias":null,"position":null}]');
 
         $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
         $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
@@ -69,7 +69,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
             ->once()
             ->with(
                 'notifications_test',
-                '[{"message":"all ok","format":"custom: :message","type":"success","flashable":true,"alias":null}]'
+                '[{"message":"all ok","format":"custom: :message","type":"success","flashable":true,"alias":null,"position":null}]'
             );
 
         $bag->success('all ok', 'custom: :message');
@@ -297,21 +297,24 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
                         'type'      => 'error',
                         'format'    => ':message!',
                         'flashable' => false,
-                        'alias'     => null
+                        'alias'     => null,
+                        'position'  => null
                     ),
                     array(
                         'message'   => 'e m',
                         'type'      => 'error',
                         'format'    => '<div class="alert alert-:type">:message</div>',
                         'flashable' => true,
-                        'alias'     => null
+                        'alias'     => null,
+                        'position'  => null
                     ),
                     array(
                         'message'   => 'e m',
                         'type'      => 'error',
                         'format'    => '<div class="alert alert-:type">:message</div>',
                         'flashable' => false,
-                        'alias'     => null
+                        'alias'     => null,
+                        'position'  => null
                     )
                 ),
                 'success'   => array(
@@ -320,14 +323,16 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
                         'type'      => 'success',
                         'format'    => 'custom: :message',
                         'flashable' => true,
-                        'alias'     => null
+                        'alias'     => null,
+                        'position'  => null
                     ),
                     array(
                         'message'   => 's m',
                         'type'      => 'success',
                         'format'    => '<div class="alert alert-:type">:message</div>',
                         'flashable' => false,
-                        'alias'     => null
+                        'alias'     => null,
+                        'position'  => null
                     )
                 ),
                 'warning'   => array(
@@ -336,21 +341,24 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
                         'type'      => 'warning',
                         'format'    => ':message...',
                         'flashable' => false,
-                        'alias'     => null
+                        'alias'     => null,
+                        'position'  => null
                     ),
                     array(
                         'message'   => 'second message',
                         'type'      => 'warning',
                         'format'    => '<div class="alert alert-:type">:message</div>',
                         'flashable' => true,
-                        'alias'     => null
+                        'alias'     => null,
+                        'position'  => null
                     ),
                     array(
                         'message'   => 'w m',
                         'type'      => 'warning',
                         'format'    => '<div class="alert alert-:type">:message</div>',
                         'flashable' => false,
-                        'alias'     => null
+                        'alias'     => null,
+                        'position'  => null
                     )
                 ),
                 'info'      => array(
@@ -359,14 +367,16 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
                         'type'      => 'info',
                         'format'    => '<div class="alert alert-:type">:message</div>',
                         'flashable' => true,
-                        'alias'     => null
+                        'alias'     => null,
+                        'position'  => null
                     ),
                     array(
                         'message'   => 'i m',
                         'type'      => 'info',
                         'format'    => '<div class="alert alert-:type">:message</div>',
                         'flashable' => false,
-                        'alias'     => null
+                        'alias'     => null,
+                        'position'  => null
                     )
                 )
             ),

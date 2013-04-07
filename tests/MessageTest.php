@@ -14,7 +14,7 @@ class MessageTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(':type: :message', $message->getFormat());
         $this->assertEquals('test', $message->getAlias());
         $this->assertFalse($message->isFlashable());
-        $this->assertEquals(5, $message->getPosition());
+        $this->assertEquals(4, $message->getPosition());
     }
 
     public function testMethodChaining()

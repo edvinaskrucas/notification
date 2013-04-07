@@ -71,6 +71,7 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
         $this->setFlashable($flashable);
         $this->setFormat($format);
         $this->setAlias($alias);
+        $this->setPosition($position);
     }
 
     /**
