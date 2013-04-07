@@ -17,6 +17,18 @@ class Collection extends BaseCollection implements RenderableInterface
      */
     public function add(Message $message)
     {
+        if($this->count() > 0)
+        {
+            for($i = 0; $i <= $this->indexOf($this->last()) + 1; $i++)
+            {
+                if(!$this->offsetExists($i))
+                {
+                    $this->setAtPosition($i, $message);
+                    return $this;
+                }
+            }
+        }
+
         $this->items[] = $message;
 
         return $this;

@@ -28,6 +28,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
         $collection->add(new \Krucas\Notification\Message());
 
+        $this->assertCount(1, $collection);
         $this->assertTrue($collection->contains(new \Krucas\Notification\Message()));
         $this->assertFalse($collection->contains(new \Krucas\Notification\Message('error')));
     }
@@ -49,6 +50,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $collection->add(new \Krucas\Notification\Message('error', 'error message', false, ':type: :message'));
         $collection->add(new \Krucas\Notification\Message('warning', 'w', false, ':message'));
 
+        $this->assertCount(2, $collection);
         $this->assertEquals('error: error messagew', $collection->render());
     }
 
@@ -59,6 +61,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $collection->add(new \Krucas\Notification\Message('error', 'error message', false, ':type: :message'));
         $collection->add(new \Krucas\Notification\Message('warning', 'w', false, ':message'));
 
+        $this->assertCount(2, $collection);
         $this->assertEquals('error: error messagew', (string)$collection);
     }
 
@@ -73,6 +76,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
         $collection->addUnique($m1)->addUnique($m2)->addUnique($m3);
 
+        $this->assertCount(3, $collection);
         $this->assertEquals(0, $collection->indexOf($m4));
     }
 
@@ -86,11 +90,12 @@ class CollectionTest extends PHPUnit_Framework_TestCase
             ->addUnique(new \Krucas\Notification\Message('info', 'i3'))
             ->setAtPosition(2, new \Krucas\Notification\Message('info', 'info'));
 
+        $this->assertCount(4, $collection);
         $this->assertEquals('info', $collection->getAtPosition(2)->getMessage());
         $this->assertEquals('i3', $collection->getAtPosition(3)->getMessage());
     }
 
-    public function testSetAtPosition2()
+    public function testSetAtPositionAndThenAddMessage()
     {
         $collection = new \Krucas\Notification\Collection();
 
@@ -98,8 +103,28 @@ class CollectionTest extends PHPUnit_Framework_TestCase
             ->setAtPosition(2, new \Krucas\Notification\Message('info', 'info'))
             ->addUnique(new \Krucas\Notification\Message('info', 'i'));
 
+        $this->assertCount(2, $collection);
         $this->assertEquals('info', $collection->getAtPosition(2)->getMessage());
-        $this->assertEquals('i', $collection->getAtPosition(3)->getMessage());
+        $this->assertEquals('i', $collection->getAtPosition(0)->getMessage());
+    }
+
+    public function testSetAtPositionAndAddLotOfMessagesAtTheBeginning()
+    {
+        $collection = new \Krucas\Notification\Collection();
+
+        $collection
+            ->setAtPosition(2, new \Krucas\Notification\Message('info', 'info'))
+            ->addUnique(new \Krucas\Notification\Message('info', 'i1'))
+            ->addUnique(new \Krucas\Notification\Message('info', 'i2'))
+            ->addUnique(new \Krucas\Notification\Message('info', 'i3'))
+            ->addUnique(new \Krucas\Notification\Message('info', 'i4'))
+            ->addUnique(new \Krucas\Notification\Message('info', 'i5'))
+            ->addUnique(new \Krucas\Notification\Message('info', 'i6'));
+
+        $this->assertCount(7, $collection);
+        $this->assertEquals('info', $collection->getAtPosition(2)->getMessage());
+        $this->assertEquals('i1', $collection->getAtPosition(0)->getMessage());
+        $this->assertEquals('i6', $collection->getAtPosition(6)->getMessage());
     }
 
     public function testSetTwoMessagesAtSamePosition()
