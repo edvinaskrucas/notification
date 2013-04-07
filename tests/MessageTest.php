@@ -6,7 +6,7 @@ class MessageTest extends PHPUnit_Framework_TestCase
 {
     public function testMessageConstructor()
     {
-        $message = new \Krucas\Notification\Message('error', 'test message', false, ':type: :message', 'test');
+        $message = new \Krucas\Notification\Message('error', 'test message', false, ':type: :message', 'test', 4);
 
         $this->assertInstanceOf('Krucas\Notification\Message', $message);
         $this->assertEquals('error', $message->getType());
@@ -14,6 +14,7 @@ class MessageTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(':type: :message', $message->getFormat());
         $this->assertEquals('test', $message->getAlias());
         $this->assertFalse($message->isFlashable());
+        $this->assertEquals(5, $message->getPosition());
     }
 
     public function testMethodChaining()
@@ -26,18 +27,21 @@ class MessageTest extends PHPUnit_Framework_TestCase
         $this->assertNull($message->getFormat());
         $this->assertTrue($message->isFlashable());
         $this->assertNull($message->getAlias());
+        $this->assertNull($message->getPosition());
 
         $message->setFlashable(false)
             ->setFormat('Test: :message')
             ->setType('warning')
             ->setMessage('test')
-            ->setAlias('test');
+            ->setAlias('test')
+            ->setPosition(5);
 
         $this->assertEquals('warning', $message->getType());
         $this->assertEquals('test', $message->getMessage());
         $this->assertEquals('Test: :message', $message->getFormat());
         $this->assertFalse($message->isFlashable());
         $this->assertEquals('test', $message->getAlias());
+        $this->assertEquals(5, $message->getPosition());
     }
 
     public function testToStringMethod()
@@ -63,7 +67,8 @@ class MessageTest extends PHPUnit_Framework_TestCase
             'format' => ':type: :message',
             'type' => 'error',
             'flashable' => false,
-            'alias' => null
+            'alias' => null,
+            'position' => null
         ), $message->toArray());
     }
 
@@ -71,6 +76,6 @@ class MessageTest extends PHPUnit_Framework_TestCase
     {
         $message = new \Krucas\Notification\Message('error', 'test message', false, ':type: :message');
 
-        $this->assertEquals('{"message":"test message","format":":type: :message","type":"error","flashable":false,"alias":null}', $message->toJson());
+        $this->assertEquals('{"message":"test message","format":":type: :message","type":"error","flashable":false,"alias":null,"position":null}', $message->toJson());
     }
 }

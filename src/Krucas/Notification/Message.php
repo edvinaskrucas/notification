@@ -48,6 +48,13 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
     protected $alias = null;
 
     /**
+     * Message position.
+     *
+     * @var int|null
+     */
+    protected $position = null;
+
+    /**
      * Construct default message object.
      *
      * @param null $type
@@ -55,8 +62,9 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
      * @param bool $flashable
      * @param null $format
      * @param null $alias
+     * @param null $position
      */
-    public function __construct($type = null, $message = null, $flashable = true, $format = null, $alias = null)
+    public function __construct($type = null, $message = null, $flashable = true, $format = null, $alias = null, $position = null)
     {
         $this->setType($type);
         $this->setMessage($message);
@@ -176,6 +184,29 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
     public function setAlias($alias)
     {
         $this->alias = $alias;
+
+        return $this;
+    }
+
+    /**
+     * Returns message position.
+     *
+     * @return int|null
+     */
+    public function getPosition()
+    {
+        return $this->position;
+    }
+
+    /**
+     * Sets message position.
+     *
+     * @param $position
+     * @return \Krucas\Notification\Message
+     */
+    public function setPosition($position)
+    {
+        $this->position = $position;
 
         return $this;
     }
