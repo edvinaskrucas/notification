@@ -20,7 +20,10 @@
     "autoload": {
         "psr-0": {
             "Krucas\\Notification": "src/"
-        }
+        },
+        "files": [
+            "src/Krucas/Notification/helpers.php"
+        ]
     },
     "minimum-stability": "dev"
 }
