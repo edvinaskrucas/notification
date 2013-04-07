@@ -175,6 +175,17 @@ Notification::info('info')->alias('infoMsg')->atPosition(4);
 Notification::info('info2')->alias('infoMsg')->atPosition(1);
 ```
 
+### Clearing messages
+
+You can clear all messages or by type.
+```php
+Notification::clearError();
+Notification::clearWarning();
+Notification::clearSuccess();
+Notification::clearInfo();
+Notification::clearAll();
+```
+
 ### Add message and display it instantly in a view file
 
 Want to add message in a view file and display it? Its very simple:
