@@ -61,4 +61,32 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('error: error messagew', (string)$collection);
     }
+
+    public function testIndexOf()
+    {
+        $collection = new \Krucas\Notification\Collection();
+
+        $m1 = new \Krucas\Notification\Message('error', 'm');
+        $m2 = new \Krucas\Notification\Message('info', 'm');
+        $m3 = new \Krucas\Notification\Message('error', 'm2');
+        $m4 = new \Krucas\Notification\Message('error', 'm');
+
+        $collection->addUnique($m1)->addUnique($m2)->addUnique($m3);
+
+        $this->assertEquals(0, $collection->indexOf($m4));
+    }
+
+    public function testSetAtPosition()
+    {
+        $collection = new \Krucas\Notification\Collection();
+
+        $collection
+            ->addUnique(new \Krucas\Notification\Message('info', 'i'))
+            ->addUnique(new \Krucas\Notification\Message('info', 'i2'))
+            ->addUnique(new \Krucas\Notification\Message('info', 'i3'))
+            ->setAtPosition(2, new \Krucas\Notification\Message('info', 'info'));
+
+        $this->assertEquals('info', $collection->getAtPosition(2)->getMessage());
+        $this->assertEquals('i3', $collection->getAtPosition(3)->getMessage());
+    }
 }

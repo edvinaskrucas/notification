@@ -50,6 +50,66 @@ class Collection extends BaseCollection implements RenderableInterface
     }
 
     /**
+     * Sets item at given position.
+     *
+     * @param $position
+     * @param \Krucas\Notification\Message $message
+     * @return \Krucas\Notification\Collection
+     */
+    public function setAtPosition($position, Message $message)
+    {
+        $tmp = array();
+
+        $i = 0;
+
+        foreach($this as $index => $m)
+        {
+            if($position == $i)
+            {
+                $tmp[] = $message;
+            }
+
+            $tmp[] = $m;
+
+            $i++;
+        }
+
+        $this->items = $tmp;
+
+        return $this;
+    }
+
+    /**
+     * Returns item on a given position.
+     *
+     * @param $position
+     * @return \Krucas\Notification\Message
+     */
+    public function getAtPosition($position)
+    {
+        return $this->offsetGet($position);
+    }
+
+    /**
+     * Returns index value of a given message.
+     *
+     * @param Message $message
+     * @return bool|int
+     */
+    public function indexOf(Message $message)
+    {
+        foreach($this as $index => $m)
+        {
+            if($message === $m)
+            {
+                return $index;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Get the evaluated contents of the object.
      *
      * @return string
