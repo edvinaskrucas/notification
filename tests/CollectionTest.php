@@ -135,7 +135,25 @@ class CollectionTest extends PHPUnit_Framework_TestCase
             ->setAtPosition(20, new \Krucas\Notification\Message('info', 'info'))
             ->setAtPosition(20, new \Krucas\Notification\Message('info', 'info2'));
 
+        $this->assertCount(2, $collection);
         $this->assertEquals('info2', $collection->getAtPosition(20)->getMessage());
         $this->assertEquals('info', $collection->getAtPosition(21)->getMessage());
+    }
+
+    public function testAddAtDifferentPositions()
+    {
+        $collection = new \Krucas\Notification\Collection();
+
+        $collection
+            ->setAtPosition(5, new \Krucas\Notification\Message('info', 'info'))
+            ->setAtPosition(3, new \Krucas\Notification\Message('info', 'info2'))
+            ->setAtPosition(8, new \Krucas\Notification\Message('info', 'info3'))
+            ->addUnique(new \Krucas\Notification\Message('info', 'info4'));
+
+        $this->assertCount(4, $collection);
+        $this->assertEquals('info', $collection->getAtPosition(5)->getMessage());
+        $this->assertEquals('info2', $collection->getAtPosition(3)->getMessage());
+        $this->assertEquals('info3', $collection->getAtPosition(8)->getMessage());
+        $this->assertEquals('info4', $collection->getAtPosition(0)->getMessage());
     }
 }
