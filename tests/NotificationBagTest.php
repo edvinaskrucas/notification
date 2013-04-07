@@ -713,10 +713,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertCount(1, $this->bag->get('info'));
         $this->assertEquals('f', $this->bag->get('info')->getAtPosition(2)->getAlias());
         $this->assertEquals('test1', $this->bag->get('info')->getAtPosition(2)->getMessage());
-    }
 
-    public function testAddMessagesWithSameAliasAndDifferentPosition2()
-    {
         $this->bag->clear();
 
         $this->bag->infoInstant('test')->atPosition(5)->alias('f');
@@ -725,6 +722,15 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertCount(1, $this->bag->get('info'));
         $this->assertEquals('f', $this->bag->get('info')->getAtPosition(2)->getAlias());
         $this->assertEquals('test1', $this->bag->get('info')->getAtPosition(2)->getMessage());
+
+        $this->bag->clear();
+
+        $this->bag->infoInstant('test')->atPosition(10)->alias('f');
+        $this->bag->infoInstant('test1')->atPosition(12)->alias('f');
+
+        $this->assertCount(1, $this->bag->get('info'));
+        $this->assertEquals('f', $this->bag->get('info')->getAtPosition(12)->getAlias());
+        $this->assertEquals('test1', $this->bag->get('info')->getAtPosition(12)->getMessage());
     }
 
     public function testAddArrayOfMessagesWithPositions()
