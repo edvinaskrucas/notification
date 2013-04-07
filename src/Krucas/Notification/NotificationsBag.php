@@ -60,6 +60,13 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     protected $lastMessage = null;
 
     /**
+     * Lastly added message position (when used atPosition()).
+     *
+     * @var int|null
+     */
+    protected $lastPosition = null;
+
+    /**
      * Creates new NotificationBag object.
      *
      * @param $container
@@ -92,6 +99,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     public function add($type, $message, $flashable = true, $format = null)
     {
         $this->lastMessage = null;
+        $this->lastPosition = null;
 
         if(is_array($message))
         {
@@ -201,7 +209,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
                     {
                         $this->get($message->getType())->offsetUnset($index);
                         $this->get($this->lastMessage->getType())->offsetUnset($lastMessageIndex);
-                        $this->get($this->lastMessage->getType())->setAtPosition($index, $this->lastMessage);
+                        $this->get($this->lastMessage->getType())->setAtPosition(is_null($this->lastPosition) ? $index : $this->lastPosition, $this->lastMessage);
                     }
                 }
             }
@@ -218,6 +226,8 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     public function atPosition($position)
     {
+        $this->lastPosition = $position;
+
         if($this->lastMessage instanceof Message)
         {
             $this->get($this->lastMessage->getType())->offsetUnset($this->get($this->lastMessage->getType())->indexOf($this->lastMessage));

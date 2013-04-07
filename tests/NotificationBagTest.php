@@ -715,6 +715,18 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('test1', $this->bag->get('info')->getAtPosition(2)->getMessage());
     }
 
+    public function testAddMessagesWithSameAliasAndDifferentPosition2()
+    {
+        $this->bag->clear();
+
+        $this->bag->infoInstant('test')->atPosition(5)->alias('f');
+        $this->bag->infoInstant('test1')->atPosition(2)->alias('f');
+
+        $this->assertCount(1, $this->bag->get('info'));
+        $this->assertEquals('f', $this->bag->get('info')->getAtPosition(2)->getAlias());
+        $this->assertEquals('test1', $this->bag->get('info')->getAtPosition(2)->getMessage());
+    }
+
     public function testAddArrayOfMessagesWithPositions()
     {
         $this->bag->infoInstant(array(
