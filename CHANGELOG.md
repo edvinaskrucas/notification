@@ -4,6 +4,7 @@
 
 * Added methods to clear notifications for a given type / all in a container.
 * Message aliasing, allows to use alias on message, so it can be overridden when needed.
+* Message positioning.
 
 ---
 
