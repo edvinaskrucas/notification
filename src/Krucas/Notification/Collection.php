@@ -58,23 +58,23 @@ class Collection extends BaseCollection implements RenderableInterface
      */
     public function setAtPosition($position, Message $message)
     {
-        $tmp = array();
+        $tmp = array_slice($this->items, $position - 1);
 
-        $i = 0;
+        array_splice($this->items, $position - 1);
 
-        foreach($this as $index => $m)
+        array_set($this->items, $position, $message);
+
+        foreach($tmp as $key => $item)
         {
-            if($position == $i)
+            $i = $key;
+            while(array_key_exists($i, $this->items))
             {
-                $tmp[] = $message;
+                $i++;
             }
-
-            $tmp[] = $m;
-
-            $i++;
+            $this->items[$i] = $item;
         }
 
-        $this->items = $tmp;
+        ksort($this->items);
 
         return $this;
     }
