@@ -107,6 +107,7 @@ If you want to add multiple notifications you can pass notication message as arr
 Notification::success(array(
     'Message one',
     array('Message two with its format', 'My format: :message')
+    array('message' => 'ok', 'format' => ':message', 'alias' => 'okMsg', 'position' => 5)
 ));
 ```
 
