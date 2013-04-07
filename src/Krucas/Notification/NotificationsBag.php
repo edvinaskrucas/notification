@@ -91,30 +91,127 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     public function add($type, $message, $flashable = true, $format = null)
     {
+        $this->lastMessage = null;
+
         if(is_array($message))
         {
-            foreach($message as $m)
-            {
-                if(is_array($m) && count($m) == 2)
-                {
-                    $this->get($type)->addUnique(new Message($type, $m[0], $flashable, $this->checkFormat($m[1], $type)));
-                }
-                else
-                {
-                    $this->get($type)->addUnique(new Message($type, $m, $flashable, $this->checkFormat($format, $type)));
-                }
-            }
+            $this->addArray($type, $message, $flashable, $format);
         }
         else
         {
             $this->lastMessage = new Message($type, $message, $flashable, $this->checkFormat($format, $type));
 
             $this->get($type)->addUnique($this->lastMessage);
+
+            if($flashable)
+            {
+                $this->flash();
+            }
         }
 
-        if($flashable)
+        return $this;
+    }
+
+    /**
+     * Adds messages from an array.
+     *
+     * @param $type
+     * @param array $messages
+     * @param bool $flashable
+     * @param null $defaultFormat
+     *
+     * @return void
+     */
+    protected function addArray($type, array $messages = array(), $flashable = true, $defaultFormat = null)
+    {
+        foreach($messages as $message)
         {
-            $this->flash();
+            $text = $format = $alias = null;
+
+            if(!is_null($defaultFormat))
+            {
+                $format = $defaultFormat;
+            }
+
+            if(is_array($message) && isset($message['message']))
+            {
+                $text = $message['message'];
+
+                if(isset($message['alias']))
+                {
+                    $alias = $message['alias'];
+                }
+
+                if(isset($message['format']))
+                {
+                    $format = $message['format'];
+                }
+            }
+            elseif(is_array($message) && count($message) == 2)
+            {
+                $text = $message[0];
+                $format = $message[1];
+            }
+            else
+            {
+                $text = $message;
+            }
+
+            $this->add($type, $text, $flashable, $format);
+
+            if(!is_null($alias))
+            {
+                $this->alias($alias);
+            }
+        }
+    }
+
+    /**
+     * Sets alias for lastly added message.
+     * If message with alias exists, it overrides it.
+     *
+     * @param $alias
+     * @return \Krucas\Notification\NotificationBag
+     */
+    public function alias($alias)
+    {
+        if($this->lastMessage instanceof Message)
+        {
+            $lastMessageIndex = $this->get($this->lastMessage->getType())->indexOf($this->lastMessage);
+
+            $this->lastMessage->setAlias($alias);
+
+            foreach($this->get($this->lastMessage->getType()) as $key => $message)
+            {
+                if($message->getAlias() == $alias)
+                {
+                    $index = $this->get($message->getType())->indexOf($message);
+
+                    if($index !== false)
+                    {
+                        $this->get($message->getType())->offsetUnset($index);
+                        $this->get($this->lastMessage->getType())->offsetUnset($lastMessageIndex);
+                        $this->get($this->lastMessage->getType())->setAtPosition($index, $this->lastMessage);
+                    }
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sets last message at given position.
+     *
+     * @param $position
+     * @return \Krucas\Notification\NotificationBag
+     */
+    public function atPosition($position)
+    {
+        if($this->lastMessage instanceof Message)
+        {
+            $this->get($this->lastMessage->getType())->offsetUnset($this->get($this->lastMessage->getType())->indexOf($this->lastMessage));
+            $this->get($this->lastMessage->getType())->setAtPosition($position, $this->lastMessage);
         }
 
         return $this;

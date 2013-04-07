@@ -553,18 +553,165 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertCount(0, $this->bag->all());
     }
 
-    public function testsClearMethodsWhenBagIsEmpty()
+    public function testClearMethodsWhenBagIsEmpty()
     {
         $this->bag->clear();
-
         $this->assertCount(0, $this->bag->all());
 
         $this->bag->clear();
-
         $this->assertCount(0, $this->bag->all());
 
         $this->bag->clear('success');
-
         $this->assertCount(0, $this->bag->get('success'));
+    }
+
+    public function testSetMessageAtPosition()
+    {
+        $this->bag->clear();
+
+        $this->bag->infoInstant('info')->atPosition(5);
+        $this->assertCount(1, $this->bag->all());
+        $this->assertEquals('info', $this->bag->get('info')->getAtPosition(5)->getMessage());
+    }
+
+    public function testSetTwoMessagesAtSamePosition()
+    {
+        $this->bag->clear();
+
+        $this->bag->infoInstant('info')->atPosition(5);
+        $this->bag->infoInstant('info2')->atPosition(5);
+        $this->assertCount(2, $this->bag->all());
+        $this->assertEquals('info2', $this->bag->get('info')->getAtPosition(5)->getMessage());
+        $this->assertEquals('info', $this->bag->get('info')->getAtPosition(6)->getMessage());
+    }
+
+    public function testAddMessageAndThenSetOtherMessageToPosition()
+    {
+        $this->bag->clear();
+
+        $this->bag->infoInstant('info');
+        $this->bag->infoInstant('info2')->atPosition(5);
+        $this->assertCount(2, $this->bag->all());
+        $this->assertEquals('info2', $this->bag->get('info')->getAtPosition(5)->getMessage());
+        $this->assertEquals('info', $this->bag->get('info')->getAtPosition(0)->getMessage());
+    }
+
+    public function testSetMessageAtPositionAndThenAdd()
+    {
+        $this->bag->clear();
+
+        $this->bag->infoInstant('info2')->atPosition(5);
+        $this->bag->infoInstant('info');
+        $this->assertCount(2, $this->bag->all());
+        $this->assertEquals('info2', $this->bag->get('info')->getAtPosition(5)->getMessage());
+        $this->assertEquals('info', $this->bag->get('info')->getAtPosition(0)->getMessage());
+    }
+
+
+    public function testSettingAliasAfterMessageWasAdded()
+    {
+        $this->bag->clear();
+
+        $this->bag->infoInstant('info')->alias('f');
+        $this->assertEquals('f', $this->bag->get('info')->first()->getAlias());
+
+        $this->bag->infoInstant('info2');
+        $this->assertEquals('f', $this->bag->get('info')->first()->getAlias());
+        $this->assertEquals('info2', $this->bag->get('info')->getAtPosition(1)->getMessage());
+    }
+
+    public function testSettingSameAliasForTwoMessages()
+    {
+        $this->bag->clear();
+
+        $this->bag->infoInstant('info1');
+        $this->bag->infoInstant('info')->alias('f');
+        $this->assertCount(2, $this->bag->get('info'));
+        $this->assertEquals('f', $this->bag->get('info')->getAtPosition(1)->getAlias());
+
+        $this->bag->infoInstant('info2')->alias('f');
+        $this->assertCount(2, $this->bag->get('info'));
+        $this->assertEquals('info1', $this->bag->get('info')->getAtPosition(0)->getMessage());
+        $this->assertEquals('f', $this->bag->get('info')->getAtPosition(1)->getAlias());
+        $this->assertEquals('info2', $this->bag->get('info')->getAtPosition(1)->getMessage());
+    }
+
+    public function testAddingAssocMessageArray()
+    {
+        $this->bag->clear();
+
+        $this->bag->infoInstant(array(
+            array('message' => 'm', 'format' => 'f', 'alias' => 'a'),
+            'second',
+            array('message' => 'm2', 'alias' => 'a2')
+        ), 'default');
+
+        $this->assertCount(3, $this->bag->get('info'));
+        $this->assertInstanceOf('Krucas\Notification\Message', $this->bag->get('info')->first());
+        $this->assertEquals('m', $this->bag->get('info')->first()->getMessage());
+        $this->assertEquals('info', $this->bag->get('info')->first()->getType());
+        $this->assertEquals('f', $this->bag->get('info')->first()->getFormat());
+        $this->assertFalse($this->bag->get('info')->first()->isFlashable());
+        $this->assertEquals('a', $this->bag->get('info')->first()->getAlias());
+
+        $this->assertInstanceOf('Krucas\Notification\Message', $this->bag->get('info')[1]);
+        $this->assertEquals('second', $this->bag->get('info')->getAtPosition(1)->getMessage());
+        $this->assertEquals('info', $this->bag->get('info')->getAtPosition(1)->getType());
+        $this->assertEquals('default', $this->bag->get('info')->getAtPosition(1)->getFormat());
+        $this->assertFalse($this->bag->get('info')->getAtPosition(1)->isFlashable());
+        $this->assertNull($this->bag->get('info')->getAtPosition(1)->getAlias());
+
+        $this->assertInstanceOf('Krucas\Notification\Message', $this->bag->get('info')->getAtPosition(2));
+        $this->assertEquals('m2', $this->bag->get('info')->getAtPosition(2)->getMessage());
+        $this->assertEquals('info', $this->bag->get('info')->getAtPosition(2)->getType());
+        $this->assertEquals('default', $this->bag->get('info')->getAtPosition(2)->getFormat());
+        $this->assertFalse($this->bag->get('info')->getAtPosition(2)->isFlashable());
+        $this->assertEquals('a2', $this->bag->get('info')->getAtPosition(2)->getAlias());
+    }
+
+    public function testAddingAssocMessageArrayWithSameAlias()
+    {
+        $this->bag->infoInstant(array(
+            array('message' => 'm', 'format' => 'f', 'alias' => 'a'),
+            'second',
+            array('message' => 'm2', 'alias' => 'a')
+        ), 'default');
+
+        $this->assertCount(2, $this->bag->get('info'));
+        $this->assertInstanceOf('Krucas\Notification\Message', $this->bag->get('info')->first());
+        $this->assertEquals('m2', $this->bag->get('info')->first()->getMessage());
+        $this->assertEquals('info', $this->bag->get('info')->first()->getType());
+        $this->assertEquals('default', $this->bag->get('info')->first()->getFormat());
+        $this->assertFalse($this->bag->get('info')->first()->isFlashable());
+        $this->assertEquals('a', $this->bag->get('info')->first()->getAlias());
+
+        $this->assertInstanceOf('Krucas\Notification\Message', $this->bag->get('info')->getAtPosition(1));
+        $this->assertEquals('second', $this->bag->get('info')->getAtPosition(1)->getMessage());
+        $this->assertEquals('info', $this->bag->get('info')->getAtPosition(1)->getType());
+        $this->assertEquals('default', $this->bag->get('info')->getAtPosition(1)->getFormat());
+        $this->assertFalse($this->bag->get('info')->getAtPosition(1)->isFlashable());
+        $this->assertNull($this->bag->get('info')->getAtPosition(1)->getAlias());
+    }
+
+    public function testAddMessageWithAliasAndPosition()
+    {
+        $this->bag->clear();
+
+        $this->bag->infoInstant('test')->alias('f')->atPosition(5);
+
+        $this->assertCount(1, $this->bag->get('info'));
+        $this->assertEquals('f', $this->bag->get('info')->getAtPosition(5)->getAlias());
+    }
+
+    public function testAddMessagesWithSameAliasAndDifferentPosition()
+    {
+        $this->bag->clear();
+
+        $this->bag->infoInstant('test')->alias('f')->atPosition(5);
+        $this->bag->infoInstant('test1')->alias('f')->atPosition(2);
+
+        $this->assertCount(1, $this->bag->get('info'));
+        $this->assertEquals('f', $this->bag->get('info')->getAtPosition(2)->getAlias());
+        $this->assertEquals('test1', $this->bag->get('info')->getAtPosition(2)->getMessage());
     }
 }
