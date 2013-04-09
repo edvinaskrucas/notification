@@ -766,6 +766,8 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
             ->once()
             ->andReturn('[{"type":"error","message":"test error","format":":message!","alias":"a","position":5},{"type":"warning","message":"test warning","format":":message...","alias":null,"position":3}]');
 
+        $session->shouldReceive('flash');
+
         $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
         $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
 
@@ -776,5 +778,63 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $this->assertCount(1, $bag->get('warning'));
         $this->assertNull($bag->get('warning')->getAtPosition(3)->getAlias());
+    }
+
+    public function testFlashMessageToSessionWithAliasAndPosition()
+    {
+        $session = m::mock('Illuminate\Session\Store');
+        $config = m::mock('Illuminate\Config\Repository');
+
+        $session->shouldReceive('get')
+            ->once()
+            ->andReturn(false);
+
+        $session->shouldReceive('flash')
+            ->once()
+            ->with('notifications_test', '[{"message":"test","format":":m","type":"info","flashable":true,"alias":null,"position":null}]');
+
+        $session->shouldReceive('flash')
+            ->once()
+            ->with('notifications_test', '[{"message":"test","format":":m","type":"info","flashable":true,"alias":"i","position":null}]');
+
+        $session->shouldReceive('flash')
+            ->once()
+            ->with('notifications_test', '[{"message":"test","format":":m","type":"info","flashable":true,"alias":"i","position":5}]');
+
+        $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
+        $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
+
+        $bag = new \Krucas\Notification\NotificationsBag('test',$session, $config);
+
+        $bag->info('test', ':m')->alias('i')->atPosition(5);
+    }
+
+    public function testFlashMessageToSessionWithPositionAndAlias()
+    {
+        $session = m::mock('Illuminate\Session\Store');
+        $config = m::mock('Illuminate\Config\Repository');
+
+        $session->shouldReceive('get')
+            ->once()
+            ->andReturn(false);
+
+        $session->shouldReceive('flash')
+            ->once()
+            ->with('notifications_test', '[{"message":"test","format":":m","type":"info","flashable":true,"alias":null,"position":null}]');
+
+        $session->shouldReceive('flash')
+            ->once()
+            ->with('notifications_test', '[{"message":"test","format":":m","type":"info","flashable":true,"alias":null,"position":5}]');
+
+        $session->shouldReceive('flash')
+            ->once()
+            ->with('notifications_test', '[{"message":"test","format":":m","type":"info","flashable":true,"alias":"i","position":5}]');
+
+        $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
+        $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
+
+        $bag = new \Krucas\Notification\NotificationsBag('test',$session, $config);
+
+        $bag->info('test', ':m')->atPosition(5)->alias('i');
     }
 }

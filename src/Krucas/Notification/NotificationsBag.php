@@ -213,6 +213,11 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
                     }
                 }
             }
+
+            if($this->lastMessage->isFlashable())
+            {
+                $this->flash();
+            }
         }
 
         return $this;
@@ -230,8 +235,17 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
 
         if($this->lastMessage instanceof Message)
         {
-            $this->get($this->lastMessage->getType())->offsetUnset($this->get($this->lastMessage->getType())->indexOf($this->lastMessage));
+            $lastMessageIndex = $this->get($this->lastMessage->getType())->indexOf($this->lastMessage);
+
+            $this->lastMessage->setPosition($position);
+
+            $this->get($this->lastMessage->getType())->offsetUnset($lastMessageIndex);
             $this->get($this->lastMessage->getType())->setAtPosition($position, $this->lastMessage);
+
+            if($this->lastMessage->isFlashable())
+            {
+                $this->flash();
+            }
         }
 
         return $this;
