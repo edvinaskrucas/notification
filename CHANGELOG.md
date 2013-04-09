@@ -1,3 +1,12 @@
+# 1.0.1
+
+---
+
+* Added test to test message flashing after adding alias and / or position.
+* Fix message flashing when using ```alias()``` and / or ```atPosition```.
+
+---
+
 # 1.1
 
 ---
