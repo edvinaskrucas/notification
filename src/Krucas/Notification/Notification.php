@@ -209,6 +209,17 @@ class Notification
     }
 
     /**
+     * Returns message with a given alias or null if not found.
+     *
+     * @param $alias
+     * @return \Krucas\Notification\Message|null
+     */
+    public function getAliased($alias)
+    {
+        return $this->container(null)->getAliased($alias);
+    }
+
+    /**
      * Adds message to container.
      *
      * @param $container

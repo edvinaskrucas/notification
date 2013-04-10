@@ -280,4 +280,15 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $this->assertCount(1, $this->n->container());
         $this->assertEquals('info', $this->n->getAtPosition(5)->getMessage());
     }
+
+    public function testGetAliasedFromADefaultContainer()
+    {
+        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
+
+        $this->n->clearAll();
+
+        $this->n->infoInstant('info')->alias('a');
+        $this->assertCount(1, $this->n->container());
+        $this->assertEquals('info', $this->n->getAliased('a')->getMessage());
+    }
 }
