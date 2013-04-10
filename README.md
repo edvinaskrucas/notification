@@ -164,6 +164,13 @@ Notification::info('info')->alias('loginMsg');
 Notification::error('error')->alias('loginMsg');
 ```
 
+Getting aliased message instance.
+```php
+Notification::getAliased('loginMsg');
+```
+Method ```getAliased($alias)``` is available in all scopes (Notification, NotificationBag and Collection),
+if no message will be found with given alias, ```null``` will be returned.
+
 ### Message positioning
 
 There is ability to add message to certain position.
