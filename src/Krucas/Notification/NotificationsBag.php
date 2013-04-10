@@ -597,7 +597,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     protected function load()
     {
-        $flashed = $this->sessionStore->get('notifications_'.$this->container);
+        $flashed = $this->sessionStore->get($this->configRepository->get('notification::session_prefix').$this->container);
 
         if($flashed)
         {
@@ -630,7 +630,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     protected function flash()
     {
-        $this->sessionStore->flash('notifications_'.$this->container, $this->getFlashable()->toJson());
+        $this->sessionStore->flash($this->configRepository->get('notification::session_prefix').$this->container, $this->getFlashable()->toJson());
     }
 
     /**

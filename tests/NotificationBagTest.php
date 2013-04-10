@@ -22,6 +22,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
         $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
+        $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
 
         $this->bag = new \Krucas\Notification\NotificationsBag('test',$session, $config);
     }
@@ -745,6 +746,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
         $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
+        $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
 
         $bag = new \Krucas\Notification\NotificationsBag('test',$session, $config);
 
@@ -778,6 +780,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
         $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
+        $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
 
         $bag = new \Krucas\Notification\NotificationsBag('test',$session, $config);
 
@@ -807,6 +810,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
         $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
+        $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
 
         $bag = new \Krucas\Notification\NotificationsBag('test',$session, $config);
 
