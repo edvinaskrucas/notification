@@ -49,7 +49,7 @@ class Notification
      */
     public function success($message, $format = null)
     {
-        return $this->addMessage(null, 'success', $message, true, $format);
+        return $this->addMessage('success', $message, true, $format);
     }
 
     /**
@@ -61,7 +61,7 @@ class Notification
      */
     public function successInstant($message, $format = null)
     {
-        return $this->addMessage(null, 'success', $message, false, $format);
+        return $this->addMessage('success', $message, false, $format);
     }
 
     /**
@@ -83,7 +83,7 @@ class Notification
      */
     public function error($message, $format = null)
     {
-        return $this->addMessage(null, 'error', $message, true, $format);
+        return $this->addMessage('error', $message, true, $format);
     }
 
     /**
@@ -95,7 +95,7 @@ class Notification
      */
     public function errorInstant($message, $format = null)
     {
-        return $this->addMessage(null, 'error', $message, false, $format);
+        return $this->addMessage('error', $message, false, $format);
     }
 
     /**
@@ -117,7 +117,7 @@ class Notification
      */
     public function warning($message, $format = null)
     {
-        return $this->addMessage(null, 'warning', $message, true, $format);
+        return $this->addMessage('warning', $message, true, $format);
     }
 
     /**
@@ -129,7 +129,7 @@ class Notification
      */
     public function warningInstant($message, $format = null)
     {
-        return $this->addMessage(null, 'warning', $message, false, $format);
+        return $this->addMessage('warning', $message, false, $format);
     }
 
     /**
@@ -151,7 +151,7 @@ class Notification
      */
     public function info($message, $format = null)
     {
-        return $this->addMessage(null, 'info', $message, true, $format);
+        return $this->addMessage('info', $message, true, $format);
     }
 
     /**
@@ -163,7 +163,7 @@ class Notification
      */
     public function infoInstant($message, $format = null)
     {
-        return $this->addMessage(null, 'info', $message, false, $format);
+        return $this->addMessage('info', $message, false, $format);
     }
 
     /**
@@ -222,16 +222,15 @@ class Notification
     /**
      * Adds message to container.
      *
-     * @param $container
      * @param $type
      * @param $message
      * @param bool $flash
      * @param null $format
      * @return mixed
      */
-    protected function addMessage($container, $type, $message, $flash = true, $format = null)
+    protected function addMessage($type, $message, $flash = true, $format = null)
     {
-        return $this->container($container)->add($type, $message, $flash, $format);
+        return $this->container(null)->add($type, $message, $flash, $format);
     }
 
     /**
