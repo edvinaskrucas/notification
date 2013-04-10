@@ -3,9 +3,9 @@
 ---
 
 * Refactored how messages are stored in bag.
-* Added method ```getAtPosition($position)``` to a NotificationBag and Notification.
-* Added method ```getAliased($alias)``` to a Notification, NotificationBag and Collection classes.
-* Added method ```group()``` to Notification and NotificationBag to allow render grouping.
+* Added method ```getAtPosition($position)``` to a NotificationBag.
+* Added method ```getAliased($alias)``` to a NotificationBag and Collection classes.
+* Added method ```group()``` to NotificationBag to allow render grouping.
 * When working directly with ```Notification```, you will work just with default container.
 * Session prefix now is configurable.
 * Refactored ```Notification``` class, now uses ```__call()``` to call methods on a default container.
