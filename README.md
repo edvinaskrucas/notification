@@ -117,7 +117,7 @@ Also you can still pass second param (format), to format messages, but you can f
 
 You can access and show just first notification in container
 ```php
-{{ Notification::container('myContainer')->first('success') }}
+{{ Notification::container('myContainer')->get('success')->first() }}
 ```
 
 Accessing first notification from all types
@@ -137,6 +137,11 @@ When using ```showAll()``` you may want to group your messages by type, it can b
 {{ Notification::group('info', 'success', 'error', 'warning')->showAll() }}
 ```
 This will group all your messages in group and output it, also you can use just one, two or three groups.
+
+Manipulating group output on the fly
+```php
+Notification::addToGrouping('success')->removeFromGrouping('error');
+```
 
 Display notifications by type in default container, you can pass custom format
 ```php
