@@ -156,4 +156,20 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('info3', $collection->getAtPosition(8)->getMessage());
         $this->assertEquals('info4', $collection->getAtPosition(0)->getMessage());
     }
+
+    public function testGetAliasedMessage()
+    {
+        $collection = new \Krucas\Notification\Collection();
+
+        $collection
+            ->addUnique(new \Krucas\Notification\Message('info', 'info', false, '', 'a'))
+            ->addUnique(new \Krucas\Notification\Message('error', 'error', false, '', 'b'))
+            ->addUnique(new \Krucas\Notification\Message('warning', 'warning', false, '', 'c'));
+
+        $this->assertCount(3, $collection);
+        $this->assertEquals('info', $collection->getAliased('a')->getMessage());
+        $this->assertEquals('error', $collection->getAliased('b')->getMessage());
+        $this->assertEquals('warning', $collection->getAliased('c')->getMessage());
+        $this->assertNull($collection->getAliased('d'));
+    }
 }

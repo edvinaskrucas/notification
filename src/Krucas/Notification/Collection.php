@@ -103,6 +103,25 @@ class Collection extends BaseCollection implements RenderableInterface
     }
 
     /**
+     * Returns aliased message or null if not found.
+     *
+     * @param $alias
+     * @return \Krucas\Notification\Message|null
+     */
+    public function getAliased($alias)
+    {
+        foreach($this as $index => $message)
+        {
+            if($message->getAlias() == $alias)
+            {
+                return $message;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Returns index value of a given message.
      *
      * @param Message $message
