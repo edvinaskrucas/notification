@@ -812,4 +812,78 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $bag->info('test', ':m')->atPosition(5)->alias('i');
     }
+
+    public function testMixVariousMessageTypesWithPositioning()
+    {
+        $this->bag->clear();
+
+        $this->bag->infoInstant('info')->atPosition(5);
+        $this->bag->errorInstant('error')->atPosition(1);
+        $this->bag->warningInstant('warning')->atPosition(2);
+        $this->bag->successInstant('success')->atPosition(0);
+        $this->bag->infoInstant('info2')->atPosition(0);
+
+        $this->assertCount(5, $this->bag);
+        $this->assertEquals('info2', $this->bag->all()->getAtPosition(0)->getMessage());
+        $this->assertEquals('success', $this->bag->all()->getAtPosition(1)->getMessage());
+        $this->assertEquals('error', $this->bag->all()->getAtPosition(2)->getMessage());
+        $this->assertEquals('warning', $this->bag->all()->getAtPosition(3)->getMessage());
+        $this->assertEquals('info', $this->bag->all()->getAtPosition(5)->getMessage());
+    }
+
+    public function testMixVariousTypesWithAliasingAndOverriding()
+    {
+        $this->bag->clear();
+
+        $this->bag->infoInstant('info')->alias('a');
+        $this->bag->errorInstant('error')->alias('b');
+        $this->bag->warningInstant('warning')->alias('c');
+        $this->bag->successInstant('success')->alias('b');
+        $this->bag->infoInstant('info2')->alias('d');
+
+        $this->assertCount(4, $this->bag);
+        $this->assertEquals('info', $this->bag->all()->getAtPosition(0)->getMessage());
+        $this->assertEquals('a', $this->bag->all()->getAtPosition(0)->getAlias());
+        $this->assertEquals('info', $this->bag->all()->getAtPosition(0)->getType());
+
+        $this->assertEquals('success', $this->bag->all()->getAtPosition(1)->getMessage());
+        $this->assertEquals('b', $this->bag->all()->getAtPosition(1)->getAlias());
+        $this->assertEquals('success', $this->bag->all()->getAtPosition(1)->getType());
+
+        $this->assertEquals('warning', $this->bag->all()->getAtPosition(2)->getMessage());
+        $this->assertEquals('c', $this->bag->all()->getAtPosition(2)->getAlias());
+        $this->assertEquals('warning', $this->bag->all()->getAtPosition(2)->getType());
+
+        $this->assertEquals('info2', $this->bag->all()->getAtPosition(3)->getMessage());
+        $this->assertEquals('d', $this->bag->all()->getAtPosition(3)->getAlias());
+        $this->assertEquals('info', $this->bag->all()->getAtPosition(3)->getType());
+    }
+
+    public function testMixingWithAliasAndPositioning()
+    {
+        $this->bag->clear();
+
+        $this->bag->infoInstant('info')->alias('a')->atPosition(5);
+        $this->bag->errorInstant('error')->atPosition(2)->alias('b');
+        $this->bag->warningInstant('warning')->alias('c')->atPosition(3);
+        $this->bag->successInstant('success')->alias('b');
+        $this->bag->infoInstant('info2')->alias('d');
+
+        $this->assertCount(4, $this->bag);
+        $this->assertEquals('info2', $this->bag->all()->getAtPosition(0)->getMessage());
+        $this->assertEquals('d', $this->bag->all()->getAtPosition(0)->getAlias());
+        $this->assertEquals('info', $this->bag->all()->getAtPosition(0)->getType());
+
+        $this->assertEquals('success', $this->bag->all()->getAtPosition(2)->getMessage());
+        $this->assertEquals('b', $this->bag->all()->getAtPosition(2)->getAlias());
+        $this->assertEquals('success', $this->bag->all()->getAtPosition(2)->getType());
+
+        $this->assertEquals('warning', $this->bag->all()->getAtPosition(3)->getMessage());
+        $this->assertEquals('c', $this->bag->all()->getAtPosition(3)->getAlias());
+        $this->assertEquals('warning', $this->bag->all()->getAtPosition(3)->getType());
+
+        $this->assertEquals('info', $this->bag->all()->getAtPosition(5)->getMessage());
+        $this->assertEquals('a', $this->bag->all()->getAtPosition(5)->getAlias());
+        $this->assertEquals('info', $this->bag->all()->getAtPosition(5)->getType());
+    }
 }
