@@ -752,9 +752,13 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $this->assertCount(1, $bag->get('error'));
         $this->assertEquals('a', $bag->get('error')->getAtPosition(5)->getAlias());
+        $this->assertEquals('test error!', (string) $bag->get('error'));
 
         $this->assertCount(1, $bag->get('warning'));
         $this->assertNull($bag->get('warning')->getAtPosition(3)->getAlias());
+        $this->assertEquals('test warning...', (string) $bag->get('warning'));
+
+        $this->assertEquals('test warning...test error!', (string) $bag);
     }
 
     public function testFlashMessageToSessionWithAliasAndPosition()
