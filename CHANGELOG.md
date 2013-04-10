@@ -1,3 +1,11 @@
+# 1.2
+
+---
+
+* Refactored how messages are stored in bag.
+
+---
+
 # 1.1.1
 
 ---
