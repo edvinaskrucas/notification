@@ -95,7 +95,6 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $bag->warning('second message');
 
-        $this->assertCount(3, $bag);
         $this->assertCount(4, $bag->all());
         $this->assertInstanceOf('Krucas\Notification\Collection', $bag->all());
         $this->assertInstanceOf('Krucas\Notification\Message', $bag->get('warning')->first());
@@ -116,7 +115,6 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $bag->info('info m');
 
-        $this->assertCount(4, $bag);
         $this->assertCount(5, $bag->all());
         $this->assertInstanceOf('Krucas\Notification\Collection', $bag->all());
         $this->assertInstanceOf('Krucas\Notification\Message', $bag->get('info')->first());
@@ -137,7 +135,6 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $bag->error('e m');
 
-        $this->assertCount(4, $bag);
         $this->assertCount(6, $bag->all());
         $this->assertInstanceOf('Krucas\Notification\Collection', $bag->all());
         $this->assertInstanceOf('Krucas\Notification\Message', $bag->get('error')->first());
@@ -156,7 +153,6 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
     {
         $bag->successInstant('s m');
 
-        $this->assertCount(4, $bag);
         $this->assertCount(7, $bag->all());
         $this->assertInstanceOf('Krucas\Notification\Collection', $bag->all());
         $this->assertInstanceOf('Krucas\Notification\Message', $bag->get('success')[1]);
@@ -175,7 +171,6 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
     {
         $bag->infoInstant('i m');
 
-        $this->assertCount(4, $bag);
         $this->assertCount(8, $bag->all());
         $this->assertInstanceOf('Krucas\Notification\Collection', $bag->all());
         $this->assertInstanceOf('Krucas\Notification\Message', $bag->get('info')[1]);
@@ -194,7 +189,6 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
     {
         $bag->warningInstant('w m');
 
-        $this->assertCount(4, $bag);
         $this->assertCount(9, $bag->all());
         $this->assertInstanceOf('Krucas\Notification\Collection', $bag->all());
         $this->assertInstanceOf('Krucas\Notification\Message', $bag->get('warning')[2]);
@@ -213,7 +207,6 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
     {
         $bag->errorInstant('e m');
 
-        $this->assertCount(4, $bag);
         $this->assertCount(10, $bag->all());
         $this->assertInstanceOf('Krucas\Notification\Collection', $bag->all());
         $this->assertInstanceOf('Krucas\Notification\Message', $bag->get('error')[2]);
@@ -227,16 +220,6 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
     /**
      * @depends testAddInstantErrorMessage
-     */
-    public function testHowManyContainersCreated(\Krucas\Notification\NotificationsBag $bag)
-    {
-        $this->assertCount(4, $bag);
-
-        return $bag;
-    }
-
-    /**
-     * @depends testHowManyContainersCreated
      */
     public function testHowManyMessagesAdded(\Krucas\Notification\NotificationsBag $bag)
     {
@@ -290,94 +273,86 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
     public function testToArray(\Krucas\Notification\NotificationsBag $bag)
     {
         $this->assertEquals(array(
-            'collections'   => array(
-                'error'     => array(
-                    array(
-                        'message'   => 'test error',
-                        'type'      => 'error',
-                        'format'    => ':message!',
-                        'flashable' => false,
-                        'alias'     => null,
-                        'position'  => null
-                    ),
-                    array(
-                        'message'   => 'e m',
-                        'type'      => 'error',
-                        'format'    => '<div class="alert alert-:type">:message</div>',
-                        'flashable' => true,
-                        'alias'     => null,
-                        'position'  => null
-                    ),
-                    array(
-                        'message'   => 'e m',
-                        'type'      => 'error',
-                        'format'    => '<div class="alert alert-:type">:message</div>',
-                        'flashable' => false,
-                        'alias'     => null,
-                        'position'  => null
-                    )
+            'notifications'   => array(
+                array(
+                    'message'   => 'test error',
+                    'type'      => 'error',
+                    'format'    => ':message!',
+                    'flashable' => false,
+                    'alias'     => null,
+                    'position'  => null
                 ),
-                'success'   => array(
-                    array(
-                        'message'   => 'all ok',
-                        'type'      => 'success',
-                        'format'    => 'custom: :message',
-                        'flashable' => true,
-                        'alias'     => null,
-                        'position'  => null
-                    ),
-                    array(
-                        'message'   => 's m',
-                        'type'      => 'success',
-                        'format'    => '<div class="alert alert-:type">:message</div>',
-                        'flashable' => false,
-                        'alias'     => null,
-                        'position'  => null
-                    )
+                array(
+                    'message'   => 'test warning',
+                    'type'      => 'warning',
+                    'format'    => ':message...',
+                    'flashable' => false,
+                    'alias'     => null,
+                    'position'  => null
                 ),
-                'warning'   => array(
-                    array(
-                        'message'   => 'test warning',
-                        'type'      => 'warning',
-                        'format'    => ':message...',
-                        'flashable' => false,
-                        'alias'     => null,
-                        'position'  => null
-                    ),
-                    array(
-                        'message'   => 'second message',
-                        'type'      => 'warning',
-                        'format'    => '<div class="alert alert-:type">:message</div>',
-                        'flashable' => true,
-                        'alias'     => null,
-                        'position'  => null
-                    ),
-                    array(
-                        'message'   => 'w m',
-                        'type'      => 'warning',
-                        'format'    => '<div class="alert alert-:type">:message</div>',
-                        'flashable' => false,
-                        'alias'     => null,
-                        'position'  => null
-                    )
+                array(
+                    'message'   => 'all ok',
+                    'type'      => 'success',
+                    'format'    => 'custom: :message',
+                    'flashable' => true,
+                    'alias'     => null,
+                    'position'  => null
                 ),
-                'info'      => array(
-                    array(
-                        'message'   => 'info m',
-                        'type'      => 'info',
-                        'format'    => '<div class="alert alert-:type">:message</div>',
-                        'flashable' => true,
-                        'alias'     => null,
-                        'position'  => null
-                    ),
-                    array(
-                        'message'   => 'i m',
-                        'type'      => 'info',
-                        'format'    => '<div class="alert alert-:type">:message</div>',
-                        'flashable' => false,
-                        'alias'     => null,
-                        'position'  => null
-                    )
+                array(
+                    'message'   => 'second message',
+                    'type'      => 'warning',
+                    'format'    => '<div class="alert alert-:type">:message</div>',
+                    'flashable' => true,
+                    'alias'     => null,
+                    'position'  => null
+                ),
+                array(
+                    'message'   => 'info m',
+                    'type'      => 'info',
+                    'format'    => '<div class="alert alert-:type">:message</div>',
+                    'flashable' => true,
+                    'alias'     => null,
+                    'position'  => null
+                ),
+                array(
+                    'message'   => 'e m',
+                    'type'      => 'error',
+                    'format'    => '<div class="alert alert-:type">:message</div>',
+                    'flashable' => true,
+                    'alias'     => null,
+                    'position'  => null
+                ),
+                array(
+                    'message'   => 's m',
+                    'type'      => 'success',
+                    'format'    => '<div class="alert alert-:type">:message</div>',
+                    'flashable' => false,
+                    'alias'     => null,
+                    'position'  => null
+                ),
+                array(
+                    'message'   => 'i m',
+                    'type'      => 'info',
+                    'format'    => '<div class="alert alert-:type">:message</div>',
+                    'flashable' => false,
+                    'alias'     => null,
+                    'position'  => null
+                ),
+                array(
+                    'message'   => 'w m',
+                    'type'      => 'warning',
+                    'format'    => '<div class="alert alert-:type">:message</div>',
+                    'flashable' => false,
+                    'alias'     => null,
+                    'position'  => null
+                ),
+                array(
+                    'message'   => 'e m',
+                    'type'      => 'error',
+                    'format'    => '<div class="alert alert-:type">:message</div>',
+                    'flashable' => false,
+                    'alias'     => null,
+                    'position'  => null
                 )
             ),
             'container'     => 'test',

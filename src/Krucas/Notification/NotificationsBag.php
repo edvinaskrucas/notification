@@ -32,11 +32,11 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     protected $sessionStore;
 
     /**
-     * Messages collections by type.
+     * Collection to store all notification messages.
      *
-     * @var array
+     * @var \Krucas\Notification\Collection|null
      */
-    protected $collections = array();
+    protected $notifications = null;
 
     /**
      * Default global format for messages.
@@ -78,6 +78,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
         $this->container = $container;
         $this->configRepository = $configRepository;
         $this->sessionStore = $sessionStore;
+        $this->notifications = new Collection();
 
         $this->loadFormats();
 
@@ -109,7 +110,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
         {
             $this->lastMessage = new Message($type, $message, $flashable, $this->checkFormat($format, $type));
 
-            $this->get($type)->addUnique($this->lastMessage);
+            $this->notifications->addUnique($this->lastMessage);
 
             if($flashable)
             {
@@ -195,21 +196,21 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     {
         if($this->lastMessage instanceof Message)
         {
-            $lastMessageIndex = $this->get($this->lastMessage->getType())->indexOf($this->lastMessage);
+            $lastMessageIndex = $this->notifications->indexOf($this->lastMessage);
 
             $this->lastMessage->setAlias($alias);
 
-            foreach($this->get($this->lastMessage->getType()) as $key => $message)
+            foreach($this->notifications as $key => $message)
             {
                 if($message->getAlias() == $alias)
                 {
-                    $index = $this->get($message->getType())->indexOf($message);
+                    $index = $this->notifications->indexOf($message);
 
                     if($index !== false)
                     {
-                        $this->get($message->getType())->offsetUnset($index);
-                        $this->get($this->lastMessage->getType())->offsetUnset($lastMessageIndex);
-                        $this->get($this->lastMessage->getType())->setAtPosition(is_null($this->lastPosition) ? $index : $this->lastPosition, $this->lastMessage);
+                        $this->notifications->offsetUnset($index);
+                        $this->notifications->offsetUnset($lastMessageIndex);
+                        $this->notifications->setAtPosition(is_null($this->lastPosition) ? $index : $this->lastPosition, $this->lastMessage);
                     }
                 }
             }
@@ -235,12 +236,12 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
 
         if($this->lastMessage instanceof Message)
         {
-            $lastMessageIndex = $this->get($this->lastMessage->getType())->indexOf($this->lastMessage);
+            $lastMessageIndex = $this->notifications->indexOf($this->lastMessage);
 
             $this->lastMessage->setPosition($position);
 
-            $this->get($this->lastMessage->getType())->offsetUnset($lastMessageIndex);
-            $this->get($this->lastMessage->getType())->setAtPosition($position, $this->lastMessage);
+            $this->notifications->offsetUnset($lastMessageIndex);
+            $this->notifications->setAtPosition($position, $this->lastMessage);
 
             if($this->lastMessage->isFlashable())
             {
@@ -261,11 +262,17 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     {
         if(is_null($type))
         {
-            $this->collections = array();
+            $this->notifications = new Collection();
         }
         else
         {
-            unset($this->collections[$type]);
+            foreach($this->notifications as $key => $message)
+            {
+                if($message->getType() == $type)
+                {
+                    $this->notifications->offsetUnset($key);
+                }
+            }
         }
 
         return $this;
@@ -426,7 +433,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     public function first($type)
     {
-        return $this->get($type)->first();
+        return $this->notifications->first();
     }
 
     /**
@@ -437,7 +444,24 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     public function get($type)
     {
-        return array_key_exists($type, $this->collections) ? $this->collections[$type] : $this->collections[$type] = new Collection();
+        $collection = new Collection();
+
+        foreach($this->notifications as $key => $message)
+        {
+            if($message->getType() == $type)
+            {
+                if(!is_null($message->getPosition()))
+                {
+                    $collection->setAtPosition($key, $message);
+                }
+                else
+                {
+                    $collection->addUnique($message);
+                }
+            }
+        }
+
+        return $collection;
     }
 
     /**
@@ -447,14 +471,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     public function all()
     {
-        $all = array();
-
-        foreach($this->collections as $collection)
-        {
-            $all = array_merge($all, $collection->all());
-        }
-
-        return new Collection($all);
+        return $this->notifications;
     }
 
     /**
@@ -622,13 +639,8 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
         (
             'container'         => $this->container,
             'format'            => $this->format,
-            'collections'       => array()
+            'notifications'     => $this->notifications->toArray()
         );
-
-        foreach($this->collections as $type => $collection)
-        {
-            $arr['collections'][$type] = $collection->toArray();
-        }
 
         return $arr;
     }
@@ -651,7 +663,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     public function count()
     {
-        return count($this->collections);
+        return count($this->notifications);
     }
 
     /**
@@ -681,13 +693,6 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     public function __toString()
     {
-        $html = '';
-
-        foreach($this->collections as $collection)
-        {
-            $html .= $collection;
-        }
-
-        return $html;
+        return (string) $this->notifications;
     }
 }
