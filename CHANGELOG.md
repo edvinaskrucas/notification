@@ -8,6 +8,7 @@
 * Added method ```group()``` to Notification and NotificationBag to allow render grouping.
 * When working directly with ```Notification```, you will work just with default container.
 * Session prefix now is configurable.
+* Refactored ```Notification``` class, now uses ```__call()``` to call methods on a default container.
 
 ---
 
