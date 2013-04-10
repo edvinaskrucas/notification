@@ -3,8 +3,9 @@
 ---
 
 * Refactored how messages are stored in bag.
-* Added method getAtPosition($position) to a NotificationBag and Notification.
-* Added method getAliased($alias) to a Notification, NotificationBag and Collection classes.
+* Added method ```getAtPosition($position)``` to a NotificationBag and Notification.
+* Added method ```getAliased($alias)``` to a Notification, NotificationBag and Collection classes.
+* Added method ```group()``` to Notification and NotificationBag to allow render grouping.
 
 ---
 
