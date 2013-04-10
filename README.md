@@ -132,17 +132,17 @@ To display all notifications in a default container you need to add just one lin
 {{ Notification::showAll() }}
 ```
 
-Display notifications by type in default container
+Display notifications by type in default container, you can pass custom format
 ```php
 {{ Notification::showError() }}
 {{ Notification::showInfo() }}
 {{ Notification::showWarning() }}
-{{ Notification::showSuccess() }}
+{{ Notification::showSuccess(':message') }}
 ```
 
-Displaying notifications you can pass container and format
+Displaying notifications in a specific container with custom format.
 ```php
-{{ Notification::showInfo('myContainer', ':message') }}
+{{ Notification::container('myContainer')->showInfo(':message') }}
 ```
 
 ### Message aliasing
