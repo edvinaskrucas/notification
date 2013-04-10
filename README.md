@@ -156,6 +156,14 @@ Notification::success('ok')->alias('okMsg');
 Notification::success('ok2')->alias('okMsg');
 ```
 
+With aliasing you can override message type too
+```php
+Notification::info('info')->alias('loginMsg');
+
+// Overrides info message with error message
+Notification::error('error')->alias('loginMsg');
+```
+
 ### Message positioning
 
 There is ability to add message to certain position.
@@ -165,6 +173,12 @@ It works in same type scope.
 Notification::info('info')->atPosition(5);
 Notification::info('info2')->atPosition(1);
 ```
+
+Retrieveing messages at certain position
+```php
+Notification::getAtPosition(5);
+```
+Above example will return message at fifth position in a default container.
 
 ### Aliasing with a position
 
