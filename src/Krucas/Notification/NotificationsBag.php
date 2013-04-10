@@ -755,7 +755,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      * @param null $format
      * @return string
      */
-    public function show($type = null, $format = null)
+    protected function show($type = null, $format = null)
     {
         $messages = $this->getMessagesForRender($type);
 

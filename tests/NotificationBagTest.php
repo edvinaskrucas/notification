@@ -378,7 +378,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
      */
     public function testShowWarningContainer(\Krucas\Notification\NotificationsBag $bag)
     {
-        $this->assertContains('<div class="alert alert-warning">w m</div>', $bag->show('warning'));
+        $this->assertContains('<div class="alert alert-warning">w m</div>', $bag->showWarning());
 
         return $bag;
     }
@@ -388,7 +388,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
      */
     public function testShowAllContainers(\Krucas\Notification\NotificationsBag $bag)
     {
-        $this->assertContains('<div class="alert alert-warning">w m</div>', $bag->show());
+        $this->assertContains('<div class="alert alert-warning">w m</div>', $bag->showAll());
 
         return $bag;
     }
@@ -398,7 +398,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
      */
     public function testShowAllContainersWithACustomFormat(\Krucas\Notification\NotificationsBag $bag)
     {
-        $this->assertContains('w m', $bag->show(null, ':message'));
+        $this->assertContains('w m', $bag->showAll(':message'));
 
         return $bag;
     }
@@ -473,7 +473,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('no format', $this->bag->get('info')[1]->getFormat());
         $this->assertFalse($this->bag->get('info')[1]->isFlashable());
 
-        $this->assertEquals('test error!test warning...firstno format', $this->bag->show());
+        $this->assertEquals('test error!test warning...firstno format', $this->bag->showAll());
     }
 
     public function testClearSuccessMessages()
@@ -940,11 +940,11 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->bag->successInstant('success');
 
         $this->assertCount(5, $this->bag);
-        $this->assertEquals('infoinfo2errorwarningsuccess', $this->bag->show(null, ':message'));
-        $this->assertEquals('successwarning', $this->bag->group('success', 'warning')->show(null, ':message'));
-        $this->assertEquals('success', $this->bag->group('success')->show(null, ':message'));
-        $this->assertEquals('infoinfo2errorwarningsuccess', $this->bag->show(null, ':message'));
-        $this->assertEquals('infoinfo2errorwarningsuccess', $this->bag->group()->show(null, ':message'));
-        $this->assertEquals('infoinfo2errorwarningsuccess', $this->bag->group('info', 'error', 'warning', 'success')->show(null, ':message'));
+        $this->assertEquals('infoinfo2errorwarningsuccess', $this->bag->showAll(':message'));
+        $this->assertEquals('successwarning', $this->bag->group('success', 'warning')->showAll(':message'));
+        $this->assertEquals('success', $this->bag->group('success')->showAll(':message'));
+        $this->assertEquals('infoinfo2errorwarningsuccess', $this->bag->showAll(':message'));
+        $this->assertEquals('infoinfo2errorwarningsuccess', $this->bag->group()->showAll(':message'));
+        $this->assertEquals('infoinfo2errorwarningsuccess', $this->bag->group('info', 'error', 'warning', 'success')->showAll(':message'));
     }
 }
