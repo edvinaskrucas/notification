@@ -641,6 +641,17 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
+     * Returns message with a given alias or null if not found.
+     *
+     * @param $alias
+     * @return \Krucas\Notification\Message|null
+     */
+    public function getAliased($alias)
+    {
+        return $this->all()->getAliased($alias);
+    }
+
+    /**
      * Get the instance as an array.
      *
      * @return array
