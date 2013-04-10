@@ -610,6 +610,16 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
+     * Return array with groups list for rendering.
+     *
+     * @return array
+     */
+    public function getGroupingForRender()
+    {
+        return $this->groupForRender;
+    }
+
+    /**
      * Set order to render types.
      * Call this method: group('success', 'info', ...)
      *
@@ -621,6 +631,43 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
         {
             $this->groupForRender = func_get_args();
         }
+
+        return $this;
+    }
+
+    /**
+     * Adds type for rendering.
+     *
+     * @param $type
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function addToGrouping($type)
+    {
+        if(!in_array($type, $this->groupForRender))
+        {
+            $this->groupForRender[] = $type;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Removes type from rendering.
+     *
+     * @param $type
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function removeFromGrouping($type)
+    {
+        foreach($this->groupForRender as $key => $typeToRender)
+        {
+            if($type == $typeToRender)
+            {
+                unset($this->groupForRender[$key]);
+            }
+        }
+
+        $this->groupForRender = array_values($this->groupForRender);
 
         return $this;
     }

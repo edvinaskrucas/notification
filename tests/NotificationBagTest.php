@@ -913,6 +913,22 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('warning', $this->bag->getAliased('a')->getType());
     }
 
+    public function testManipulatingGroupingForRender()
+    {
+        $this
+            ->bag
+            ->addToGrouping('info')
+            ->addToGrouping('success');
+
+        $this->assertEquals(array('info', 'success'), $this->bag->getGroupingForRender());
+
+        $this
+            ->bag
+            ->removeFromGrouping('info');
+
+        $this->assertEquals(array('success'), $this->bag->getGroupingForRender());
+    }
+
     public function testGroupingForRendering()
     {
         $this->bag->clear();
