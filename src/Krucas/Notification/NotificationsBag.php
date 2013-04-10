@@ -479,10 +479,9 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     /**
      * Returns first message object for given type.
      *
-     * @param $type
      * @return \Krucas\Notification\Message
      */
-    public function first($type)
+    public function first()
     {
         return $this->notifications->first();
     }
