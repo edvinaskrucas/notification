@@ -3,8 +3,8 @@
 ---
 
 * Refactored how messages are stored in bag.
-* Added method getAtPosition($position) to a NotificationBag
-* Added method getAtPosition($position) to a Notification
+* Added method getAtPosition($position) to a NotificationBag and Notification.
+* Added method getAliased($alias) to a Notification, NotificationBag and Collection classes.
 
 ---
 
