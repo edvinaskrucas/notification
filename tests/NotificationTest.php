@@ -162,7 +162,7 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $this->n->successInstant('success');
         $this->n->success('success flash');
 
-        $this->assertEquals('warning error info success ', $this->n->showAll(null, ':message '));
+        $this->assertEquals('warning error info success ', $this->n->showAll(':message '));
     }
 
     public function testAddToMoreThanOneContainerAndShowOneOfThem()
@@ -180,8 +180,8 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
         $this->n->container('b')->warning('warning flash');
 
-        $this->assertEquals('<div class="alert alert-warning">warning</div>', $this->n->showAll('a'));
-        $this->assertEquals('', $this->n->showAll('b'));
+        $this->assertEquals('<div class="alert alert-warning">warning</div>', $this->n->container('a')->showAll());
+        $this->assertEquals('', $this->n->container('b')->showAll());
     }
 
     public function testAddInstantMessageAndInstantlyShowIt()
@@ -290,5 +290,26 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $this->n->infoInstant('info')->alias('a');
         $this->assertCount(1, $this->n->container());
         $this->assertEquals('info', $this->n->getAliased('a')->getMessage());
+    }
+
+    public function testGroupingForRendering()
+    {
+        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
+
+        $this->n->clearAll();
+
+        $this->n->infoInstant('info');
+        $this->n->infoInstant('info2');
+        $this->n->errorInstant('error');
+        $this->n->warningInstant('warning');
+        $this->n->successInstant('success');
+
+        $this->assertCount(5, $this->n->container());
+        $this->assertEquals('infoinfo2errorwarningsuccess', $this->n->showAll(':message'));
+        $this->assertEquals('successwarning', $this->n->group('success', 'warning')->showAll(':message'));
+        $this->assertEquals('success', $this->n->group('success')->showAll(':message'));
+        $this->assertEquals('infoinfo2errorwarningsuccess', $this->n->showAll(':message'));
+        $this->assertEquals('infoinfo2errorwarningsuccess', $this->n->group()->showAll(':message'));
+        $this->assertEquals('infoinfo2errorwarningsuccess', $this->n->group('info', 'error', 'warning', 'success')->showAll(':message'));
     }
 }

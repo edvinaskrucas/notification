@@ -227,6 +227,7 @@ class Notification
      * @param $message
      * @param bool $flash
      * @param null $format
+     * @return mixed
      */
     protected function addMessage($container, $type, $message, $flash = true, $format = null)
     {
@@ -258,76 +259,75 @@ class Notification
     }
 
     /**
-     * Renders each message by given type (or all) in container.
-     *
-     * @param null $type
-     * @param null $container
-     * @param null $format
-     * @return mixed
-     */
-    protected function show($type = null, $container = null, $format = null)
-    {
-        return $this->container($container)->show($type, $format);
-    }
-
-    /**
      * Renders error messages in given container.
      *
-     * @param null $container
      * @param null $format
      * @return mixed
      */
-    public function showError($container = null, $format = null)
+    public function showError($format = null)
     {
-        return $this->show('error', $container, $format);
+        return $this->container(null)->showError($format);
     }
 
     /**
      * Renders success messages in given container.
      *
-     * @param null $container
      * @param null $format
      * @return mixed
      */
-    public function showSuccess($container = null, $format = null)
+    public function showSuccess($format = null)
     {
-        return $this->show('success', $container, $format);
+        return $this->container(null)->showSuccess($format);
     }
 
     /**
      * Renders info messages in given container.
      *
-     * @param null $container
      * @param null $format
      * @return mixed
      */
-    public function showInfo($container = null, $format = null)
+    public function showInfo($format = null)
     {
-        return $this->show('info', $container, $format);
+        return $this->container(null)->showInfo($format);
     }
 
     /**
      * Renders warning messages in given container.
      *
-     * @param null $container
      * @param null $format
      * @return mixed
      */
-    public function showWarning($container = null, $format = null)
+    public function showWarning($format = null)
     {
-        return $this->show('warning', $container, $format);
+        return $this->container(null)->showWarning($format);
     }
 
     /**
      * Renders all messages in given container.
      *
-     * @param null $container
      * @param null $format
      * @return mixed
      */
-    public function showAll($container = null, $format = null)
+    public function showAll($format = null)
     {
-        return $this->show(null, $container, $format);
+        return $this->container(null)->showAll($format);
+    }
+
+    /**
+     * Adds grouping types for a default container.
+     *
+     * @return \Krucas\Notification\Notification
+     */
+    public function group()
+    {
+        $groups = func_get_args();
+
+        foreach($groups as $group)
+        {
+            $this->container(null)->addToGrouping($group);
+        }
+
+        return $this;
     }
 
     /**
