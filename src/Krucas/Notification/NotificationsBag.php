@@ -331,6 +331,17 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
+     * Renders success messages.
+     *
+     * @param null $format
+     * @return string
+     */
+    public function showSuccess($format = null)
+    {
+        return $this->show('success', $format);
+    }
+
+    /**
      * Shortcut to add error message.
      *
      * @param $message
@@ -362,6 +373,17 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     public function clearError()
     {
         return $this->clear('error');
+    }
+
+    /**
+     * Renders error messages.
+     *
+     * @param null $format
+     * @return string
+     */
+    public function showError($format = null)
+    {
+        return $this->show('error', $format);
     }
 
     /**
@@ -399,6 +421,17 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
+     * Renders info messages.
+     *
+     * @param null $format
+     * @return string
+     */
+    public function showInfo($format = null)
+    {
+        return $this->show('info', $format);
+    }
+
+    /**
      * Shortcut to add warning message.
      *
      * @param $message
@@ -430,6 +463,17 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     public function clearWarning()
     {
         return $this->clear('warning');
+    }
+
+    /**
+     * Renders warning messages.
+     *
+     * @param null $format
+     * @return string
+     */
+    public function showWarning($format = null)
+    {
+        return $this->show('warning', $format);
     }
 
     /**
@@ -730,6 +774,17 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
         }
 
         return $output;
+    }
+
+    /**
+     * Renders all messages.
+     *
+     * @param null $format
+     * @return string
+     */
+    public function showAll($format = null)
+    {
+        return $this->show(null, $format);
     }
 
     /**
