@@ -912,4 +912,23 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('warning', $this->bag->getAliased('a')->getMessage());
         $this->assertEquals('warning', $this->bag->getAliased('a')->getType());
     }
+
+    public function testGroupingForRendering()
+    {
+        $this->bag->clear();
+
+        $this->bag->infoInstant('info');
+        $this->bag->infoInstant('info2');
+        $this->bag->errorInstant('error');
+        $this->bag->warningInstant('warning');
+        $this->bag->successInstant('success');
+
+        $this->assertCount(5, $this->bag);
+        $this->assertEquals('infoinfo2errorwarningsuccess', $this->bag->show(null, ':message'));
+        $this->assertEquals('successwarning', $this->bag->group('success', 'warning')->show(null, ':message'));
+        $this->assertEquals('success', $this->bag->group('success')->show(null, ':message'));
+        $this->assertEquals('infoinfo2errorwarningsuccess', $this->bag->show(null, ':message'));
+        $this->assertEquals('infoinfo2errorwarningsuccess', $this->bag->group()->show(null, ':message'));
+        $this->assertEquals('infoinfo2errorwarningsuccess', $this->bag->group('info', 'error', 'warning', 'success')->show(null, ':message'));
+    }
 }

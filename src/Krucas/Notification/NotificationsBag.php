@@ -67,6 +67,13 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     protected $lastPosition = null;
 
     /**
+     * Sequence of how messages should be rendered by its type.
+     *
+     * @var array
+     */
+    protected $groupForRender = array();
+
+    /**
      * Creates new NotificationBag object.
      *
      * @param $container
@@ -603,6 +610,54 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
+     * Set order to render types.
+     * Call this method: group('success', 'info', ...)
+     *
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function group()
+    {
+        if(func_num_args() > 0)
+        {
+            $this->groupForRender = func_get_args();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Resolves which messages should be returned for rendering.
+     *
+     * @param null $type
+     * @return \Krucas\Notification\Collection
+     */
+    protected function getMessagesForRender($type = null)
+    {
+        if(is_null($type))
+        {
+            if(count($this->groupForRender) > 0)
+            {
+                $messages = array();
+
+                foreach($this->groupForRender as $typeToRender)
+                {
+                    $messages = array_merge($messages, $this->get($typeToRender)->all());
+                }
+
+                return new Collection($messages);
+            }
+            else
+            {
+                return $this->all();
+            }
+        }
+        else
+        {
+            return $this->get($type);
+        }
+    }
+
+    /**
      * Returns generated output of non flashable messages.
      *
      * @param null $type
@@ -611,7 +666,9 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     public function show($type = null, $format = null)
     {
-        $messages = is_null($type) ? $this->all() : $this->get($type);
+        $messages = $this->getMessagesForRender($type);
+
+        $this->groupForRender = array();
 
         $output = '';
 
