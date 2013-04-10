@@ -12,6 +12,8 @@ A simple notification management package for Laravel4.
 * Formats for notifications
 * Flashable notifications
 * Method chaining
+* Message aliasing
+* Message positioning
 
 ---
 
