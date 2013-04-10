@@ -132,6 +132,12 @@ To display all notifications in a default container you need to add just one lin
 {{ Notification::showAll() }}
 ```
 
+When using ```showAll()``` you may want to group your messages by type, it can be done like this
+```php
+{{ Notification::group('info', 'success', 'error', 'warning')->showAll() }}
+```
+This will group all your messages in group and output it, also you can use just one, two or three groups.
+
 Display notifications by type in default container, you can pass custom format
 ```php
 {{ Notification::showError() }}
