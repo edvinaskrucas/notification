@@ -269,4 +269,15 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $this->n->clearAll();
         $this->assertCount(0, $this->n->container()->all());
     }
+
+    public function testGetAtPositionForADefaultContainer()
+    {
+        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
+
+        $this->n->clearAll();
+
+        $this->n->infoInstant('info')->atPosition(5);
+        $this->assertCount(1, $this->n->container());
+        $this->assertEquals('info', $this->n->getAtPosition(5)->getMessage());
+    }
 }

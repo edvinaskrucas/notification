@@ -198,6 +198,17 @@ class Notification
     }
 
     /**
+     * Returns message at given position in a default container.
+     *
+     * @param $position
+     * @return \Krucas\Notification\Message
+     */
+    public function getAtPosition($position)
+    {
+        return $this->container(null)->getAtPosition($position);
+    }
+
+    /**
      * Adds message to container.
      *
      * @param $container
