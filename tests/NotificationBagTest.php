@@ -886,4 +886,13 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('a', $this->bag->all()->getAtPosition(5)->getAlias());
         $this->assertEquals('info', $this->bag->all()->getAtPosition(5)->getType());
     }
+
+    public function testGetAtPositionShortcut()
+    {
+        $this->bag->clear();
+
+        $this->bag->infoInstant('info')->atPosition(5);
+
+        $this->assertEquals('info', $this->bag->getAtPosition(5)->getMessage());
+    }
 }

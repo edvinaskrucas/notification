@@ -629,6 +629,18 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
+     * Returns messages at given position.
+     * Shortcut to all()->getAtPosition().
+     *
+     * @param $position
+     * @return \Krucas\Notification\Message
+     */
+    public function getAtPosition($position)
+    {
+        return $this->all()->getAtPosition($position);
+    }
+
+    /**
      * Get the instance as an array.
      *
      * @return array
