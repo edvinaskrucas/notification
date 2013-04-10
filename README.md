@@ -194,7 +194,7 @@ Notification::info('info')->atPosition(5);
 Notification::info('info2')->atPosition(1);
 ```
 
-Retrieveing messages at certain position
+Retrieving messages at certain position
 ```php
 Notification::getAtPosition(5);
 ```
