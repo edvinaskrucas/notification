@@ -19,6 +19,7 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
         $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
         $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
+        $config->shouldReceive('get')->with('notification::default_container')->andReturn('default');
 
         $session->shouldReceive('get')->andReturn(false);
 
@@ -33,11 +34,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
     public function testContainerMethodIfReturnsNotificationBag()
     {
         $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->container('test'));
-    }
-
-    public function testGetMethodIfReturnsNotificationBag()
-    {
-        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->get('test'));
     }
 
     public function testIfAddingSuccessMessageReturnsNotificationsBag()
