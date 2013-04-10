@@ -6,6 +6,7 @@
 * Added method ```getAtPosition($position)``` to a NotificationBag and Notification.
 * Added method ```getAliased($alias)``` to a Notification, NotificationBag and Collection classes.
 * Added method ```group()``` to Notification and NotificationBag to allow render grouping.
+* When working directly with ```Notification```, you will work just with default container.
 
 ---
 
