@@ -3,6 +3,7 @@
 ---
 
 * Refactored how messages are stored in bag.
+* Added method getAtPosition($position) to a NotificationBag
 
 ---
 
