@@ -32,7 +32,7 @@ class NotificationServiceProvider extends ServiceProvider {
 
 		$this->app['notification'] = $this->app->share(function($app)
         {
-            return new Notification($app['config'], $app['session']);
+            return new Notification($app['config'], $app['session.store']);
         });
 	}
 
