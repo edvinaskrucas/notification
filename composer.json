@@ -1,6 +1,6 @@
 {
     "name": "edvinaskrucas/notification",
-    "description": "",
+    "description": "Package for Laravel for helping to manage flash / instant notifications / messages.",
     "authors": [
         {
             "name": "Edvinas Kručas",
