@@ -1,3 +1,8 @@
+# 1.2.3
+---
+
+* Check if ```session.store``` is set before using it.
+
 # 1.2
 
 ---
