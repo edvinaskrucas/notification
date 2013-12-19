@@ -2,6 +2,8 @@
 
 use Mockery as m;
 
+require_once 'Mocks/NotificationsBagMock.php';
+
 class NotificationBagTest extends PHPUnit_Framework_TestCase
 {
     private $bag;
@@ -22,6 +24,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
         $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
+        $config->shouldReceive('get')->with('notification::default_types')->andReturn(array('__' => array('success', 'info', 'error', 'warning')));
         $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
 
         $this->bag = new \Krucas\Notification\NotificationsBag('test',$session, $config);
@@ -32,6 +35,53 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->bag);
 
         return $this->bag;
+    }
+
+    public function testAddMessageType()
+    {
+        $this->bag->clearTypes();
+        $this->assertCount(0, $this->bag->getTypes());
+        $this->assertFalse($this->bag->typeIsAvailable('info'));
+        $this->bag->addType('info');
+        $this->assertEquals(array('info'), $this->bag->getTypes());
+        $this->assertCount(1, $this->bag->getTypes());
+        $this->bag->addType(array('error', 'warning'));
+        $this->assertEquals(array('info', 'error', 'warning'), $this->bag->getTypes());
+        $this->assertCount(3, $this->bag->getTypes());
+        $this->assertTrue($this->bag->typeIsAvailable('info'));
+    }
+
+    public function testExtractType()
+    {
+        $session = m::mock('Illuminate\Session\Store');
+        $config = m::mock('Illuminate\Config\Repository');
+
+        $session->shouldReceive('get')
+            ->once()
+            ->andReturn('[{"type":"error","message":"test error","format":":message!","alias":null,"position":null},{"type":"warning","message":"test warning","format":":message...","alias":null,"position":null}]');
+
+        $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
+        $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
+        $config->shouldReceive('get')->with('notification::default_types')->andReturn(array('__' => array()));
+        $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
+
+        $bag = new NotificationsBagMock('test', $session, $config);
+
+        $this->assertFalse($bag->extractType('info'));
+
+        $bag->addType(array('info', 'warning', 'danger', 'success', 'error'));
+
+        $this->assertEquals(array('info', 'add'), $bag->extractType('info'));
+        $this->assertEquals(array('info', 'instant'), $bag->extractType('infoInstant'));
+        $this->assertEquals(array('info', 'clear'), $bag->extractType('clearInfo'));
+        $this->assertEquals(array('info', 'show'), $bag->extractType('showInfo'));
+        $this->assertFalse($bag->extractType('ShowInfo'));
+        $this->assertFalse($bag->extractType('infoinstant'));
+
+        $this->assertEquals(array('warning', 'instant'), $bag->extractType('warningInstant'));
+        $this->assertEquals(array('danger', 'show'), $bag->extractType('showDanger'));
+        $this->assertEquals(array('error', 'clear'), $bag->extractType('clearError'));
+        $this->assertEquals(array('success', 'add'), $bag->extractType('success'));
     }
 
     /**
@@ -746,6 +796,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
         $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
+        $config->shouldReceive('get')->with('notification::default_types')->andReturn(array('__' => array('success', 'info', 'error', 'warning')));
         $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
 
         $bag = new \Krucas\Notification\NotificationsBag('test',$session, $config);
@@ -784,6 +835,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
         $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
+        $config->shouldReceive('get')->with('notification::default_types')->andReturn(array('__' => array('success', 'info', 'error', 'warning')));
         $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
 
         $bag = new \Krucas\Notification\NotificationsBag('test',$session, $config);
@@ -814,6 +866,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
         $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
+        $config->shouldReceive('get')->with('notification::default_types')->andReturn(array('__' => array('success', 'info', 'error', 'warning')));
         $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
 
         $bag = new \Krucas\Notification\NotificationsBag('test',$session, $config);

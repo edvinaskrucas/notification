@@ -74,6 +74,25 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     protected $groupForRender = array();
 
     /**
+     * Available message types in container.
+     *
+     * @var array
+     */
+    protected $types = array();
+
+    /**
+     * Array of matcher for extracting types.
+     *
+     * @var array
+     */
+    protected $matcher = array(
+        'add'       => '{type}',
+        'instant'   => '{type}Instant',
+        'clear'     => 'clear{uType}',
+        'show'      => 'show{uType}',
+    );
+
+    /**
      * Creates new NotificationBag object.
      *
      * @param $container
@@ -90,6 +109,107 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
         $this->loadFormats();
 
         $this->load();
+
+        $this->initTypes();
+    }
+
+    /**
+     * Initialize default container types.
+     */
+    protected function initTypes()
+    {
+        $config = $this->configRepository->get('notification::default_types');
+
+        $types = isset($config[$this->container]) ? $config[$this->container] : $config['__'];
+
+        foreach($types as $type)
+        {
+            $this->addType($type);
+        }
+    }
+
+    /**
+     * Add new available type of message to bag.
+     *
+     * @param $type
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function addType($type)
+    {
+        if(is_array($type))
+        {
+            foreach($type as $t)
+            {
+                $this->addType($t);
+            }
+        } else {
+            if(!$this->typeIsAvailable($type))
+            {
+                $this->types[] = $type;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Determines if type is available in container.
+     *
+     * @param $type
+     * @return bool
+     */
+    public function typeIsAvailable($type)
+    {
+        return in_array($type, array_values($this->types)) ? true : false;
+    }
+
+    /**
+     * Return available types of messages in container.
+     *
+     * @return array
+     */
+    public function getTypes()
+    {
+        return $this->types;
+    }
+
+    /**
+     * Resets types values.
+     *
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function clearTypes()
+    {
+        $this->types = array();
+
+        return $this;
+    }
+
+    /**
+     * Extract type from a given string.
+     *
+     * @param $name
+     * @return bool|array
+     */
+    protected function extractType($name)
+    {
+        if(count($this->types) <= 0)
+        {
+            return false;
+        }
+
+        foreach($this->types as $type)
+        {
+            foreach($this->matcher as $function => $pattern)
+            {
+                if(str_replace(array('{type}', '{uType}'), array($type, ucfirst($type)), $pattern) === $name)
+                {
+                    return array($type, $function);
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -294,186 +414,6 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     public function clearAll()
     {
         return $this->clear(null);
-    }
-
-    /**
-     * Shortcut to add success message.
-     *
-     * @param $message
-     * @param null $format
-     * @return \Krucas\Notification\NotificationsBag
-     */
-    public function success($message, $format = null)
-    {
-        return $this->add('success', $message, true, $format);
-    }
-
-    /**
-     * Adds instant success message. It will be shown in same request.
-     *
-     * @param $message
-     * @param null $format
-     * @return \Krucas\Notification\NotificationsBag
-     */
-    public function successInstant($message, $format = null)
-    {
-        return $this->add('success', $message, false, $format);
-    }
-
-    /**
-     * Clears success messages.
-     *
-     * @return \Krucas\Notification\NotificationsBag
-     */
-    public function clearSuccess()
-    {
-        return $this->clear('success');
-    }
-
-    /**
-     * Renders success messages.
-     *
-     * @param null $format
-     * @return string
-     */
-    public function showSuccess($format = null)
-    {
-        return $this->show('success', $format);
-    }
-
-    /**
-     * Shortcut to add error message.
-     *
-     * @param $message
-     * @param null $format
-     * @return \Krucas\Notification\NotificationsBag
-     */
-    public function error($message, $format = null)
-    {
-        return $this->add('error', $message, true, $format);
-    }
-
-    /**
-     * Adds instant error message. It will be shown in same request.
-     *
-     * @param $message
-     * @param null $format
-     * @return \Krucas\Notification\NotificationsBag
-     */
-    public function errorInstant($message, $format = null)
-    {
-        return $this->add('error', $message, false, $format);
-    }
-
-    /**
-     * Clears error messages.
-     *
-     * @return \Krucas\Notification\NotificationsBag
-     */
-    public function clearError()
-    {
-        return $this->clear('error');
-    }
-
-    /**
-     * Renders error messages.
-     *
-     * @param null $format
-     * @return string
-     */
-    public function showError($format = null)
-    {
-        return $this->show('error', $format);
-    }
-
-    /**
-     * Shortcut to add info message.
-     *
-     * @param $message
-     * @param null $format
-     * @return \Krucas\Notification\NotificationsBag
-     */
-    public function info($message, $format = null)
-    {
-        return $this->add('info', $message, true, $format);
-    }
-
-    /**
-     * Adds instant info message. It will be shown in same request.
-     *
-     * @param $message
-     * @param null $format
-     * @return \Krucas\Notification\NotificationsBag
-     */
-    public function infoInstant($message, $format = null)
-    {
-        return $this->add('info', $message, false, $format);
-    }
-
-    /**
-     * Clears info messages.
-     *
-     * @return \Krucas\Notification\NotificationsBag
-     */
-    public function clearInfo()
-    {
-        return $this->clear('info');
-    }
-
-    /**
-     * Renders info messages.
-     *
-     * @param null $format
-     * @return string
-     */
-    public function showInfo($format = null)
-    {
-        return $this->show('info', $format);
-    }
-
-    /**
-     * Shortcut to add warning message.
-     *
-     * @param $message
-     * @param null $format
-     * @return \Krucas\Notification\NotificationsBag
-     */
-    public function warning($message, $format = null)
-    {
-        return $this->add('warning', $message, true, $format);
-    }
-
-    /**
-     * Adds instant warning message. It will be shown in same request.
-     *
-     * @param $message
-     * @param null $format
-     * @return \Krucas\Notification\NotificationsBag
-     */
-    public function warningInstant($message, $format = null)
-    {
-        return $this->add('warning', $message, false, $format);
-    }
-
-    /**
-     * Clears warning messages.
-     *
-     * @return \Krucas\Notification\NotificationsBag
-     */
-    public function clearWarning()
-    {
-        return $this->clear('warning');
-    }
-
-    /**
-     * Renders warning messages.
-     *
-     * @param null $format
-     * @return string
-     */
-    public function showWarning($format = null)
-    {
-        return $this->show('warning', $format);
     }
 
     /**
@@ -875,5 +815,30 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     public function __toString()
     {
         return (string) $this->notifications;
+    }
+
+    public function __call($name, $arguments)
+    {
+        if(($extracted = $this->extractType($name)) !== false)
+        {
+            switch($extracted[1])
+            {
+                case 'add':
+                    return $this->add($extracted[0], isset($arguments[0]) ? $arguments[0] : null, true, isset($arguments[1]) ? $arguments[1] : null);
+                break;
+
+                case 'instant';
+                    return $this->add($extracted[0], isset($arguments[0]) ? $arguments[0] : null, false, isset($arguments[1]) ? $arguments[1] : null);
+                break;
+
+                case 'clear':
+                    return $this->clear($extracted[0]);
+                break;
+
+                case 'show':
+                    return $this->show($extracted[0], isset($arguments[0]) ? $arguments[0] : null);
+                break;
+            }
+        }
     }
 }

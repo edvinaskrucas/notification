@@ -68,6 +68,26 @@ return array(
 
         ),
 
-    )
+    ),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default message types available in containers
+    |--------------------------------------------------------------------------
+    |
+    */
+    'default_types'                         => array(
+
+        /**
+         * Default individual messages for all containers.
+         */
+        '__'                    => array(
+            'info',
+            'success',
+            'warning',
+            'error',
+        ),
+
+    ),
 
 );
