@@ -16,8 +16,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $session = m::mock('Illuminate\Session\Store');
         $config = m::mock('Illuminate\Config\Repository');
 
-        $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
-        $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
         $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
         $config->shouldReceive('get')->with('notification::default_container')->andReturn('default');
 

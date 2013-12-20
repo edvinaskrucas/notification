@@ -22,11 +22,9 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
             ->once()
             ->andReturn('[{"type":"error","message":"test error","format":":message!","alias":null,"position":null},{"type":"warning","message":"test warning","format":":message...","alias":null,"position":null}]');
 
-        $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
-        $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
         $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
 
-        $this->bag = new \Krucas\Notification\NotificationsBag('test',$session, $config, array('success', 'info', 'error', 'warning'));
+        $this->bag = new \Krucas\Notification\NotificationsBag('test',$session, $config, array('success', 'info', 'error', 'warning'), '<div class="alert alert-:type">:message</div>', array());
     }
 
     public function testConstructor()
@@ -59,11 +57,9 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
             ->once()
             ->andReturn('[{"type":"error","message":"test error","format":":message!","alias":null,"position":null},{"type":"warning","message":"test warning","format":":message...","alias":null,"position":null}]');
 
-        $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
-        $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
         $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
 
-        $bag = new NotificationsBagMock('test', $session, $config, array());
+        $bag = new NotificationsBagMock('test', $session, $config, array(), '<div class="alert alert-:type">:message</div>', array());
 
         $this->assertFalse($bag->extractType('info'));
 
@@ -792,11 +788,9 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $session->shouldReceive('flash');
 
-        $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
-        $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
         $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
 
-        $bag = new \Krucas\Notification\NotificationsBag('test',$session, $config, array('success', 'info', 'error', 'warning'));
+        $bag = new \Krucas\Notification\NotificationsBag('test',$session, $config, array('success', 'info', 'error', 'warning'), '<div class="alert alert-:type">:message</div>', array());
 
         $this->assertCount(1, $bag->get('error'));
         $this->assertEquals('a', $bag->get('error')->getAtPosition(5)->getAlias());
@@ -830,11 +824,9 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
             ->once()
             ->with('notifications_test', '[{"message":"test","format":":m","type":"info","flashable":true,"alias":"i","position":5}]');
 
-        $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
-        $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
         $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
 
-        $bag = new \Krucas\Notification\NotificationsBag('test',$session, $config, array('success', 'info', 'error', 'warning'));
+        $bag = new \Krucas\Notification\NotificationsBag('test',$session, $config, array('success', 'info', 'error', 'warning'), '<div class="alert alert-:type">:message</div>', array());
 
         $bag->info('test', ':m')->alias('i')->atPosition(5);
     }
@@ -860,11 +852,9 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
             ->once()
             ->with('notifications_test', '[{"message":"test","format":":m","type":"info","flashable":true,"alias":"i","position":5}]');
 
-        $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
-        $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
         $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
 
-        $bag = new \Krucas\Notification\NotificationsBag('test',$session, $config, array('success', 'info', 'error', 'warning'));
+        $bag = new \Krucas\Notification\NotificationsBag('test',$session, $config, array('success', 'info', 'error', 'warning'), '<div class="alert alert-:type">:message</div>', array());
 
         $bag->info('test', ':m')->atPosition(5)->alias('i');
     }

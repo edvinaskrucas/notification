@@ -53,7 +53,7 @@ class Notification
 
         if(!isset($this->containers[$container]))
         {
-            $this->containers[$container] = new NotificationsBag($container, $this->sessionStore, $this->configRepository, array('success', 'info', 'error', 'warning'));
+            $this->containers[$container] = new NotificationsBag($container, $this->sessionStore, $this->configRepository, array('success', 'info', 'error', 'warning'), '<div class="alert alert-:type">:message</div>', array());
         }
 
         if(is_callable($callback))

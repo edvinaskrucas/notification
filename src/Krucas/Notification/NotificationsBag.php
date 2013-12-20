@@ -99,19 +99,23 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      * @param \Illuminate\Session\Store $sessionStore
      * @param \Illuminate\Config\Repository $configRepository
      * @param array $types
+     * @param string $defaultFormat
+     * @param array $formats
      */
-    public function __construct($container, SessionStore $sessionStore, Repository $configRepository, $types = array())
+    public function __construct($container, SessionStore $sessionStore, Repository $configRepository, $types = array(), $defaultFormat = ':message', $formats = array())
     {
         $this->container = $container;
         $this->configRepository = $configRepository;
         $this->sessionStore = $sessionStore;
         $this->notifications = new Collection();
 
-        $this->loadFormats();
-
         $this->load();
 
         $this->addType($types);
+
+        $this->setFormat($defaultFormat);
+
+        $this->addFormats($formats);
     }
 
     /**
@@ -451,27 +455,6 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
-     * Loads default formats for messages.
-     *
-     * @return void
-     */
-    protected function loadFormats()
-    {
-        $this->setFormat($this->configRepository->get('notification::default_format'));
-
-        $config = $this->configRepository->get('notification::default_formats');
-
-        $formats = isset($config[$this->container]) ?
-            $config[$this->container] :
-            $config['__'];
-
-        foreach($formats as $type => $format)
-        {
-            $this->setFormat($format, $type);
-        }
-    }
-
-    /**
      * Sets global or individual message format.
      *
      * @param $format
@@ -487,6 +470,22 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
         else
         {
             $this->format = $format;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add formats for types.
+     *
+     * @param array $formats
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function addFormats($formats = array())
+    {
+        foreach($formats as $type => $format)
+        {
+            $this->setFormat($format, $type);
         }
 
         return $this;
