@@ -98,8 +98,9 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      * @param $container
      * @param \Illuminate\Session\Store $sessionStore
      * @param \Illuminate\Config\Repository $configRepository
+     * @param array $types
      */
-    public function __construct($container, SessionStore $sessionStore, Repository $configRepository)
+    public function __construct($container, SessionStore $sessionStore, Repository $configRepository, $types = array())
     {
         $this->container = $container;
         $this->configRepository = $configRepository;
@@ -110,22 +111,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
 
         $this->load();
 
-        $this->initTypes();
-    }
-
-    /**
-     * Initialize default container types.
-     */
-    protected function initTypes()
-    {
-        $config = $this->configRepository->get('notification::default_types');
-
-        $types = isset($config[$this->container]) ? $config[$this->container] : $config['__'];
-
-        foreach($types as $type)
-        {
-            $this->addType($type);
-        }
+        $this->addType($types);
     }
 
     /**
