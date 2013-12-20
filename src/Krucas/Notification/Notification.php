@@ -36,6 +36,14 @@ class Notification
     protected $containers = array();
 
     /**
+     * Default types for containers.
+     * Used when creating new container.
+     *
+     * @var array
+     */
+    protected $types = array();
+
+    /**
      * Creates new instance.
      *
      * @param \Illuminate\Config\Repository $configRepository
@@ -47,6 +55,29 @@ class Notification
         $this->configRepository = $configRepository;
         $this->sessionStore = $sessionStore;
         $this->defaultContainer = $defaultContainer;
+    }
+
+    /**
+     * @param $container
+     * @param array $types
+     * @return \Krucas\Notification\Notification
+     */
+    public function setTypes($container, $types = array())
+    {
+        $this->types[$container] = $types;
+
+        return $this;
+    }
+
+    /**
+     * Return default types of a container.
+     *
+     * @param $container
+     * @return array
+     */
+    public function getTypes($container)
+    {
+        return isset($this->types[$container]) ? $this->types[$container] : array();
     }
 
     /**
@@ -62,7 +93,7 @@ class Notification
 
         if(!isset($this->containers[$container]))
         {
-            $this->containers[$container] = new NotificationsBag($container, $this->sessionStore, $this->configRepository, array('success', 'info', 'error', 'warning'), '<div class="alert alert-:type">:message</div>', array());
+            $this->containers[$container] = new NotificationsBag($container, $this->sessionStore, $this->configRepository, $this->getTypes($container), '<div class="alert alert-:type">:message</div>', array());
         }
 
         if(is_callable($callback))

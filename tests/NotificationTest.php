@@ -11,6 +11,20 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
+    protected function getNotification()
+    {
+        $session = m::mock('Illuminate\Session\Store');
+        $config = m::mock('Illuminate\Config\Repository');
+
+        $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
+
+        $session->shouldReceive('get')->andReturn(false);
+
+        $notification = new \Krucas\Notification\Notification($config, $session, 'default');
+
+        return $notification;
+    }
+
     protected function setUp()
     {
         $session = m::mock('Illuminate\Session\Store');
@@ -21,11 +35,22 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $session->shouldReceive('get')->andReturn(false);
 
         $this->n = new \Krucas\Notification\Notification($config, $session, 'default');
+        $this->n->setTypes('default', array('success', 'info', 'error', 'warning'));
     }
 
     public function testConstructor()
     {
         $this->assertInstanceOf('Krucas\Notification\Notification', $this->n);
+    }
+
+    public function testSetTypesForContainer()
+    {
+        $notification = $this->getNotification();
+
+        $this->assertEquals(array(), $notification->getTypes('test'));
+
+        $notification->setTypes('test', array('info', 'success'));
+        $this->assertEquals(array('info', 'success'), $notification->getTypes('test'));
     }
 
     public function testContainerMethodIfReturnsNotificationBag()
@@ -64,6 +89,8 @@ class NotificationTest extends PHPUnit_Framework_TestCase
     public function testAddingAMessageToDifferentContainers()
     {
         $this->n->getSessionStore()->shouldReceive('flash');
+
+        $this->n->setTypes('other', array('info'));
 
         $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->info('test'));
         $this->assertCount(1, $this->n->container());
@@ -142,6 +169,9 @@ class NotificationTest extends PHPUnit_Framework_TestCase
     {
         $this->n->getSessionStore()->shouldReceive('flash');
 
+        $this->n->setTypes('a', array('warning'));
+        $this->n->setTypes('b', array('warning'));
+
         $this->n->warningInstant('warning');
         $this->n->errorInstant('error');
         $this->n->infoInstant('info');
@@ -158,11 +188,14 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testAddInstantMessageAndInstantlyShowIt()
     {
+        $this->n->setTypes('instant', array('info'));
         $this->assertEquals('<div class="alert alert-info">instant</div>', (string) $this->n->container('instant')->infoInstant('instant'));
     }
 
     public function testAddingMessagesInAClosure()
     {
+        $this->n->setTypes('a', array('info', 'error'));
+
         $this->n->container('a', function($bag)
         {
             $bag->infoInstant('info');
