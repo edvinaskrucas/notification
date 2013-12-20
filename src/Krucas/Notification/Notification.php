@@ -22,6 +22,13 @@ class Notification
     protected $sessionStore;
 
     /**
+     * Default container name.
+     *
+     * @var string
+     */
+    protected $defaultContainer;
+
+    /**
      * List of instantiated containers.
      *
      * @var array
@@ -33,11 +40,13 @@ class Notification
      *
      * @param \Illuminate\Config\Repository $configRepository
      * @param \Illuminate\Session\Store $sessionStore
+     * @param string $defaultContainer
      */
-    public function __construct(Repository $configRepository, SessionStore $sessionStore)
+    public function __construct(Repository $configRepository, SessionStore $sessionStore, $defaultContainer = 'default')
     {
         $this->configRepository = $configRepository;
         $this->sessionStore = $sessionStore;
+        $this->defaultContainer = $defaultContainer;
     }
 
     /**
@@ -49,7 +58,7 @@ class Notification
      */
     public function container($container = null, Closure $callback = null)
     {
-        $container = is_null($container) ? $this->configRepository->get('notification::default_container') : $container;
+        $container = is_null($container) ? $this->defaultContainer : $container;
 
         if(!isset($this->containers[$container]))
         {

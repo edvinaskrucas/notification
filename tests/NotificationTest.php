@@ -17,11 +17,10 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $config = m::mock('Illuminate\Config\Repository');
 
         $config->shouldReceive('get')->with('notification::session_prefix')->andReturn('notifications_');
-        $config->shouldReceive('get')->with('notification::default_container')->andReturn('default');
 
         $session->shouldReceive('get')->andReturn(false);
 
-        $this->n = new \Krucas\Notification\Notification($config, $session);
+        $this->n = new \Krucas\Notification\Notification($config, $session, 'default');
     }
 
     public function testConstructor()
@@ -36,7 +35,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testIfAddingSuccessMessageReturnsNotificationsBag()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
         $this->n->getSessionStore()->shouldReceive('flash')->once();
 
         $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->success('test'));
@@ -44,7 +42,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testIfAddingWarningMessageReturnsNotificationsBag()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
         $this->n->getSessionStore()->shouldReceive('flash')->once();
 
         $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->warning('test'));
@@ -52,7 +49,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testIfAddingErrorMessageReturnsNotificationsBag()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
         $this->n->getSessionStore()->shouldReceive('flash')->once();
 
         $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->error('test'));
@@ -60,7 +56,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testIfAddingInfoMessageReturnsNotificationsBag()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
         $this->n->getSessionStore()->shouldReceive('flash')->once();
 
         $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->info('test'));
@@ -68,7 +63,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testAddingAMessageToDifferentContainers()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
         $this->n->getSessionStore()->shouldReceive('flash');
 
         $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->info('test'));
@@ -81,35 +75,26 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testIfAddingInstantSuccessMessageReturnsNotificationsBag()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->successInstant('test'));
     }
 
     public function testIfAddingInstantWarningMessageReturnsNotificationsBag()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->warningInstant('test'));
     }
 
     public function testIfAddingInstantErrorMessageReturnsNotificationsBag()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->errorInstant('test'));
     }
 
     public function testIfAddingInstantInfoMessageReturnsNotificationsBag()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->infoInstant('test'));
     }
 
     public function testShowSuccessMethod()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
         $this->n->getSessionStore()->shouldReceive('flash');
 
         $this->n->successInstant('ok', ':message');
@@ -121,8 +106,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testShowInfoMethod()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->n->infoInstant('info');
 
         $this->assertEquals('<div class="alert alert-info">info</div>', $this->n->showInfo());
@@ -130,8 +113,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testShowErrorMethod()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->n->errorInstant('error');
 
         $this->assertEquals('<div class="alert alert-error">error</div>', $this->n->showError());
@@ -139,8 +120,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testShowWarningMethod()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->n->warningInstant('warning');
 
         $this->assertEquals('<div class="alert alert-warning">warning</div>', $this->n->showWarning());
@@ -148,7 +127,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testShowAllWithACustomFormat()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
         $this->n->getSessionStore()->shouldReceive('flash');
 
         $this->n->warningInstant('warning');
@@ -162,7 +140,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testAddToMoreThanOneContainerAndShowOneOfThem()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
         $this->n->getSessionStore()->shouldReceive('flash');
 
         $this->n->warningInstant('warning');
@@ -181,8 +158,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testAddInstantMessageAndInstantlyShowIt()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->assertEquals('<div class="alert alert-info">instant</div>', (string) $this->n->container('instant')->infoInstant('instant'));
     }
 
@@ -199,8 +174,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testClearSuccessMessages()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->n->successInstant('test');
         $this->assertCount(1, $this->n->container()->get('success'));
 
@@ -210,8 +183,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testClearInfoMessages()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->n->infoInstant('test');
         $this->assertCount(1, $this->n->container()->get('info'));
 
@@ -221,8 +192,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testClearWarningMessages()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->n->warningInstant('test');
         $this->assertCount(1, $this->n->container()->get('warning'));
 
@@ -232,8 +201,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testClearErrorMessages()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->n->errorInstant('test');
         $this->assertCount(1, $this->n->container()->get('error'));
 
@@ -243,8 +210,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testClearAllMessages()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->n->errorInstant('test');
         $this->n->infoInstant('test');
         $this->n->warningInstant('test');
@@ -257,8 +222,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testClearMessagesWhenNoMessagesSet()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->assertCount(0, $this->n->container()->all());
 
         $this->n->clearAll();
@@ -267,8 +230,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testGetAtPositionForADefaultContainer()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->n->clearAll();
 
         $this->n->infoInstant('info')->atPosition(5);
@@ -278,8 +239,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testGetAliasedFromADefaultContainer()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->n->clearAll();
 
         $this->n->infoInstant('info')->alias('a');
@@ -289,8 +248,6 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     public function testGroupingForRendering()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
         $this->n->clearAll();
 
         $this->n->infoInstant('info');
