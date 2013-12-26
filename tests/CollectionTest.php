@@ -6,7 +6,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 {
     public function testCollectionConstructor()
     {
-        $collection = new \Krucas\Notification\Collection();
+        $collection = $this->getCollection();
 
         $this->assertInstanceOf('Krucas\Notification\Collection', $collection);
         $this->assertCount(0, $collection);
@@ -14,17 +14,19 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
     public function testAddingMessagesToCollection()
     {
-        $collection = new \Krucas\Notification\Collection();
+        $collection = $this->getCollection();
+        $this->assertCount(0, $collection);
 
         $collection->add(new \Krucas\Notification\Message());
-        $collection->add(new \Krucas\Notification\Message());
+        $this->assertCount(1, $collection);
 
+        $collection->add(new \Krucas\Notification\Message());
         $this->assertCount(2, $collection);
     }
 
     public function testContainsMethod()
     {
-        $collection = new \Krucas\Notification\Collection();
+        $collection = $this->getCollection();
 
         $collection->add(new \Krucas\Notification\Message());
 
@@ -35,17 +37,19 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
     public function testAddUniqueMessages()
     {
-        $collection = new \Krucas\Notification\Collection();
+        $collection = $this->getCollection();
+        $this->assertCount(0, $collection);
 
         $collection->addUnique(new \Krucas\Notification\Message());
-        $collection->addUnique(new \Krucas\Notification\Message());
+        $this->assertCount(1, $collection);
 
+        $collection->addUnique(new \Krucas\Notification\Message());
         $this->assertCount(1, $collection);
     }
 
     public function testCollectionRender()
     {
-        $collection = new \Krucas\Notification\Collection();
+        $collection = $this->getCollection();
 
         $collection->add(new \Krucas\Notification\Message('error', 'error message', false, ':type: :message'));
         $collection->add(new \Krucas\Notification\Message('warning', 'w', false, ':message'));
@@ -56,7 +60,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
     public function testCollectionToString()
     {
-        $collection = new \Krucas\Notification\Collection();
+        $collection = $this->getCollection();
 
         $collection->add(new \Krucas\Notification\Message('error', 'error message', false, ':type: :message'));
         $collection->add(new \Krucas\Notification\Message('warning', 'w', false, ':message'));
@@ -67,7 +71,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
     public function testIndexOf()
     {
-        $collection = new \Krucas\Notification\Collection();
+        $collection = $this->getCollection();
 
         $m1 = new \Krucas\Notification\Message('error', 'm');
         $m2 = new \Krucas\Notification\Message('info', 'm');
@@ -82,7 +86,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
     public function testSetAtPosition()
     {
-        $collection = new \Krucas\Notification\Collection();
+        $collection = $this->getCollection();
 
         $collection
             ->addUnique(new \Krucas\Notification\Message('info', 'i'))
@@ -97,7 +101,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
     public function testSetAtPositionAndThenAddMessage()
     {
-        $collection = new \Krucas\Notification\Collection();
+        $collection = $this->getCollection();
 
         $collection
             ->setAtPosition(2, new \Krucas\Notification\Message('info', 'info'))
@@ -110,7 +114,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
     public function testSetAtPositionAndAddLotOfMessagesAtTheBeginning()
     {
-        $collection = new \Krucas\Notification\Collection();
+        $collection = $this->getCollection();
 
         $collection
             ->setAtPosition(2, new \Krucas\Notification\Message('info', 'info'))
@@ -129,7 +133,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
     public function testSetTwoMessagesAtSamePosition()
     {
-        $collection = new \Krucas\Notification\Collection();
+        $collection = $this->getCollection();
 
         $collection
             ->setAtPosition(20, new \Krucas\Notification\Message('info', 'info'))
@@ -142,7 +146,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
     public function testAddAtDifferentPositions()
     {
-        $collection = new \Krucas\Notification\Collection();
+        $collection = $this->getCollection();
 
         $collection
             ->setAtPosition(5, new \Krucas\Notification\Message('info', 'info'))
@@ -159,7 +163,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
     public function testGetAliasedMessage()
     {
-        $collection = new \Krucas\Notification\Collection();
+        $collection = $this->getCollection();
 
         $collection
             ->addUnique(new \Krucas\Notification\Message('info', 'info', false, '', 'a'))
@@ -171,5 +175,10 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('error', $collection->getAliased('b')->getMessage());
         $this->assertEquals('warning', $collection->getAliased('c')->getMessage());
         $this->assertNull($collection->getAliased('d'));
+    }
+
+    protected function getCollection()
+    {
+        return new \Krucas\Notification\Collection();
     }
 }
