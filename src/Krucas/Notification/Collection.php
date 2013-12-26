@@ -1,10 +1,7 @@
 <?php namespace Krucas\Notification;
 
-use Illuminate\Support\Contracts\ArrayableInterface;
-use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\RenderableInterface;
 use Illuminate\Support\Collection as BaseCollection;
-use Krucas\Notification\Message;
 use Session;
 
 class Collection extends BaseCollection implements RenderableInterface
@@ -17,12 +14,9 @@ class Collection extends BaseCollection implements RenderableInterface
      */
     public function add(Message $message)
     {
-        if($this->count() > 0)
-        {
-            for($i = 0; $i <= $this->indexOf($this->last()) + 1; $i++)
-            {
-                if(!$this->offsetExists($i))
-                {
+        if ($this->count() > 0) {
+            for ($i = 0; $i <= $this->indexOf($this->last()) + 1; $i++) {
+                if (!$this->offsetExists($i)) {
                     $this->setAtPosition($i, $message);
                     return $this;
                 }
@@ -42,8 +36,7 @@ class Collection extends BaseCollection implements RenderableInterface
      */
     public function addUnique(Message $message)
     {
-        if(!$this->contains($message))
-        {
+        if (!$this->contains($message)) {
             return $this->add($message);
         }
 
@@ -74,11 +67,9 @@ class Collection extends BaseCollection implements RenderableInterface
 
         array_set($tmp, $position, $message);
 
-        foreach($this->items as $key => $item)
-        {
+        foreach ($this->items as $key => $item) {
             $i = $key;
-            while(array_key_exists($i, $tmp))
-            {
+            while (array_key_exists($i, $tmp)) {
                 $i++;
             }
             $tmp[$i] = $item;
@@ -110,10 +101,8 @@ class Collection extends BaseCollection implements RenderableInterface
      */
     public function getAliased($alias)
     {
-        foreach($this as $index => $message)
-        {
-            if($message->getAlias() == $alias)
-            {
+        foreach ($this as $message) {
+            if ($message->getAlias() == $alias) {
                 return $message;
             }
         }
@@ -129,10 +118,8 @@ class Collection extends BaseCollection implements RenderableInterface
      */
     public function indexOf(Message $message)
     {
-        foreach($this as $index => $m)
-        {
-            if($message === $m)
-            {
+        foreach ($this as $index => $m) {
+            if ($message === $m) {
                 return $index;
             }
         }
@@ -149,8 +136,7 @@ class Collection extends BaseCollection implements RenderableInterface
     {
         $output = '';
 
-        foreach($this->items as $message)
-        {
+        foreach ($this->items as $message) {
             $output .= $message->render();
         }
 
