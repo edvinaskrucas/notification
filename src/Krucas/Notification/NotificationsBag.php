@@ -76,6 +76,13 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     protected static $dispatcher;
 
     /**
+     * Sequence of how messages should be rendered by its type.
+     *
+     * @var array
+     */
+    protected $groupForRender = array();
+
+    /**
      * Creates new NotificationBag object.
      *
      * @param $container
@@ -412,6 +419,8 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     {
         $messages = $this->getMessagesForRender($type);
 
+        $this->groupForRender = array();
+
         $output = '';
 
         foreach ($messages as $message) {
@@ -447,10 +456,86 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     protected function getMessagesForRender($type = null)
     {
         if (is_null($type)) {
+            if (count($this->groupForRender) > 0) {
+                $messages = array();
+
+                foreach ($this->groupForRender as $typeToRender) {
+                    $messages = array_merge($messages, $this->get($typeToRender)->all());
+                }
+
+                return new Collection($messages);
+            }
+
             return $this->all();
-        } else {
-            return $this->get($type);
         }
+        return $this->get($type);
+    }
+
+    /**
+     * Return array with groups list for rendering.
+     *
+     * @return array
+     */
+    public function getGroupingForRender()
+    {
+        return $this->groupForRender;
+    }
+
+    /**
+     * Set order to render types.
+     * Call this method: group('success', 'info', ...)
+     *
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function group()
+    {
+        if (func_num_args() > 0) {
+            $types = func_get_args();
+            $this->groupForRender = array();
+            foreach ($types as $type) {
+                $this->addToGrouping($type);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Adds type for rendering.
+     *
+     * @param $type
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function addToGrouping($type)
+    {
+        if (!$this->typeIsAvailable($type)) {
+            return $this;
+        }
+
+        if (!in_array($type, $this->groupForRender)) {
+            $this->groupForRender[] = $type;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Removes type from rendering.
+     *
+     * @param $type
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function removeFromGrouping($type)
+    {
+        foreach ($this->groupForRender as $key => $typeToRender) {
+            if ($type == $typeToRender) {
+                unset($this->groupForRender[$key]);
+            }
+        }
+
+        $this->groupForRender = array_values($this->groupForRender);
+
+        return $this;
     }
 
     /**

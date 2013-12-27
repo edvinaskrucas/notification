@@ -430,6 +430,55 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('success - testinfo - test', $notificationBag->showAll());
     }
 
+    public function testAddTypesForGroupedRendering()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $this->assertEquals(array(), $notificationBag->getGroupingForRender());
+
+        $notificationBag->addToGrouping('success');
+        $this->assertEquals(array('success'), $notificationBag->getGroupingForRender());
+
+        $notificationBag->addToGrouping('info');
+        $this->assertEquals(array('success', 'info'), $notificationBag->getGroupingForRender());
+    }
+
+    public function testAddAndRemoveTypesForGroupedRendering()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $this->assertEquals(array(), $notificationBag->getGroupingForRender());
+
+        $notificationBag->addToGrouping('success');
+        $this->assertEquals(array('success'), $notificationBag->getGroupingForRender());
+
+        $notificationBag->addToGrouping('info');
+        $this->assertEquals(array('success', 'info'), $notificationBag->getGroupingForRender());
+
+        $notificationBag->removeFromGrouping('success');
+        $this->assertEquals(array('info'), $notificationBag->getGroupingForRender());
+    }
+
+    public function testAddTypesForGroupedRenderingInvalidType()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $this->assertEquals(array(), $notificationBag->getGroupingForRender());
+
+        $notificationBag->addToGrouping('success');
+        $this->assertEquals(array(), $notificationBag->getGroupingForRender());
+    }
+
+    public function testShowGroupedMessages()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->setDefaultFormat(':type - :message');
+        $notificationBag->add('success', 'test', false);
+        $notificationBag->add('info', 'test2', false);
+        $this->assertEquals('success - test', $notificationBag->group('success')->show());
+        $this->assertEquals('info - test2success - test', $notificationBag->group('info', 'success')->show());
+    }
+
     public function testToArray()
     {
         $notificationBag = $this->getNotificationBag();
