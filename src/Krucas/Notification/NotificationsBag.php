@@ -1,77 +1,18 @@
 <?php namespace Krucas\Notification;
 
 use Countable;
-use Illuminate\Config\Repository;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Illuminate\Support\Contracts\JsonableInterface;
-use Illuminate\Session\Store as SessionStore;
-use Krucas\Notification\Message;
-use Krucas\Notification\Collection;
 
 class NotificationsBag implements ArrayableInterface, JsonableInterface, Countable
 {
-    /**
-     * Config repository.
-     *
-     * @var \Illuminate\Config\Repository
-     */
-    protected $configRepository;
-
     /**
      * NotificationBag container name.
      *
      * @var string
      */
-    protected $container;
-
-    /**
-     * Session store instance.
-     *
-     * @var \Illuminate\Session\Store
-     */
-    protected $sessionStore;
-
-    /**
-     * Collection to store all notification messages.
-     *
-     * @var \Krucas\Notification\Collection|null
-     */
-    protected $notifications = null;
-
-    /**
-     * Default global format for messages.
-     *
-     * @var null
-     */
-    protected $format = null;
-
-    /**
-     * Default message formats for individual types.
-     *
-     * @var array
-     */
-    protected $formats = array();
-
-    /**
-     * Instance of lastly added message.
-     *
-     * @var \Krucas\Notification\Message|null
-     */
-    protected $lastMessage = null;
-
-    /**
-     * Lastly added message position (when used atPosition()).
-     *
-     * @var int|null
-     */
-    protected $lastPosition = null;
-
-    /**
-     * Sequence of how messages should be rendered by its type.
-     *
-     * @var array
-     */
-    protected $groupForRender = array();
+    protected $container = null;
 
     /**
      * Available message types in container.
@@ -93,29 +34,72 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     );
 
     /**
+     * Default format for all message types.
+     *
+     * @var string
+     */
+    protected $defaultFormat = null;
+
+    /**
+     * Default formats for types.
+     *
+     * @var array
+     */
+    protected $formats = array();
+
+    /**
+     * Collection to store all instant notification messages.
+     *
+     * @var \Krucas\Notification\Collection|null
+     */
+    protected $notifications;
+
+    /**
+     * Instance of lastly added message.
+     *
+     * @var \Krucas\Notification\Message|null
+     */
+    protected $lastMessage = null;
+
+    /**
+     * Lastly added message position (when used atPosition()).
+     *
+     * @var int|null
+     */
+    protected $lastPosition = null;
+
+    /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Events\Dispatcher
+     */
+    protected static $dispatcher;
+
+    /**
      * Creates new NotificationBag object.
      *
      * @param $container
-     * @param \Illuminate\Session\Store $sessionStore
-     * @param \Illuminate\Config\Repository $configRepository
      * @param array $types
-     * @param string $defaultFormat
+     * @param null $defaultFormat
      * @param array $formats
      */
-    public function __construct($container, SessionStore $sessionStore, Repository $configRepository, $types = array(), $defaultFormat = ':message', $formats = array())
+    public function __construct($container, $types = array(), $defaultFormat = null, $formats = array())
     {
         $this->container = $container;
-        $this->configRepository = $configRepository;
-        $this->sessionStore = $sessionStore;
-        $this->notifications = new Collection();
-
-        $this->load();
-
         $this->addType($types);
+        $this->setDefaultFormat($defaultFormat);
+        $this->setFormats($formats);
+        $this->notifications = new Collection();
+    }
 
-        $this->setFormat($defaultFormat);
-
-        $this->addFormats($formats);
+    /**
+     * Returns assigned container name.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->container;
     }
 
     /**
@@ -126,20 +110,27 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     public function addType($type)
     {
-        if(is_array($type))
-        {
-            foreach($type as $t)
-            {
+        if (is_array($type)) {
+            foreach ($type as $t) {
                 $this->addType($t);
             }
         } else {
-            if(!$this->typeIsAvailable($type))
-            {
+            if (!$this->typeIsAvailable($type)) {
                 $this->types[] = $type;
             }
         }
 
         return $this;
+    }
+
+    /**
+     * Return available types of messages in container.
+     *
+     * @return array
+     */
+    public function getTypes()
+    {
+        return $this->types;
     }
 
     /**
@@ -151,16 +142,6 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     public function typeIsAvailable($type)
     {
         return in_array($type, array_values($this->types)) ? true : false;
-    }
-
-    /**
-     * Return available types of messages in container.
-     *
-     * @return array
-     */
-    public function getTypes()
-    {
-        return $this->types;
     }
 
     /**
@@ -183,17 +164,13 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     protected function extractType($name)
     {
-        if(count($this->types) <= 0)
-        {
+        if (count($this->types) <= 0) {
             return false;
         }
 
-        foreach($this->types as $type)
-        {
-            foreach($this->matcher as $function => $pattern)
-            {
-                if(str_replace(array('{type}', '{uType}'), array($type, ucfirst($type)), $pattern) === $name)
-                {
+        foreach ($this->types as $type) {
+            foreach ($this->matcher as $function => $pattern) {
+                if (str_replace(array('{type}', '{uType}'), array($type, ucfirst($type)), $pattern) === $name) {
                     return array($type, $function);
                 }
             }
@@ -203,13 +180,127 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
+     * Set default format for all message types.
+     *
+     * @param $format
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function setDefaultFormat($format)
+    {
+        $this->defaultFormat = $format;
+
+        return $this;
+    }
+
+    /**
+     * Return default format.
+     *
+     * @return string
+     */
+    public function getDefaultFormat()
+    {
+        return $this->defaultFormat;
+    }
+
+    /**
+     * Set formats for a given types.
+     *
+     * @param $formats
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function setFormats($formats)
+    {
+        foreach ($formats as $type => $format) {
+            $this->setFormat($type, $format);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set format for a given type.
+     *
+     * @param $type
+     * @param $format
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function setFormat($type, $format)
+    {
+        if ($this->typeIsAvailable($type)) {
+            $this->formats[$type] = $format;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Return format for a given type.
+     *
+     * @param $type
+     * @return bool|string
+     */
+    public function getFormat($type)
+    {
+        if (!$this->typeIsAvailable($type)) {
+            return false;
+        }
+
+        if (isset($this->formats[$type])) {
+            return $this->formats[$type];
+        }
+
+        if (!is_null($this->getDefaultFormat())) {
+            return $this->getDefaultFormat();
+        }
+
+        return false;
+    }
+
+    /**
+     * Clear format for a given type.
+     *
+     * @param $type
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function clearFormat($type)
+    {
+        unset($this->formats[$type]);
+
+        return $this;
+    }
+
+    /**
+     * Clear all formats.
+     *
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function clearFormats()
+    {
+        $this->formats = array();
+
+        return $this;
+    }
+
+    /**
+     * Returns valid format.
+     *
+     * @param $format
+     * @param null $type
+     * @return null
+     */
+    protected function checkFormat($format, $type = null)
+    {
+        return !is_null($format) ? $format : $this->getFormat($type);
+    }
+
+    /**
      * Adds new notification message to one of collections.
      * If message is array, adds multiple messages.
      * Message can be string, array (array can contain string for message, or array of message and format).
      * Flashes flashable messages.
      *
      * @param $type
-     * @param string|array $message
+     * @@param string|array $message
      * @param bool $flashable
      * @param null $format
      * @return \Krucas\Notification\NotificationsBag
@@ -219,154 +310,43 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
         $this->lastMessage = null;
         $this->lastPosition = null;
 
-        if(is_array($message))
-        {
-            $this->addArray($type, $message, $flashable, $format);
+        if (!$this->typeIsAvailable($type)) {
+            return $this;
         }
-        else
-        {
-            $this->lastMessage = new Message($type, $message, $flashable, $this->checkFormat($format, $type));
 
+        $m = new Message($type, $message, $flashable, $this->checkFormat($format, $type));
+        if (!$flashable) {
+            $this->lastMessage = $m;
             $this->notifications->addUnique($this->lastMessage);
-
-            if($flashable)
-            {
-                $this->flash();
-            }
+            //$this->fireEvent('added', $this->lastMessage);
+        } else {
+            $this->fireEvent('flash', $m);
         }
 
         return $this;
     }
 
     /**
-     * Adds messages from an array.
+     * Returns all messages for given type.
      *
      * @param $type
-     * @param array $messages
-     * @param bool $flashable
-     * @param null $defaultFormat
-     *
-     * @return void
+     * @return \Krucas\Notification\Collection
      */
-    protected function addArray($type, array $messages = array(), $flashable = true, $defaultFormat = null)
+    public function get($type)
     {
-        foreach($messages as $message)
-        {
-            $text = $format = $alias = $position = null;
+        $collection = new Collection();
 
-            if(!is_null($defaultFormat))
-            {
-                $format = $defaultFormat;
-            }
-
-            if(is_array($message) && isset($message['message']))
-            {
-                $text = $message['message'];
-
-                if(isset($message['alias']))
-                {
-                    $alias = $message['alias'];
+        foreach ($this->notifications as $key => $message) {
+            if ($message->getType() == $type) {
+                if (!is_null($message->getPosition())) {
+                    $collection->setAtPosition($key, $message);
+                } else {
+                    $collection->addUnique($message);
                 }
-
-                if(isset($message['format']))
-                {
-                    $format = $message['format'];
-                }
-
-                if(isset($message['position']))
-                {
-                    $position = $message['position'];
-                }
-            }
-            elseif(is_array($message) && count($message) == 2)
-            {
-                $text = $message[0];
-                $format = $message[1];
-            }
-            else
-            {
-                $text = $message;
-            }
-
-            $this->add($type, $text, $flashable, $format);
-
-            if(!is_null($alias))
-            {
-                $this->alias($alias);
-            }
-
-            if(!is_null($position))
-            {
-                $this->atPosition($position);
-            }
-        }
-    }
-
-    /**
-     * Sets alias for lastly added message.
-     * If message with alias exists, it overrides it.
-     *
-     * @param $alias
-     * @return \Krucas\Notification\NotificationBag
-     */
-    public function alias($alias)
-    {
-        if($this->lastMessage instanceof Message)
-        {
-            $lastMessageIndex = $this->notifications->indexOf($this->lastMessage);
-
-            $this->lastMessage->setAlias($alias);
-
-            foreach($this->notifications as $key => $message)
-            {
-                if($message->getAlias() == $alias)
-                {
-                    $index = $this->notifications->indexOf($message);
-
-                    if($index !== false)
-                    {
-                        $this->notifications->offsetUnset($index);
-                        $this->notifications->offsetUnset($lastMessageIndex);
-                        $this->notifications->setAtPosition(is_null($this->lastPosition) ? $index : $this->lastPosition, $this->lastMessage);
-                    }
-                }
-            }
-
-            if($this->lastMessage->isFlashable())
-            {
-                $this->flash();
             }
         }
 
-        return $this;
-    }
-
-    /**
-     * Sets last message at given position.
-     *
-     * @param $position
-     * @return \Krucas\Notification\NotificationBag
-     */
-    public function atPosition($position)
-    {
-        $this->lastPosition = $position;
-
-        if($this->lastMessage instanceof Message)
-        {
-            $lastMessageIndex = $this->notifications->indexOf($this->lastMessage);
-
-            $this->lastMessage->setPosition($position);
-
-            $this->notifications->offsetUnset($lastMessageIndex);
-            $this->notifications->setAtPosition($position, $this->lastMessage);
-
-            if($this->lastMessage->isFlashable())
-            {
-                $this->flash();
-            }
-        }
-
-        return $this;
+        return $collection;
     }
 
     /**
@@ -377,16 +357,11 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     public function clear($type = null)
     {
-        if(is_null($type))
-        {
+        if (is_null($type)) {
             $this->notifications = new Collection();
-        }
-        else
-        {
-            foreach($this->notifications as $key => $message)
-            {
-                if($message->getType() == $type)
-                {
+        } else {
+            foreach ($this->notifications as $key => $message) {
+                if ($message->getType() == $type) {
                     $this->notifications->offsetUnset($key);
                 }
             }
@@ -407,44 +382,6 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
-     * Returns first message object for given type.
-     *
-     * @return \Krucas\Notification\Message
-     */
-    public function first()
-    {
-        return $this->notifications->first();
-    }
-
-    /**
-     * Returns all messages for given type.
-     *
-     * @param $type
-     * @return \Krucas\Notification\Collection
-     */
-    public function get($type)
-    {
-        $collection = new Collection();
-
-        foreach($this->notifications as $key => $message)
-        {
-            if($message->getType() == $type)
-            {
-                if(!is_null($message->getPosition()))
-                {
-                    $collection->setAtPosition($key, $message);
-                }
-                else
-                {
-                    $collection->addUnique($message);
-                }
-            }
-        }
-
-        return $collection;
-    }
-
-    /**
      * Returns all messages in bag.
      *
      * @return \Krucas\Notification\Collection
@@ -455,221 +392,13 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
-     * Sets global or individual message format.
+     * Returns first message object for given type.
      *
-     * @param $format
-     * @param null $type
-     * @return \Krucas\Notification\NotificationsBag
+     * @return \Krucas\Notification\Message
      */
-    public function setFormat($format, $type = null)
+    public function first()
     {
-        if(!is_null($type))
-        {
-            $this->formats[$type] = $format;
-        }
-        else
-        {
-            $this->format = $format;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Add formats for types.
-     *
-     * @param array $formats
-     * @return \Krucas\Notification\NotificationsBag
-     */
-    public function addFormats($formats = array())
-    {
-        foreach($formats as $type => $format)
-        {
-            $this->setFormat($format, $type);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Returns message format.
-     *
-     * @param null $type
-     * @return null
-     */
-    public function getFormat($type = null)
-    {
-        return !is_null($type) && isset($this->formats[$type]) ? $this->formats[$type] : $this->format;
-    }
-
-    /**
-     * Returns valid format.
-     *
-     * @param $format
-     * @param null $type
-     * @return null
-     */
-    protected function checkFormat($format, $type = null)
-    {
-        return !is_null($format) ? $format : $this->getFormat($type);
-    }
-
-    /**
-     * Loads flashed messages.
-     *
-     * @return void
-     */
-    protected function load()
-    {
-        $flashed = $this->sessionStore->get($this->configRepository->get('notification::session_prefix').$this->container);
-
-        if($flashed)
-        {
-            $messages = json_decode($flashed);
-
-            if(is_array($messages))
-            {
-                foreach($messages as $key => $message)
-                {
-                    $this->add($message->type, $message->message, false, $message->format);
-
-                    if(isset($message->alias) && !is_null($message->alias))
-                    {
-                        $this->alias($message->alias);
-                    }
-
-                    if(isset($message->position) && !is_null($message->position))
-                    {
-                        $this->atPosition($message->position);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Flashes all flashable messages.
-     *
-     * @return void
-     */
-    protected function flash()
-    {
-        $this->sessionStore->flash($this->configRepository->get('notification::session_prefix').$this->container, $this->getFlashable()->toJson());
-    }
-
-    /**
-     * Returns all flashable messages.
-     *
-     * @return \Krucas\Notification\Collection
-     */
-    protected function getFlashable()
-    {
-        $collection = new Collection();
-
-        foreach($this->all() as $message)
-        {
-            if($message->isFlashable())
-            {
-                $collection->addUnique($message);
-            }
-        }
-
-        return $collection;
-    }
-
-    /**
-     * Return array with groups list for rendering.
-     *
-     * @return array
-     */
-    public function getGroupingForRender()
-    {
-        return $this->groupForRender;
-    }
-
-    /**
-     * Set order to render types.
-     * Call this method: group('success', 'info', ...)
-     *
-     * @return \Krucas\Notification\NotificationsBag
-     */
-    public function group()
-    {
-        if(func_num_args() > 0)
-        {
-            $this->groupForRender = func_get_args();
-        }
-
-        return $this;
-    }
-
-    /**
-     * Adds type for rendering.
-     *
-     * @param $type
-     * @return \Krucas\Notification\NotificationsBag
-     */
-    public function addToGrouping($type)
-    {
-        if(!in_array($type, $this->groupForRender))
-        {
-            $this->groupForRender[] = $type;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Removes type from rendering.
-     *
-     * @param $type
-     * @return \Krucas\Notification\NotificationsBag
-     */
-    public function removeFromGrouping($type)
-    {
-        foreach($this->groupForRender as $key => $typeToRender)
-        {
-            if($type == $typeToRender)
-            {
-                unset($this->groupForRender[$key]);
-            }
-        }
-
-        $this->groupForRender = array_values($this->groupForRender);
-
-        return $this;
-    }
-
-    /**
-     * Resolves which messages should be returned for rendering.
-     *
-     * @param null $type
-     * @return \Krucas\Notification\Collection
-     */
-    protected function getMessagesForRender($type = null)
-    {
-        if(is_null($type))
-        {
-            if(count($this->groupForRender) > 0)
-            {
-                $messages = array();
-
-                foreach($this->groupForRender as $typeToRender)
-                {
-                    $messages = array_merge($messages, $this->get($typeToRender)->all());
-                }
-
-                return new Collection($messages);
-            }
-            else
-            {
-                return $this->all();
-            }
-        }
-        else
-        {
-            return $this->get($type);
-        }
+        return $this->notifications->first();
     }
 
     /**
@@ -679,19 +408,17 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      * @param null $format
      * @return string
      */
-    protected function show($type = null, $format = null)
+    public function show($type = null, $format = null)
     {
         $messages = $this->getMessagesForRender($type);
 
-        $this->groupForRender = array();
-
         $output = '';
 
-        foreach($messages as $message)
-        {
-            if(!$message->isFlashable())
-            {
-                if(!is_null($format)) $message->setFormat($format);
+        foreach ($messages as $message) {
+            if (!$message->isFlashable()) {
+                if (!is_null($format)) {
+                    $message->setFormat($format);
+                }
 
                 $output .= $message->render();
             }
@@ -712,26 +439,18 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
-     * Returns messages at given position.
-     * Shortcut to all()->getAtPosition().
+     * Resolves which messages should be returned for rendering.
      *
-     * @param $position
-     * @return \Krucas\Notification\Message
+     * @param null $type
+     * @return \Krucas\Notification\Collection
      */
-    public function getAtPosition($position)
+    protected function getMessagesForRender($type = null)
     {
-        return $this->all()->getAtPosition($position);
-    }
-
-    /**
-     * Returns message with a given alias or null if not found.
-     *
-     * @param $alias
-     * @return \Krucas\Notification\Message|null
-     */
-    public function getAliased($alias)
-    {
-        return $this->all()->getAliased($alias);
+        if (is_null($type)) {
+            return $this->all();
+        } else {
+            return $this->get($type);
+        }
     }
 
     /**
@@ -744,7 +463,8 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
         $arr = array
         (
             'container'         => $this->container,
-            'format'            => $this->format,
+            'format'            => $this->getDefaultFormat(),
+            'types'             => $this->getTypes(),
             'notifications'     => $this->notifications->toArray()
         );
 
@@ -754,12 +474,12 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     /**
      * Convert the object to its JSON representation.
      *
-     * @param  int  $options
+     * @param  int $options
      * @return string
      */
     public function toJson($options = 0)
     {
-        return json_encode($this->toArray());
+        return json_encode($this->toArray(), $options);
     }
 
     /**
@@ -773,56 +493,90 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
-     * Returns session store instance.
+     * Fire event for a given message.
      *
-     * @return \Illuminate\Session\Store
+     * @param $event
+     * @param $message
+     * @return boolean
      */
-    public function getSessionStore()
+    protected function fireEvent($event, $message)
     {
-        return $this->sessionStore;
+        if (!isset(static::$dispatcher)) {
+            return true;
+        }
+
+        $event = "notification.{$event}: ".$this->getName();
+
+        return static::$dispatcher->fire($event, array($this, $message));
     }
 
     /**
-     * Returns config repository instance.
+     * Get the event dispatcher instance.
      *
-     * @return \Illuminate\Config\Repository
+     * @return \Illuminate\Events\Dispatcher
      */
-    public function getConfigRepository()
+    public static function getEventDispatcher()
     {
-        return $this->configRepository;
+        return static::$dispatcher;
     }
 
     /**
-     * Convert the Bag to its string representation.
+     * Set the event dispatcher instance.
      *
-     * @return string
+     * @param  \Illuminate\Events\Dispatcher  $dispatcher
+     * @return void
      */
-    public function __toString()
+    public static function setEventDispatcher(Dispatcher $dispatcher)
     {
-        return (string) $this->notifications;
+        static::$dispatcher = $dispatcher;
     }
 
+    /**
+     * Unset the event dispatcher for models.
+     *
+     * @return void
+     */
+    public static function unsetEventDispatcher()
+    {
+        static::$dispatcher = null;
+    }
+
+    /**
+     * Execute short version of function calls.
+     *
+     * @param $name
+     * @param $arguments
+     * @return \Krucas\Notification\NotificationsBag|string
+     */
     public function __call($name, $arguments)
     {
-        if(($extracted = $this->extractType($name)) !== false)
-        {
-            switch($extracted[1])
-            {
+        if (($extracted = $this->extractType($name)) !== false) {
+            switch($extracted[1]) {
                 case 'add':
-                    return $this->add($extracted[0], isset($arguments[0]) ? $arguments[0] : null, true, isset($arguments[1]) ? $arguments[1] : null);
-                break;
+                    return $this->add(
+                        $extracted[0],
+                        isset($arguments[0]) ? $arguments[0] : null,
+                        true,
+                        isset($arguments[1]) ? $arguments[1] : null
+                    );
+                    break;
 
-                case 'instant';
-                    return $this->add($extracted[0], isset($arguments[0]) ? $arguments[0] : null, false, isset($arguments[1]) ? $arguments[1] : null);
-                break;
+                case 'instant':
+                    return $this->add(
+                        $extracted[0],
+                        isset($arguments[0]) ? $arguments[0] : null,
+                        false,
+                        isset($arguments[1]) ? $arguments[1] : null
+                    );
+                    break;
 
                 case 'clear':
                     return $this->clear($extracted[0]);
-                break;
+                    break;
 
                 case 'show':
                     return $this->show($extracted[0], isset($arguments[0]) ? $arguments[0] : null);
-                break;
+                    break;
             }
         }
     }
