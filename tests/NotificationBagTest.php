@@ -39,6 +39,15 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array('info', 'danger'), $notificationBag->getTypes());
     }
 
+    public function testAddTypesArrayAsIndividualParam()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $this->assertEquals(array(), $notificationBag->getTypes());
+
+        $notificationBag->addType('info', 'danger');
+        $this->assertEquals(array('info', 'danger'), $notificationBag->getTypes());
+    }
+
     public function testAddExistingType()
     {
         $notificationBag = $this->getNotificationBag();

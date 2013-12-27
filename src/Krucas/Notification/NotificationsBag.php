@@ -117,13 +117,19 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     public function addType($type)
     {
-        if (is_array($type)) {
-            foreach ($type as $t) {
+        if (func_num_args() > 1) {
+            foreach (func_get_args() as $t) {
                 $this->addType($t);
             }
         } else {
-            if (!$this->typeIsAvailable($type)) {
-                $this->types[] = $type;
+            if (is_array($type)) {
+                foreach ($type as $t) {
+                    $this->addType($t);
+                }
+            } else {
+                if (!$this->typeIsAvailable($type)) {
+                    $this->types[] = $type;
+                }
             }
         }
 
