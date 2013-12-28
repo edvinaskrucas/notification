@@ -22,64 +22,64 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('default', $notification->getDefaultContainerName());
     }
 
-    public function testSetTypes()
+    public function testSetContainerTypes()
     {
         $notification = $this->getNotification();
-        $this->assertEquals(array(), $notification->getTypes('default'));
+        $this->assertEquals(array(), $notification->getContainerTypes('default'));
 
-        $notification->setTypes('default', array('success', 'info'));
-        $this->assertEquals(array('success', 'info'), $notification->getTypes('default'));
+        $notification->setContainerTypes('default', array('success', 'info'));
+        $this->assertEquals(array('success', 'info'), $notification->getContainerTypes('default'));
     }
 
-    public function testGetTypeForContainer()
+    public function testGetTypesContainerForContainer()
     {
         $notification = $this->getNotification();
-        $this->assertEquals(array(), $notification->getTypes('default'));
-        $this->assertEquals(array(), $notification->getTypes('test'));
+        $this->assertEquals(array(), $notification->getContainerTypes('default'));
+        $this->assertEquals(array(), $notification->getContainerTypes('test'));
 
-        $notification->setTypes('default', array('success', 'info'));
-        $this->assertEquals(array('success', 'info'), $notification->getTypes('default'));
-        $this->assertEquals(array(), $notification->getTypes('test'));
+        $notification->setContainerTypes('default', array('success', 'info'));
+        $this->assertEquals(array('success', 'info'), $notification->getContainerTypes('default'));
+        $this->assertEquals(array(), $notification->getContainerTypes('test'));
     }
 
-    public function testSetFormat()
+    public function testSetContainerFormat()
     {
         $notification = $this->getNotification();
-        $this->assertNull($notification->getFormat('default'));
+        $this->assertNull($notification->getContainerFormat('default'));
 
-        $notification->setFormat('default', ':message');
-        $this->assertEquals(':message', $notification->getFormat('default'));
+        $notification->setContainerFormat('default', ':message');
+        $this->assertEquals(':message', $notification->getContainerFormat('default'));
     }
 
-    public function testGetFormatForContainer()
+    public function testGetContainerFormatForContainer()
     {
         $notification = $this->getNotification();
-        $this->assertNull($notification->getFormat('default'));
-        $this->assertNull($notification->getFormat('test'));
+        $this->assertNull($notification->getContainerFormat('default'));
+        $this->assertNull($notification->getContainerFormat('test'));
 
-        $notification->setFormat('default', ':message');
-        $this->assertEquals(':message', $notification->getFormat('default'));
-        $this->assertNull($notification->getFormat('test'));
+        $notification->setContainerFormat('default', ':message');
+        $this->assertEquals(':message', $notification->getContainerFormat('default'));
+        $this->assertNull($notification->getContainerFormat('test'));
     }
 
-    public function testSetFormats()
+    public function testSetContainerContainerFormats()
     {
         $notification = $this->getNotification();
-        $this->assertEquals(array(), $notification->getFormats('default'));
+        $this->assertEquals(array(), $notification->getContainerFormats('default'));
 
-        $notification->setFormats('default', array('info' => ':message'));
-        $this->assertEquals(array('info' => ':message'), $notification->getFormats('default'));
+        $notification->setContainerFormats('default', array('info' => ':message'));
+        $this->assertEquals(array('info' => ':message'), $notification->getContainerFormats('default'));
     }
 
-    public function testGetFormatsForContainer()
+    public function testGetContainerFormatsForContainer()
     {
         $notification = $this->getNotification();
-        $this->assertEquals(array(), $notification->getFormats('default'));
-        $this->assertEquals(array(), $notification->getFormats('test'));
+        $this->assertEquals(array(), $notification->getContainerFormats('default'));
+        $this->assertEquals(array(), $notification->getContainerFormats('test'));
 
-        $notification->setFormats('default', array('info' => ':message'));
-        $this->assertEquals(array('info' => ':message'), $notification->getFormats('default'));
-        $this->assertEquals(array(), $notification->getFormats('test'));
+        $notification->setContainerFormats('default', array('info' => ':message'));
+        $this->assertEquals(array('info' => ':message'), $notification->getContainerFormats('default'));
+        $this->assertEquals(array(), $notification->getContainerFormats('test'));
     }
 
     public function testAddContainer()
@@ -131,9 +131,9 @@ class NotificationTest extends PHPUnit_Framework_TestCase
     public function testNotificationBagInstanceOnNonExistingContainerWithResolvedParams()
     {
         $notification = $this->getNotification();
-        $notification->setTypes('test', array('success'));
-        $notification->setFormat('test', ':message');
-        $notification->setFormats('test', array('success' => ':message - OK'));
+        $notification->setContainerTypes('test', array('success'));
+        $notification->setContainerFormat('test', ':message');
+        $notification->setContainerFormats('test', array('success' => ':message - OK'));
         $container = $notification->container('test');
         $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $container);
         $this->assertEquals(array('success'), $container->getTypes());

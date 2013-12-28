@@ -73,7 +73,7 @@ class Notification
      * @param array $types
      * @return \Krucas\Notification\Notification
      */
-    public function setTypes($container, $types = array())
+    public function setContainerTypes($container, $types = array())
     {
         $this->types[$container] = $types;
 
@@ -86,7 +86,7 @@ class Notification
      * @param $container
      * @return array
      */
-    public function getTypes($container)
+    public function getContainerTypes($container)
     {
         if (isset($this->types[$container])) {
             return $this->types[$container];
@@ -102,7 +102,7 @@ class Notification
      * @param null $format
      * @return \Krucas\Notification\Notification
      */
-    public function setFormat($container, $format = null)
+    public function setContainerFormat($container, $format = null)
     {
         $this->format[$container] = $format;
 
@@ -115,7 +115,7 @@ class Notification
      * @param $container
      * @return string|null
      */
-    public function getFormat($container)
+    public function getContainerFormat($container)
     {
         if (isset($this->format[$container])) {
             return $this->format[$container];
@@ -131,7 +131,7 @@ class Notification
      * @param array $formats
      * @return \Krucas\Notification\Notification
      */
-    public function setFormats($container, $formats = array())
+    public function setContainerFormats($container, $formats = array())
     {
         $this->formats[$container] = $formats;
 
@@ -144,7 +144,7 @@ class Notification
      * @param $container
      * @return array
      */
-    public function getFormats($container)
+    public function getContainerFormats($container)
     {
         if (isset($this->formats[$container])) {
             return $this->formats[$container];
@@ -197,9 +197,9 @@ class Notification
         if (!isset($this->containers[$container])) {
             $this->addContainer(
                 $container,
-                $this->getTypes($container),
-                $this->getFormat($container),
-                $this->getFormats($container)
+                $this->getContainerTypes($container),
+                $this->getContainerFormat($container),
+                $this->getContainerFormats($container)
             );
         }
 
