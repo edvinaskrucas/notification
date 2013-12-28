@@ -319,6 +319,9 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
                 if ($m->isFlashable() != $flashable) {
                     $m->setFlashable($flashable);
                 }
+                if (is_null($m->getFormat())) {
+                    $m->setFormat($this->getFormat($type));
+                }
                 if (!is_null($format)) {
                     $m->setFormat($this->checkFormat($format, $type));
                 }

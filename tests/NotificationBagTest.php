@@ -293,6 +293,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $message->shouldReceive('isFlashable')->andReturn(false);
         $message->shouldReceive('getPosition')->andReturn(null);
         $message->shouldReceive('getAlias')->andReturn(null);
+        $message->shouldReceive('getFormat')->andReturn(':message');
         $notificationBag->add('info', $message, false);
         $this->assertCount(1, $notificationBag);
     }
@@ -307,6 +308,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $message->shouldReceive('isFlashable')->andReturn(true);
         $message->shouldReceive('getPosition')->andReturn(null);
         $message->shouldReceive('getAlias')->andReturn(null);
+        $message->shouldReceive('getFormat')->andReturn(':message');
         $events->shouldReceive('fire')->once()->with('notification.flash: test', array($notificationBag, $message));
         $this->assertCount(0, $notificationBag);
 
@@ -325,6 +327,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $message->shouldReceive('isFlashable')->andReturn(false);
         $message->shouldReceive('getPosition')->andReturn(null);
         $message->shouldReceive('getAlias')->andReturn(null);
+        $message->shouldReceive('getFormat')->andReturn(':message');
         $notificationBag->infoInstant($message);
         $this->assertCount(1, $notificationBag);
     }
@@ -341,7 +344,26 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $message->shouldReceive('setFlashable')->with(false)->andReturn($message);
         $message->shouldReceive('getPosition')->andReturn(null);
         $message->shouldReceive('getAlias')->andReturn(null);
+        $message->shouldReceive('getFormat')->andReturn(':message');
         $notificationBag->infoInstant($message);
+        $this->assertCount(1, $notificationBag);
+    }
+
+    public function testAddInstantMessageWithMessageInstanceSetFormatIfNotSet()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $notificationBag->setDefaultFormat(':message');
+        $this->assertCount(0, $notificationBag);
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('getFormat')->andReturn(null);
+        $message->shouldReceive('setFormat')->once()->with(':message')->andReturn($message);
+        $message->shouldReceive('getPosition')->andReturn(null);
+        $message->shouldReceive('getAlias')->andReturn(null);
+        $notificationBag->add('info', $message, false);
         $this->assertCount(1, $notificationBag);
     }
 
@@ -354,6 +376,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $message = $this->getMessage();
         $message->shouldReceive('setType')->with('info')->andReturn($message);
         $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('getFormat')->andReturn('m');
         $message->shouldReceive('setFormat')->with(':message')->andReturn($message);
         $message->shouldReceive('getPosition')->andReturn(null);
         $message->shouldReceive('getAlias')->andReturn(null);
@@ -372,6 +395,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $message->shouldReceive('isFlashable')->andReturn(false);
         $message->shouldReceive('getPosition')->andReturn(5);
         $message->shouldReceive('getAlias')->andReturn(null);
+        $message->shouldReceive('getFormat')->andReturn(':message');
         $notificationBag->add('info', $message, false);
         $this->assertCount(1, $notificationBag);
         $this->assertEquals($message, $notificationBag->getAtPosition(5));
@@ -388,12 +412,14 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $message1->shouldReceive('isFlashable')->andReturn(false);
         $message1->shouldReceive('getPosition')->andReturn(5);
         $message1->shouldReceive('getAlias')->andReturn(null);
+        $message1->shouldReceive('getFormat')->andReturn(':message');
 
         $message2 = $this->getMessage();
         $message2->shouldReceive('setType')->with('info')->andReturn($message2);
         $message2->shouldReceive('isFlashable')->andReturn(false);
         $message2->shouldReceive('getPosition')->andReturn(5);
         $message2->shouldReceive('getAlias')->andReturn(null);
+        $message2->shouldReceive('getFormat')->andReturn(':message');
 
         $notificationBag->add('info', $message1, false);
         $notificationBag->add('info', $message2, false);
@@ -414,6 +440,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $message->shouldReceive('isFlashable')->andReturn(false);
         $message->shouldReceive('getPosition')->andReturn(null);
         $message->shouldReceive('getAlias')->andReturn('test_alias');
+        $message->shouldReceive('getFormat')->andReturn(':message');
         $notificationBag->add('info', $message, false);
         $this->assertCount(1, $notificationBag);
         $this->assertEquals($message, $notificationBag->getAliased('test_alias'));
@@ -430,12 +457,14 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $message1->shouldReceive('isFlashable')->andReturn(false);
         $message1->shouldReceive('getPosition')->andReturn(null);
         $message1->shouldReceive('getAlias')->andReturn('test_alias');
+        $message1->shouldReceive('getFormat')->andReturn(':message');
 
         $message2 = $this->getMessage();
         $message2->shouldReceive('setType')->with('danger')->andReturn($message2);
         $message2->shouldReceive('isFlashable')->andReturn(false);
         $message2->shouldReceive('getPosition')->andReturn(null);
         $message2->shouldReceive('getAlias')->andReturn('test_alias');
+        $message2->shouldReceive('getFormat')->andReturn(':message');
 
         $notificationBag->add('info', $message1, false);
         $notificationBag->add('danger', $message2, false);
@@ -454,6 +483,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $message->shouldReceive('isFlashable')->andReturn(false);
         $message->shouldReceive('getPosition')->andReturn(5);
         $message->shouldReceive('getAlias')->andReturn('test_alias');
+        $message->shouldReceive('getFormat')->andReturn(':message');
 
         $notificationBag->add('info', $message, false);
         $this->assertCount(1, $notificationBag);
@@ -472,12 +502,14 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $message1->shouldReceive('isFlashable')->andReturn(false);
         $message1->shouldReceive('getPosition')->andReturn(5);
         $message1->shouldReceive('getAlias')->andReturn('test_alias');
+        $message1->shouldReceive('getFormat')->andReturn(':message');
 
         $message2 = $this->getMessage();
         $message2->shouldReceive('setType')->with('danger')->andReturn($message2);
         $message2->shouldReceive('isFlashable')->andReturn(false);
         $message2->shouldReceive('getPosition')->andReturn(9);
         $message2->shouldReceive('getAlias')->andReturn('test_alias');
+        $message2->shouldReceive('getFormat')->andReturn(':message');
 
         $notificationBag->add('info', $message1, false);
         $notificationBag->add('danger', $message2, false);
@@ -581,6 +613,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $messages[0]->shouldReceive('isFlashable')->andReturn(false);
         $messages[0]->shouldReceive('getPosition')->andReturn(null);
         $messages[0]->shouldReceive('getAlias')->andReturn(null);
+        $messages[0]->shouldReceive('getFormat')->andReturn(':message');
         $notificationBag->add('info', $messages[0], false);
 
         $messages[1] = $this->getMessage();
@@ -588,6 +621,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $messages[1]->shouldReceive('isFlashable')->andReturn(false);
         $messages[1]->shouldReceive('getPosition')->andReturn(null);
         $messages[1]->shouldReceive('getAlias')->andReturn(null);
+        $messages[1]->shouldReceive('getFormat')->andReturn(':message');
         $notificationBag->add('info', $messages[1], false);
 
         $this->assertCount(2, $notificationBag);
@@ -622,6 +656,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $message->shouldReceive('isFlashable')->andReturn(false);
         $message->shouldReceive('getPosition')->andReturn(5);
         $message->shouldReceive('getAlias')->andReturn(null);
+        $message->shouldReceive('getFormat')->andReturn(':message');
 
         $notificationBag->add('info', $message, false);
         $notificationBag->add('danger', 'test', false);
