@@ -324,7 +324,11 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
         }
 
         if (!$m->isFlashable()) {
-            $this->notifications->addUnique($m);
+            if (!is_null($m->getPosition())) {
+                $this->notifications->setAtPosition($m->getPosition(), $message);
+            } else {
+                $this->notifications->addUnique($m);
+            }
             //$this->fireEvent('added', $this->lastMessage);
         } else {
             $this->fireEvent('flash', $m);
@@ -536,6 +540,18 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
         $this->groupForRender = array_values($this->groupForRender);
 
         return $this;
+    }
+
+    /**
+     * Returns messages at given position.
+     * Shortcut to all()->getAtPosition().
+     *
+     * @param $position
+     * @return \Krucas\Notification\Message
+     */
+    public function getAtPosition($position)
+    {
+        return $this->all()->getAtPosition($position);
     }
 
     /**
