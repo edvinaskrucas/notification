@@ -215,7 +215,8 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $notificationBag->add('success', 'test', false, 'customFormat');
         $this->assertCount(1, $notificationBag);
-        $this->assertEquals('customFormat', $notificationBag->all()[0]->getFormat());
+        $notifications = $notificationBag->all();
+        $this->assertEquals('customFormat', $notifications[0]->getFormat());
     }
 
     public function testAddInstantMessageUsingNamedMethod()
@@ -493,8 +494,9 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $notificationBag->add('info', array('test1', 'test2'), false);
         $this->assertCount(2, $notificationBag);
-        $this->assertEquals('test1', $notificationBag->all()[0]->getMessage());
-        $this->assertEquals('test2', $notificationBag->all()[1]->getMessage());
+        $notifications = $notificationBag->all();
+        $this->assertEquals('test1', $notifications[0]->getMessage());
+        $this->assertEquals('test2', $notifications[1]->getMessage());
     }
 
     public function testAddArrayOfMessagesForGivenTypeOverrideFormat()
@@ -505,10 +507,11 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $notificationBag->add('info', array('test1', 'test2'), false, 'custom');
         $this->assertCount(2, $notificationBag);
-        $this->assertEquals('test1', $notificationBag->all()[0]->getMessage());
-        $this->assertEquals('custom', $notificationBag->all()[0]->getFormat());
-        $this->assertEquals('test2', $notificationBag->all()[1]->getMessage());
-        $this->assertEquals('custom', $notificationBag->all()[1]->getFormat());
+        $notifications = $notificationBag->all();
+        $this->assertEquals('test1', $notifications[0]->getMessage());
+        $this->assertEquals('custom', $notifications[0]->getFormat());
+        $this->assertEquals('test2', $notifications[1]->getMessage());
+        $this->assertEquals('custom', $notifications[1]->getFormat());
     }
 
     public function testAddArrayOfMessagesWithFormats()
@@ -519,10 +522,11 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $notificationBag->add('info', array(array('test1', 'custom1'), array('test2', 'custom2')), false);
         $this->assertCount(2, $notificationBag);
-        $this->assertEquals('test1', $notificationBag->all()[0]->getMessage());
-        $this->assertEquals('custom1', $notificationBag->all()[0]->getFormat());
-        $this->assertEquals('test2', $notificationBag->all()[1]->getMessage());
-        $this->assertEquals('custom2', $notificationBag->all()[1]->getFormat());
+        $notifications = $notificationBag->all();
+        $this->assertEquals('test1', $notifications[0]->getMessage());
+        $this->assertEquals('custom1', $notifications[0]->getFormat());
+        $this->assertEquals('test2', $notifications[1]->getMessage());
+        $this->assertEquals('custom2', $notifications[1]->getFormat());
     }
 
     public function testAddArrayOfMessagesWithFormatsOverrideFormat()
@@ -533,10 +537,11 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $notificationBag->add('info', array(array('test1', 'custom1'), 'test2'), false, 'c');
         $this->assertCount(2, $notificationBag);
-        $this->assertEquals('test1', $notificationBag->all()[0]->getMessage());
-        $this->assertEquals('custom1', $notificationBag->all()[0]->getFormat());
-        $this->assertEquals('test2', $notificationBag->all()[1]->getMessage());
-        $this->assertEquals('c', $notificationBag->all()[1]->getFormat());
+        $notifications = $notificationBag->all();
+        $this->assertEquals('test1', $notifications[0]->getMessage());
+        $this->assertEquals('custom1', $notifications[0]->getFormat());
+        $this->assertEquals('test2', $notifications[1]->getMessage());
+        $this->assertEquals('c', $notifications[1]->getFormat());
     }
 
     public function testAddArrayOfMessagesWithAssociativeArrayAsParams()
@@ -586,8 +591,9 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $notificationBag->add('info', $messages[1], false);
 
         $this->assertCount(2, $notificationBag);
-        $this->assertEquals($messages[0], $notificationBag->all()[0]);
-        $this->assertEquals($messages[1], $notificationBag->all()[1]);
+        $notifications = $notificationBag->all();
+        $this->assertEquals($messages[0], $notifications[0]);
+        $this->assertEquals($messages[1], $notifications[1]);
     }
 
     public function testGetInstantMessagesForGivenType()
