@@ -55,20 +55,6 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     protected $notifications;
 
     /**
-     * Instance of lastly added message.
-     *
-     * @var \Krucas\Notification\Message|null
-     */
-    protected $lastMessage = null;
-
-    /**
-     * Lastly added message position (when used atPosition()).
-     *
-     * @var int|null
-     */
-    protected $lastPosition = null;
-
-    /**
      * The event dispatcher instance.
      *
      * @var \Illuminate\Events\Dispatcher
@@ -320,9 +306,6 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     public function add($type, $message, $flashable = true, $format = null)
     {
-        $this->lastMessage = null;
-        $this->lastPosition = null;
-
         if (!$this->typeIsAvailable($type)) {
             return $this;
         }
@@ -341,8 +324,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
         }
 
         if (!$m->isFlashable()) {
-            $this->lastMessage = $m;
-            $this->notifications->addUnique($this->lastMessage);
+            $this->notifications->addUnique($m);
             //$this->fireEvent('added', $this->lastMessage);
         } else {
             $this->fireEvent('flash', $m);
