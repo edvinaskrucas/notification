@@ -9,8 +9,6 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
     public function tearDown()
     {
         m::close();
-
-        \Krucas\Notification\NotificationsBag::unsetEventDispatcher();
     }
 
     public function testIsConstructed()
@@ -196,17 +194,6 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($notificationBag->getFormat('info'));
     }
 
-    public function testAddMessage()
-    {
-        $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType('success');
-        $notificationBag->setDefaultFormat(':message');
-        $notificationBag->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
-        $message = new \Krucas\Notification\Message('success', 'test', true, ':message', null, null);
-        $events->shouldReceive('fire')->once()->with('notification.flash: test', array($notificationBag, $message));
-        $notificationBag->add('success', 'test');
-    }
-
     public function testAddMessageWithCustomFormat()
     {
         $notificationBag = $this->getNotificationBag();
@@ -227,28 +214,6 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $notificationBag->successInstant('test');
         $this->assertCount(1, $notificationBag);
-    }
-
-    public function testAddInstantMessageEventFired()
-    {
-        $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType('info');
-        $notificationBag->setDefaultFormat(':message');
-        $notificationBag->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
-        $message = new \Krucas\Notification\Message('info', 'test', false, ':message', null, null);
-        $events->shouldReceive('fire')->once()->with('notification.added: test', array($notificationBag, $message));
-        $notificationBag->infoInstant('test');
-    }
-
-    public function testAddFlashMessageUsingNamedMethod()
-    {
-        $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType('success');
-        $notificationBag->setDefaultFormat(':message');
-        $notificationBag->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
-        $message = new \Krucas\Notification\Message('success', 'test', true, ':message', null, null);
-        $events->shouldReceive('fire')->once()->with('notification.flash: test', array($notificationBag, $message));
-        $notificationBag->success('test');
     }
 
     public function testAddMessageForNonExistingType()
@@ -302,14 +267,12 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
     {
         $notificationBag = $this->getNotificationBag();
         $notificationBag->addType('info');
-        $notificationBag->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
         $message = $this->getMessage();
         $message->shouldReceive('setType')->with('info')->andReturn($message);
         $message->shouldReceive('isFlashable')->andReturn(true);
         $message->shouldReceive('getPosition')->andReturn(null);
         $message->shouldReceive('getAlias')->andReturn(null);
         $message->shouldReceive('getFormat')->andReturn(':message');
-        $events->shouldReceive('fire')->once()->with('notification.flash: test', array($notificationBag, $message));
         $this->assertCount(0, $notificationBag);
 
         $notificationBag->add('info', $message);

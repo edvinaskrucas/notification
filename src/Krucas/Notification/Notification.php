@@ -232,6 +232,25 @@ class Notification
     }
 
     /**
+     * Fire given event.
+     *
+     * @param $event
+     * @param \Krucas\Notification\NotificationsBag $notificationBag
+     * @param \Krucas\Notification\Message $message
+     * @return array|bool|null
+     */
+    public function fire($event, NotificationsBag $notificationBag, Message $message)
+    {
+        if (!isset(static::$dispatcher)) {
+            return true;
+        }
+
+        $event = "notification.{$event}: ".$notificationBag->getName();
+
+        return static::$dispatcher->fire($event, array($this, $notificationBag, $message));
+    }
+
+    /**
      * Get the event dispatcher instance.
      *
      * @return \Illuminate\Events\Dispatcher

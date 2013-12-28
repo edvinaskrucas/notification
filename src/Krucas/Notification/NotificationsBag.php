@@ -725,44 +725,11 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
      */
     protected function fireEvent($event, $message)
     {
-        if (!isset(static::$dispatcher)) {
+        if (!isset($this->notification)) {
             return true;
         }
 
-        $event = "notification.{$event}: ".$this->getName();
-
-        return static::$dispatcher->fire($event, array($this, $message));
-    }
-
-    /**
-     * Get the event dispatcher instance.
-     *
-     * @return \Illuminate\Events\Dispatcher
-     */
-    public static function getEventDispatcher()
-    {
-        return static::$dispatcher;
-    }
-
-    /**
-     * Set the event dispatcher instance.
-     *
-     * @param  \Illuminate\Events\Dispatcher  $dispatcher
-     * @return void
-     */
-    public static function setEventDispatcher(Dispatcher $dispatcher)
-    {
-        static::$dispatcher = $dispatcher;
-    }
-
-    /**
-     * Unset the event dispatcher for models.
-     *
-     * @return void
-     */
-    public static function unsetEventDispatcher()
-    {
-        static::$dispatcher = null;
+        return $this->getNotification()->fire($event, $this, $message);
     }
 
     /**

@@ -187,8 +187,48 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $this->assertNull($notification->getEventDispatcher());
     }
 
+    public function testAddFlashMessageProcess()
+    {
+        $notification = $this->getNotification();
+        $notification->setContainerTypes('default', array('info'));
+        $notification->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(true);
+        $message->shouldReceive('getPosition')->andReturn(null);
+        $message->shouldReceive('getAlias')->andReturn(null);
+        $message->shouldReceive('getFormat')->andReturn(':message');
+
+        $events->shouldReceive('fire')->once()->with('notification.flash: default', array($notification, $notification->container(), $message));
+        $notification->container()->info($message);
+    }
+
+    public function testAddInstantMessageProcess()
+    {
+        $notification = $this->getNotification();
+        $notification->setContainerTypes('default', array('info'));
+        $notification->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('getPosition')->andReturn(null);
+        $message->shouldReceive('getAlias')->andReturn(null);
+        $message->shouldReceive('getFormat')->andReturn(':message');
+
+        $events->shouldReceive('fire')->once()->with('notification.added: default', array($notification, $notification->container(), $message));
+        $notification->container()->infoInstant($message);
+    }
+
     protected function getNotification()
     {
         return new \Krucas\Notification\Notification('default');
+    }
+
+    protected function getMessage()
+    {
+        $message = m::mock('Krucas\Notification\Message');
+        return $message;
     }
 }
