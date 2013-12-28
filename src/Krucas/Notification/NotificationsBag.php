@@ -310,35 +310,89 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
             return $this;
         }
 
-        if ($message instanceof \Krucas\Notification\Message) {
-            $m = $message;
-            $m->setType($type);
-            if ($m->isFlashable() != $flashable) {
-                $m->setFlashable($flashable);
-            }
-            if (!is_null($format)) {
-                $m->setFormat($this->checkFormat($format, $type));
-            }
+        if (is_array($message)) {
+            $this->addArray($type, $message, $flashable, $format);
         } else {
-            $m = new Message($type, $message, $flashable, $this->checkFormat($format, $type));
-        }
-
-        if (!$m->isFlashable()) {
-            if (!is_null($m->getAlias())) {
-                $this->addAliased($m);
-            } else {
-                if (!is_null($m->getPosition())) {
-                    $this->notifications->setAtPosition($m->getPosition(), $message);
-                } else {
-                    $this->notifications->addUnique($m);
+            if ($message instanceof \Krucas\Notification\Message) {
+                $m = $message;
+                $m->setType($type);
+                if ($m->isFlashable() != $flashable) {
+                    $m->setFlashable($flashable);
                 }
+                if (!is_null($format)) {
+                    $m->setFormat($this->checkFormat($format, $type));
+                }
+            } else {
+                $m = new Message($type, $message, $flashable, $this->checkFormat($format, $type));
             }
-            $this->fireEvent('added', $m);
-        } else {
-            $this->fireEvent('flash', $m);
+
+            if (!$m->isFlashable()) {
+                if (!is_null($m->getAlias())) {
+                    $this->addAliased($m);
+                } else {
+                    if (!is_null($m->getPosition())) {
+                        $this->notifications->setAtPosition($m->getPosition(), $message);
+                    } else {
+                        $this->notifications->addUnique($m);
+                    }
+                }
+                $this->fireEvent('added', $m);
+            } else {
+                $this->fireEvent('flash', $m);
+            }
         }
 
         return $this;
+    }
+
+    /**
+     * Add array of messages to container.
+     *
+     * @param $type
+     * @param array $messages
+     * @param bool $flashable
+     * @param null $defaultFormat
+     * @return void
+     */
+    protected function addArray($type, $messages = array(), $flashable = true, $defaultFormat = null)
+    {
+        foreach ($messages as $message) {
+            if (is_array($message)) {
+                $text = $format = $alias = $position = null;
+                if (isset($message['message'])) {
+                    $text = $message['message'];
+
+                    if (isset($message['alias'])) {
+                        $alias = $message['alias'];
+                    }
+
+                    if (isset($message['position'])) {
+                        $position = $message['position'];
+                    }
+
+                    if (isset($message['format'])) {
+                        $format = $message['format'];
+                    }
+                } elseif (count($message) == 2) {
+                    $text = $message[0];
+                    $format = $message[1];
+                }
+                $this->add(
+                    $type,
+                    new Message(
+                        $type,
+                        $text,
+                        $flashable,
+                        is_null($format) ? $defaultFormat : $format,
+                        $alias,
+                        $position
+                    ),
+                    $flashable
+                );
+            } else {
+                $this->add($type, $message, $flashable, $defaultFormat);
+            }
+        }
     }
 
     /**
