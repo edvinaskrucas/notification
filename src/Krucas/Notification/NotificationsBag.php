@@ -324,10 +324,27 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
         }
 
         if (!$m->isFlashable()) {
-            if (!is_null($m->getPosition())) {
-                $this->notifications->setAtPosition($m->getPosition(), $message);
+            if (!is_null($m->getAlias())) {
+                foreach ($this->notifications as $k => $v) {
+                    if ($m->getAlias() == $v->getAlias()) {
+                        $index = $this->notifications->indexOf($v);
+
+                        if ($index !== false) {
+                            $this->notifications->offsetUnset($index);
+                            $this->notifications->setAtPosition($index, $m);
+                        }
+                    }
+                }
+
+                if (!$this->notifications->indexOf($m)) {
+                    $this->notifications->addUnique($m);
+                }
             } else {
-                $this->notifications->addUnique($m);
+                if (!is_null($m->getPosition())) {
+                    $this->notifications->setAtPosition($m->getPosition(), $message);
+                } else {
+                    $this->notifications->addUnique($m);
+                }
             }
             $this->fireEvent('added', $m);
         } else {
@@ -552,6 +569,17 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     public function getAtPosition($position)
     {
         return $this->all()->getAtPosition($position);
+    }
+
+    /**
+     * Returns message with a given alias or null if not found.
+     *
+     * @param $alias
+     * @return \Krucas\Notification\Message|null
+     */
+    public function getAliased($alias)
+    {
+        return $this->all()->getAliased($alias);
     }
 
     /**
