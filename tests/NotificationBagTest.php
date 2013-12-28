@@ -442,6 +442,49 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($message2, $notificationBag->getAliased('test_alias'));
     }
 
+    public function testAddMessageWithAliasAndPosition()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('getPosition')->andReturn(5);
+        $message->shouldReceive('getAlias')->andReturn('test_alias');
+
+        $notificationBag->add('info', $message, false);
+        $this->assertCount(1, $notificationBag);
+        $this->assertEquals($message, $notificationBag->getAtPosition(5));
+        $this->assertEquals($message, $notificationBag->getAliased('test_alias'));
+    }
+
+    public function testAddMessagesWithSameAliasDifferentPositions()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('info', 'danger'));
+        $this->assertCount(0, $notificationBag);
+
+        $message1 = $this->getMessage();
+        $message1->shouldReceive('setType')->with('info')->andReturn($message1);
+        $message1->shouldReceive('isFlashable')->andReturn(false);
+        $message1->shouldReceive('getPosition')->andReturn(5);
+        $message1->shouldReceive('getAlias')->andReturn('test_alias');
+
+        $message2 = $this->getMessage();
+        $message2->shouldReceive('setType')->with('danger')->andReturn($message2);
+        $message2->shouldReceive('isFlashable')->andReturn(false);
+        $message2->shouldReceive('getPosition')->andReturn(9);
+        $message2->shouldReceive('getAlias')->andReturn('test_alias');
+
+        $notificationBag->add('info', $message1, false);
+        $notificationBag->add('danger', $message2, false);
+        $this->assertCount(1, $notificationBag);
+        $this->assertEquals($message2, $notificationBag->getAtPosition(9));
+        $this->assertEquals($message2, $notificationBag->getAliased('test_alias'));
+    }
+
     public function testGetInstantMessagesForGivenType()
     {
         $notificationBag = $this->getNotificationBag();

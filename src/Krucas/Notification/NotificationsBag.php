@@ -357,14 +357,21 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
 
                 if ($index !== false) {
                     $this->notifications->offsetUnset($index);
-                    $this->notifications->setAtPosition($index, $message);
+                    $this->notifications->setAtPosition(
+                        is_null($message->getPosition()) ? $index : $message->getPosition(),
+                        $message
+                    );
                     $inserted = true;
                 }
             }
         }
 
         if (!$inserted) {
-            $this->notifications->addUnique($message);
+            if (!is_null($message->getPosition())) {
+                $this->notifications->setAtPosition($message->getPosition(), $message);
+            } else {
+                $this->notifications->addUnique($message);
+            }
         }
     }
 
