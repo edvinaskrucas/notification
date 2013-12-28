@@ -228,6 +228,17 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertCount(1, $notificationBag);
     }
 
+    public function testAddInstantMessageEventFired()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $notificationBag->setDefaultFormat(':message');
+        $notificationBag->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+        $message = new \Krucas\Notification\Message('info', 'test', false, ':message', null, null);
+        $events->shouldReceive('fire')->once()->with('notification.added: test', array($notificationBag, $message));
+        $notificationBag->infoInstant('test');
+    }
+
     public function testAddFlashMessageUsingNamedMethod()
     {
         $notificationBag = $this->getNotificationBag();

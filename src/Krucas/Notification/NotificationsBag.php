@@ -329,7 +329,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
             } else {
                 $this->notifications->addUnique($m);
             }
-            //$this->fireEvent('added', $this->lastMessage);
+            $this->fireEvent('added', $m);
         } else {
             $this->fireEvent('flash', $m);
         }
