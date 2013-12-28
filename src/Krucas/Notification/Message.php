@@ -6,7 +6,6 @@ use Illuminate\Support\Contracts\ArrayableInterface;
 
 class Message implements RenderableInterface, JsonableInterface, ArrayableInterface
 {
-
     /**
      * Notification message.
      *
@@ -64,8 +63,14 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
      * @param null $alias
      * @param null $position
      */
-    public function __construct($type = null, $message = null, $flashable = true, $format = null, $alias = null, $position = null)
-    {
+    public function __construct(
+        $type = null,
+        $message = null,
+        $flashable = true,
+        $format = null,
+        $alias = null,
+        $position = null
+    ) {
         $this->setType($type);
         $this->setMessage($message);
         $this->setFlashable($flashable);

@@ -1,6 +1,5 @@
 <?php namespace Krucas\Notification;
 
-use Krucas\Notification\NotificationsBag;
 use Closure;
 
 class Notification
