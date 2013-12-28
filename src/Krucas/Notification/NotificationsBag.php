@@ -325,20 +325,7 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
 
         if (!$m->isFlashable()) {
             if (!is_null($m->getAlias())) {
-                foreach ($this->notifications as $k => $v) {
-                    if ($m->getAlias() == $v->getAlias()) {
-                        $index = $this->notifications->indexOf($v);
-
-                        if ($index !== false) {
-                            $this->notifications->offsetUnset($index);
-                            $this->notifications->setAtPosition($index, $m);
-                        }
-                    }
-                }
-
-                if (!$this->notifications->indexOf($m)) {
-                    $this->notifications->addUnique($m);
-                }
+                $this->addAliased($m);
             } else {
                 if (!is_null($m->getPosition())) {
                     $this->notifications->setAtPosition($m->getPosition(), $message);
@@ -352,6 +339,33 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
         }
 
         return $this;
+    }
+
+    /**
+     * Add message with alias.
+     *
+     * @param $message
+     * @return void
+     */
+    protected function addAliased($message)
+    {
+        $inserted = false;
+
+        foreach ($this->notifications as $m) {
+            if ($message->getAlias() == $m->getAlias()) {
+                $index = $this->notifications->indexOf($m);
+
+                if ($index !== false) {
+                    $this->notifications->offsetUnset($index);
+                    $this->notifications->setAtPosition($index, $message);
+                    $inserted = true;
+                }
+            }
+        }
+
+        if (!$inserted) {
+            $this->notifications->addUnique($message);
+        }
     }
 
     /**
