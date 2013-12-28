@@ -327,8 +327,20 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
             return $this;
         }
 
-        $m = new Message($type, $message, $flashable, $this->checkFormat($format, $type));
-        if (!$flashable) {
+        if ($message instanceof \Krucas\Notification\Message) {
+            $m = $message;
+            $m->setType($type);
+            if ($m->isFlashable() != $flashable) {
+                $m->setFlashable($flashable);
+            }
+            if (!is_null($format)) {
+                $m->setFormat($this->checkFormat($format, $type));
+            }
+        } else {
+            $m = new Message($type, $message, $flashable, $this->checkFormat($format, $type));
+        }
+
+        if (!$m->isFlashable()) {
             $this->lastMessage = $m;
             $this->notifications->addUnique($this->lastMessage);
             //$this->fireEvent('added', $this->lastMessage);

@@ -270,6 +270,75 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertCount(2, $notificationBag);
     }
 
+    public function testAddInstantMessageWithMessageInstance()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(false);
+        $notificationBag->add('info', $message, false);
+        $this->assertCount(1, $notificationBag);
+    }
+
+    public function testAddFlashMessageWithMessageInstance()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $notificationBag->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(true);
+        $events->shouldReceive('fire')->once()->with('notification.flash: test', array($notificationBag, $message));
+        $this->assertCount(0, $notificationBag);
+
+        $notificationBag->add('info', $message);
+        $this->assertCount(0, $notificationBag);
+    }
+
+    public function testAddInstantMessageWithMessageInstanceUsingNamedMethods()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(false);
+        $notificationBag->infoInstant($message);
+        $this->assertCount(1, $notificationBag);
+    }
+
+    public function testAddInstantMessageWithMessageInstanceUsingNamedMethodsOverrideFlashStatus()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(true, false);
+        $message->shouldReceive('setFlashable')->with(false)->andReturn($message);
+        $notificationBag->infoInstant($message);
+        $this->assertCount(1, $notificationBag);
+    }
+
+    public function testAddInstantMessageWithMessageInstanceAndOverrideFormat()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('setFormat')->with(':message')->andReturn($message);
+        $notificationBag->add('info', $message, false, ':message');
+        $this->assertCount(1, $notificationBag);
+    }
+
     public function testGetInstantMessagesForGivenType()
     {
         $notificationBag = $this->getNotificationBag();
@@ -548,5 +617,11 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
     protected function getNotificationBag()
     {
         return new NotificationsBagMock('test');
+    }
+
+    protected function getMessage()
+    {
+        $message = m::mock('Krucas\Notification\Message');
+        return $message;
     }
 }
