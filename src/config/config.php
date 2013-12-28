@@ -1,6 +1,5 @@
 <?php
 
-
 return array(
 
     /*
@@ -11,7 +10,7 @@ return array(
     | This will be used to prefix flash messages.
     |
     */
-    'session_prefix'                       => 'notifications_',
+    'session_prefix'                        => 'notifications_',
 
     /*
     |--------------------------------------------------------------------------
@@ -29,13 +28,18 @@ return array(
     |--------------------------------------------------------------------------
     |
     | This format will be used when no format is specified.
+    | Specify default format for each container.
     | Available place holders:
     |
     | :type - type of message (error, warning, info, success).
     | :message - message text.
     |
     */
-    'default_format'                        => '<div class="alert alert-:type">:message</div>',
+    'default_format'                        => array(
+
+        'default'               => '<div class="alert alert-:type">:message</div>',
+
+    ),
 
     /*
     |--------------------------------------------------------------------------
@@ -51,8 +55,6 @@ return array(
     |       )
     |   )
     |
-    | If you want to set global formats for each type of message use same syntax just place them in array named '__'.
-    |
     | Available place holders:
     |
     | :type - type of message (error, warning, info, success).
@@ -61,10 +63,7 @@ return array(
     */
     'default_formats'                       => array(
 
-        /**
-         * Default individual messages for all containers.
-         */
-        '__'                    => array(
+        'default'               => array(
 
         ),
 
@@ -75,18 +74,12 @@ return array(
     | Default message types available in containers
     |--------------------------------------------------------------------------
     |
+    | Specify available types for each container.
+    |
     */
     'default_types'                         => array(
 
-        /**
-         * Default individual messages for all containers.
-         */
-        '__'                    => array(
-            'info',
-            'success',
-            'warning',
-            'error',
-        ),
+        'default'               => array('info', 'success', 'warning', 'error'),
 
     ),
 

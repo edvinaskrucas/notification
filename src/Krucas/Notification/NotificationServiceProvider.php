@@ -31,10 +31,16 @@ class NotificationServiceProvider extends ServiceProvider
         $this->app['config']->package('edvinaskrucas/notification', __DIR__.'/../config');
 
         $this->app['notification'] = $this->app->share(function ($app) {
-            return new Notification(
-                $app['config'],
-                isset($app['session.store']) ? $app['session.store'] : $app['session']
+            $config = $app['config'];
+
+            $notification = new Notification(
+                $config->get('notification::default_container'),
+                $config->get('notification::default_format'),
+                $config->get('notification::default_formats'),
+                $config->get('notification::default_types')
             );
+
+            return $notification;
         });
     }
 
