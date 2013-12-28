@@ -69,6 +69,13 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     protected $groupForRender = array();
 
     /**
+     * Notification library instance.
+     *
+     * @var \Krucas\Notification\Notification
+     */
+    protected $notification;
+
+    /**
      * Creates new NotificationBag object.
      *
      * @param $container
@@ -756,6 +763,21 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     public static function unsetEventDispatcher()
     {
         static::$dispatcher = null;
+    }
+
+    public function setNotification(Notification $notification)
+    {
+        $this->notification = $notification;
+    }
+
+    public function getNotification()
+    {
+        return $this->notification;
+    }
+
+    public function unsetNotification()
+    {
+        $this->notification = null;
     }
 
     /**

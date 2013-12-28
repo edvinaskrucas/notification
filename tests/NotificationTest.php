@@ -103,6 +103,16 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $this->assertCount(1, $notification->getContainers());
     }
 
+    public function testSetNotificationInstanceOnNewContainer()
+    {
+        $notification = $this->getNotification();
+        $this->assertCount(0, $notification->getContainers());
+
+        $notification->addContainer('test');
+        $this->assertCount(1, $notification->getContainers());
+        $this->assertEquals($notification, $notification->container('test')->getNotification());
+    }
+
     public function testNotificationBagInstanceOnDefaultContainer()
     {
         $notification = $this->getNotification();

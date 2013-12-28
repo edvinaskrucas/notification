@@ -869,6 +869,16 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('info - test2success - test', $notificationBag->group('info', 'success')->show());
     }
 
+    public function testSetNotificationInstance()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $this->assertNull($notificationBag->getEventDispatcher());
+        $notificationBag->setNotification($notification = m::mock('Krucas\Notification\Notification'));
+        $this->assertEquals($notification, $notificationBag->getNotification());
+        $notificationBag->unsetNotification();
+        $this->assertNull($notificationBag->getNotification());
+    }
+
     public function testToString()
     {
         $notificationBag = $this->getNotificationBag();

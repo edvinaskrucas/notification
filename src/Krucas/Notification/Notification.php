@@ -176,6 +176,7 @@ class Notification
         }
 
         $this->containers[$container] = new NotificationsBag($container, $types, $defaultFormat, $formats);
+        $this->containers[$container]->setNotification($this);
 
         return $this;
     }
