@@ -765,16 +765,32 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
         static::$dispatcher = null;
     }
 
+    /**
+     * Set notification instance.
+     *
+     * @param \Krucas\Notification\Notification $notification
+     * @return void
+     */
     public function setNotification(Notification $notification)
     {
         $this->notification = $notification;
     }
 
+    /**
+     * Get notification instance.
+     *
+     * @return \Krucas\Notification\Notification
+     */
     public function getNotification()
     {
         return $this->notification;
     }
 
+    /**
+     * Unset notification instance.
+     *
+     * @return void
+     */
     public function unsetNotification()
     {
         $this->notification = null;
