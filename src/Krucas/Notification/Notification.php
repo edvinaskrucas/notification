@@ -211,6 +211,19 @@ class Notification
     }
 
     /**
+     * Create new message instance.
+     *
+     * @param null $message
+     * @return \Krucas\Notification\Message
+     */
+    public function message($message = null)
+    {
+        $m = new Message();
+        $m->setMessage($message);
+        return $m;
+    }
+
+    /**
      * Calls NotificationBag function for a default container.
      *
      * @param $name

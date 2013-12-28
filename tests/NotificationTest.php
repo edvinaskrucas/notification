@@ -151,6 +151,22 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array('info'), $notification->container('default')->getTypes());
     }
 
+    public function testCreateNewEmptyMessageInstance()
+    {
+        $notification = $this->getNotification();
+        $message = $notification->message();
+        $this->assertInstanceOf('Krucas\Notification\Message', $message);
+        $this->assertNull($message->getMessage());
+    }
+
+    public function testCreateNewMessageInstanceWithMessage()
+    {
+        $notification = $this->getNotification();
+        $message = $notification->message('test');
+        $this->assertInstanceOf('Krucas\Notification\Message', $message);
+        $this->assertEquals('test', $message->getMessage());
+    }
+
     protected function getNotification()
     {
         return new \Krucas\Notification\Notification('default');
