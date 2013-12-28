@@ -604,6 +604,26 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertCount(1, $notificationBag->get('info'));
     }
 
+    public function testGetInstantMessagesForGivenTypeWhenMessageHasPosition()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('info', 'danger'));
+        $this->assertCount(0, $notificationBag);
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('getType')->andReturn('info');
+        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('getPosition')->andReturn(5);
+        $message->shouldReceive('getAlias')->andReturn(null);
+
+        $notificationBag->add('info', $message, false);
+        $notificationBag->add('danger', 'test', false);
+        $this->assertCount(2, $notificationBag);
+        $this->assertCount(1, $notificationBag->get('info'));
+        $this->assertEquals($message, $notificationBag->get('info')->getAtPosition(5));
+    }
+
     public function testClearMessagesForGivenType()
     {
         $notificationBag = $this->getNotificationBag();
