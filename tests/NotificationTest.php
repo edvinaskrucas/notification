@@ -167,6 +167,16 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('test', $message->getMessage());
     }
 
+    public function testSetEventDispatcher()
+    {
+        $notification = $this->getNotification();
+        $this->assertNull($notification->getEventDispatcher());
+        $notification->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+        $this->assertEquals($events, $notification->getEventDispatcher());
+        $notification->unsetEventDispatcher();
+        $this->assertNull($notification->getEventDispatcher());
+    }
+
     protected function getNotification()
     {
         return new \Krucas\Notification\Notification('default');

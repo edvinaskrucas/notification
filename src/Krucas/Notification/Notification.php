@@ -1,6 +1,7 @@
 <?php namespace Krucas\Notification;
 
 use Closure;
+use Illuminate\Events\Dispatcher;
 
 class Notification
 {
@@ -38,6 +39,13 @@ class Notification
      * @var array
      */
     protected $formats = array();
+
+    /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Events\Dispatcher
+     */
+    protected static $dispatcher;
 
     /**
      * Create new instance.
@@ -220,6 +228,37 @@ class Notification
         $m = new Message();
         $m->setMessage($message);
         return $m;
+    }
+
+    /**
+     * Get the event dispatcher instance.
+     *
+     * @return \Illuminate\Events\Dispatcher
+     */
+    public static function getEventDispatcher()
+    {
+        return static::$dispatcher;
+    }
+
+    /**
+     * Set the event dispatcher instance.
+     *
+     * @param \Illuminate\Events\Dispatcher $dispatcher
+     * @return void
+     */
+    public static function setEventDispatcher(Dispatcher $dispatcher)
+    {
+        static::$dispatcher = $dispatcher;
+    }
+
+    /**
+     * Unset the event dispatcher for models.
+     *
+     * @return void
+     */
+    public static function unsetEventDispatcher()
+    {
+        static::$dispatcher = null;
     }
 
     /**
