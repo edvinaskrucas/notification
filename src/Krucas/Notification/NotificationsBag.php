@@ -633,6 +633,16 @@ class NotificationsBag implements ArrayableInterface, JsonableInterface, Countab
     }
 
     /**
+     * Convert the Bag to its string representation.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string) $this->notifications;
+    }
+
+    /**
      * Count the number of colections.
      *
      * @return int

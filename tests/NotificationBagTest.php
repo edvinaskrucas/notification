@@ -703,6 +703,15 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('info - test2success - test', $notificationBag->group('info', 'success')->show());
     }
 
+    public function testToString()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $notificationBag->setDefaultFormat(':type - :message');
+        $notificationBag->add('info', 'ok', false);
+        $this->assertEquals('info - ok', (string) $notificationBag);
+    }
+
     public function testToArray()
     {
         $notificationBag = $this->getNotificationBag();
