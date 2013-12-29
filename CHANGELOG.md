@@ -4,6 +4,7 @@
 * Add message types dynamically
 * Changes in position and alias API
 * Added events
+* Updated ```config.php``` file
 * Messages now flashed using events
 * Refactored library
 
