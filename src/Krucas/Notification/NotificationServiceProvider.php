@@ -19,6 +19,7 @@ class NotificationServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->package('edvinaskrucas/notification');
+        $this->app['events']->fire('notification.booted', $this->app['notification']);
     }
 
     /**
@@ -44,6 +45,12 @@ class NotificationServiceProvider extends ServiceProvider
 
             return $notification;
         });
+
+        $this->app->bind('Krucas\Notification\Subscriber', function ($app) {
+            return new Subscriber($app['session.store'], $app['config']);
+        });
+
+        $this->app['events']->subscribe('Krucas\Notification\Subscriber');
     }
 
     /**
