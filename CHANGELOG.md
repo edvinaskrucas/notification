@@ -1,7 +1,20 @@
+# 2.0.0
+---
+
+* Add message types dynamically
+* Changes in position and alias API
+* Added events
+* Messages now flashed using events
+* Refactored library
+
+---
+
 # 1.2.3
 ---
 
 * Check if ```session.store``` is set before using it.
+
+---
 
 # 1.2
 
