@@ -1,5 +1,7 @@
 # Notification package for Laravel4
 
+[![Build Status](https://travis-ci.org/edvinaskrucas/notification.png?branch=master)](https://travis-ci.org/edvinaskrucas/notification)
+
 ---
 
 A simple notification management package for Laravel4.
@@ -21,7 +23,7 @@ A simple notification management package for Laravel4.
 
 Just place require new package for your laravel installation via composer.json
 
-    "edvinaskrucas/notification": "1.*"
+    "edvinaskrucas/notification": "2.*"
 
 Then hit ```composer update```
 
@@ -115,6 +117,22 @@ Notification::success(array(
 
 Also you can still pass second param (format), to format messages, but you can format individual messages as shown above.
 
+### Add message as object
+
+You can add messages as objects
+```php
+Notification::success(
+    Notification::message('Sample text')
+);
+```
+
+When adding message as object you can add additional params to message
+```php
+Notification::success(
+    Notification::message('Sample text')->format(':message')
+);
+```
+
 ### Accessing first notification from container
 
 You can access and show just first notification in container
@@ -163,18 +181,18 @@ Displaying notifications in a specific container with custom format.
 You can add message with an alias, then if you want to override that message just add new one with same alias.
 It works in a same type scope.
 ```php
-Notification::success('ok')->alias('okMsg');
+Notification::success(Notification::message('ok')->alias('okMsg'));
 
 // We need to override first success message, just alias it with same alias name.
-Notification::success('ok2')->alias('okMsg');
+Notification::success(Notification::message('ok2')->alias('okMsg'));
 ```
 
 With aliasing you can override message type too
 ```php
-Notification::info('info')->alias('loginMsg');
+Notification::info(Notification::message('info')->alias('loginMsg'));
 
 // Overrides info message with error message
-Notification::error('error')->alias('loginMsg');
+Notification::error(Notification::message('error')->alias('loginMsg'));
 ```
 
 Getting aliased message instance.
@@ -190,8 +208,8 @@ There is ability to add message to certain position.
 It works in same type scope.
 ```php
 // This will add message at 5th position
-Notification::info('info')->atPosition(5);
-Notification::info('info2')->atPosition(1);
+Notification::info(Notification::message('info')->position(5));
+Notification::info(Notification::message('info2')->position(1);
 ```
 
 Retrieving messages at certain position
@@ -205,9 +223,9 @@ Above example will return message at fifth position in a default container.
 You can alias message and add it to a certain position.
 It works in same type scope.
 ```php
-Notification::info('info')->alias('infoMsg')->atPosition(4);
+Notification::info(Notification::message('info')->alias('infoMsg')->position(4));
 // If we want to override and set other position
-Notification::info('info2')->alias('infoMsg')->atPosition(1);
+Notification::info(Notification::message('info2')->alias('infoMsg')->position(1));
 ```
 
 ### Clearing messages
