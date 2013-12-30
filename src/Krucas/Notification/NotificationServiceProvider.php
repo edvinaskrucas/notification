@@ -41,7 +41,7 @@ class NotificationServiceProvider extends ServiceProvider
                 $config->get('notification::default_formats')
             );
 
-            $notification->setEventDispatcher($this->app['events']);
+            $notification->setEventDispatcher($app['events']);
 
             return $notification;
         });
