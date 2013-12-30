@@ -1,3 +1,10 @@
+# 2.0.1
+---
+
+* Fix ```$this``` usage when in Closure in ServiceProvider
+
+---
+
 # 2.0.0
 ---
 
