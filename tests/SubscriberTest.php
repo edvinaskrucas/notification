@@ -14,7 +14,7 @@ class SubscriberTest extends PHPUnit_Framework_TestCase
     public function testIsConstructed()
     {
         $subscriber = $this->getSubscriber();
-        $this->assertInstanceOf('Illuminate\Session\Store', $subscriber->getSession());
+        $this->assertInstanceOf('Illuminate\Session\SessionManager', $subscriber->getSession());
         $this->assertInstanceOf('Illuminate\Config\Repository', $subscriber->getConfig());
     }
 
@@ -70,7 +70,7 @@ class SubscriberTest extends PHPUnit_Framework_TestCase
 
     public function testOnFlash()
     {
-        $session = $this->getSessionStore();
+        $session = $this->getSessionManager();
         $config = $this->getConfigRepository();
         $subscriber = m::mock('SubscriberMock[flashContainerNames,generateMessageKey,getSession,getConfig]');
 
@@ -114,13 +114,13 @@ class SubscriberTest extends PHPUnit_Framework_TestCase
 
     protected function getSubscriber()
     {
-        $subscriber = new SubscriberMock($this->getSessionStore(), $this->getConfigRepository());
+        $subscriber = new SubscriberMock($this->getSessionManager(), $this->getConfigRepository());
         return $subscriber;
     }
 
-    protected function getSessionStore()
+    protected function getSessionManager()
     {
-        return m::mock('Illuminate\Session\Store');
+        return m::mock('Illuminate\Session\SessionManager');
     }
 
     protected function getConfigRepository()

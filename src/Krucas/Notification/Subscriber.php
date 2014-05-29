@@ -1,7 +1,7 @@
 <?php namespace Krucas\Notification;
 
 use Illuminate\Config\Repository;
-use Illuminate\Session\Store;
+use Illuminate\Session\SessionManager;
 
 class Subscriber
 {
@@ -15,7 +15,7 @@ class Subscriber
     /**
      * Session instance for flashing messages.
      *
-     * @var \Illuminate\Session\Store
+     * @var \Illuminate\Session\SessionManager
      */
     protected $session;
 
@@ -29,10 +29,10 @@ class Subscriber
     /**
      * Create new subscriber.
      *
-     * @param \Illuminate\Session\Store $session
+     * @param \Illuminate\Session\SessionManager $session
      * @param \Illuminate\Config\Repository $config
      */
-    public function __construct(Store $session, Repository $config)
+    public function __construct(SessionManager $session, Repository $config)
     {
         $this->session = $session;
         $this->config = $config;
@@ -41,7 +41,7 @@ class Subscriber
     /**
      * Get session instance.
      *
-     * @return \Illuminate\Session\Store
+     * @return \Illuminate\Session\SessionManager
      */
     public function getSession()
     {

@@ -47,7 +47,7 @@ class NotificationServiceProvider extends ServiceProvider
         });
 
         $this->app->bind('Krucas\Notification\Subscriber', function ($app) {
-            return new Subscriber($app['session.store'], $app['config']);
+            return new Subscriber($app['session'], $app['config']);
         });
 
         $this->app['events']->subscribe('Krucas\Notification\Subscriber');
