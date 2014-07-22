@@ -46,10 +46,10 @@ class Collection extends BaseCollection implements RenderableInterface
     /**
      * Determines if given message is already in collection.
      *
-     * @param Message $message
+     * @param $message
      * @return bool
      */
-    public function contains(Message $message)
+    public function contains($message)
     {
         return in_array($message, $this->items);
     }
