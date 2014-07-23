@@ -49,9 +49,9 @@ class Collection extends BaseCollection implements RenderableInterface
      * @param Message $message
      * @return bool
      */
-    public function contains(Message $message)
+    public function contains($value)
     {
-        return in_array($message, $this->items);
+        return in_array($value, $this->items);
     }
 
     /**
