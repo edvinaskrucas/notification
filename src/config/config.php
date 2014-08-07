@@ -64,7 +64,7 @@ return array(
     'default_formats'                       => array(
 
         'default'               => array(
-
+            'error'             => '<div class="alert alert-danger">:message</div>'
         ),
 
     ),
@@ -79,7 +79,7 @@ return array(
     */
     'default_types'                         => array(
 
-        'default'               => array('info', 'success', 'warning', 'danger'),
+        'default'               => array('info', 'success', 'warning', 'error'),
 
     ),
 
