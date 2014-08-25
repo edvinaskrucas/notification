@@ -4,201 +4,231 @@ use Mockery as m;
 
 class NotificationTest extends PHPUnit_Framework_TestCase
 {
-    private $n;
-
     public function tearDown()
     {
         m::close();
     }
 
-    protected function setUp()
+    public function testIsConstructed()
     {
-        $session = m::mock('Illuminate\Session\Store');
-        $config = m::mock('Illuminate\Config\Repository');
-
-        $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
-        $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
-
-        $session->shouldReceive('get')->andReturn(false);
-
-        $this->n = new \Krucas\Notification\Notification($config, $session);
+        $notification = $this->getNotification();
+        $this->assertEquals('default', $notification->getDefaultContainerName());
+        $this->assertCount(0, $notification->getContainers());
     }
 
-    public function testConstructor()
+    public function testGetDefaultContainerName()
     {
-        $this->assertInstanceOf('Krucas\Notification\Notification', $this->n);
+        $notification = $this->getNotification();
+        $this->assertEquals('default', $notification->getDefaultContainerName());
     }
 
-    public function testContainerMethodIfReturnsNotificationBag()
+    public function testSetContainerTypes()
     {
-        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->container('test'));
+        $notification = $this->getNotification();
+        $this->assertEquals(array(), $notification->getContainerTypes('default'));
+
+        $notification->setContainerTypes('default', array('success', 'info'));
+        $this->assertEquals(array('success', 'info'), $notification->getContainerTypes('default'));
     }
 
-    public function testGetMethodIfReturnsNotificationBag()
+    public function testGetTypesContainerForContainer()
     {
-        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->get('test'));
+        $notification = $this->getNotification();
+        $this->assertEquals(array(), $notification->getContainerTypes('default'));
+        $this->assertEquals(array(), $notification->getContainerTypes('test'));
+
+        $notification->setContainerTypes('default', array('success', 'info'));
+        $this->assertEquals(array('success', 'info'), $notification->getContainerTypes('default'));
+        $this->assertEquals(array(), $notification->getContainerTypes('test'));
     }
 
-    public function testIfAddingSuccessMessageReturnsNotificationsBag()
+    public function testSetContainerFormat()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-        $this->n->getSessionStore()->shouldReceive('flash')->once();
+        $notification = $this->getNotification();
+        $this->assertNull($notification->getContainerFormat('default'));
 
-        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->success('test'));
+        $notification->setContainerFormat('default', ':message');
+        $this->assertEquals(':message', $notification->getContainerFormat('default'));
     }
 
-    public function testIfAddingWarningMessageReturnsNotificationsBag()
+    public function testGetContainerFormatForContainer()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-        $this->n->getSessionStore()->shouldReceive('flash')->once();
+        $notification = $this->getNotification();
+        $this->assertNull($notification->getContainerFormat('default'));
+        $this->assertNull($notification->getContainerFormat('test'));
 
-        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->warning('test'));
+        $notification->setContainerFormat('default', ':message');
+        $this->assertEquals(':message', $notification->getContainerFormat('default'));
+        $this->assertNull($notification->getContainerFormat('test'));
     }
 
-    public function testIfAddingErrorMessageReturnsNotificationsBag()
+    public function testSetContainerContainerFormats()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-        $this->n->getSessionStore()->shouldReceive('flash')->once();
+        $notification = $this->getNotification();
+        $this->assertEquals(array(), $notification->getContainerFormats('default'));
 
-        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->error('test'));
+        $notification->setContainerFormats('default', array('info' => ':message'));
+        $this->assertEquals(array('info' => ':message'), $notification->getContainerFormats('default'));
     }
 
-    public function testIfAddingInfoMessageReturnsNotificationsBag()
+    public function testGetContainerFormatsForContainer()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-        $this->n->getSessionStore()->shouldReceive('flash')->once();
+        $notification = $this->getNotification();
+        $this->assertEquals(array(), $notification->getContainerFormats('default'));
+        $this->assertEquals(array(), $notification->getContainerFormats('test'));
 
-        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->info('test'));
+        $notification->setContainerFormats('default', array('info' => ':message'));
+        $this->assertEquals(array('info' => ':message'), $notification->getContainerFormats('default'));
+        $this->assertEquals(array(), $notification->getContainerFormats('test'));
     }
 
-    public function testAddingAMessageToDifferentContainers()
+    public function testAddContainer()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-        $this->n->getSessionStore()->shouldReceive('flash');
+        $notification = $this->getNotification();
+        $this->assertCount(0, $notification->getContainers());
 
-        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->info('test'));
-        $this->assertCount(1, $this->n->container());
-
-        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->container('other')->info('test'));
-        $this->assertCount(1, $this->n->container('other'));
-        $this->assertCount(1, $this->n->container());
+        $notification->addContainer('test');
+        $this->assertCount(1, $notification->getContainers());
     }
 
-    public function testIfAddingInstantSuccessMessageReturnsNotificationsBag()
+    public function testAddExistingContainer()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
+        $notification = $this->getNotification();
+        $this->assertCount(0, $notification->getContainers());
 
-        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->successInstant('test'));
+        $notification->addContainer('test');
+        $this->assertCount(1, $notification->getContainers());
+
+        $notification->addContainer('test');
+        $this->assertCount(1, $notification->getContainers());
     }
 
-    public function testIfAddingInstantWarningMessageReturnsNotificationsBag()
+    public function testSetNotificationInstanceOnNewContainer()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
+        $notification = $this->getNotification();
+        $this->assertCount(0, $notification->getContainers());
 
-        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->warningInstant('test'));
+        $notification->addContainer('test');
+        $this->assertCount(1, $notification->getContainers());
+        $this->assertEquals($notification, $notification->container('test')->getNotification());
     }
 
-    public function testIfAddingInstantErrorMessageReturnsNotificationsBag()
+    public function testNotificationBagInstanceOnDefaultContainer()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
-        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->errorInstant('test'));
+        $notification = $this->getNotification();
+        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $notification->container());
     }
 
-    public function testIfAddingInstantInfoMessageReturnsNotificationsBag()
+    public function testNotificationBagInstanceOnDefaultContainerUsingMagicMethod()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
-        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->n->infoInstant('test'));
+        $notification = $this->getNotification();
+        $this->assertEquals('default', $notification->getName());
     }
 
-    public function testShowSuccessMethod()
+    public function testNotificationBagInstanceOnAddedContainer()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-        $this->n->getSessionStore()->shouldReceive('flash');
-
-        $this->n->successInstant('ok', ':message');
-        $this->n->successInstant('ok');
-        $this->n->success('ok flashed');
-
-        $this->assertEquals('ok<div class="alert alert-success">ok</div>', $this->n->showSuccess());
+        $notification = $this->getNotification();
+        $notification->addContainer('test');
+        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $notification->container('test'));
     }
 
-    public function testShowInfoMethod()
+    public function testNotificationBagInstanceOnNonExistingContainer()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
-        $this->n->infoInstant('info');
-
-        $this->assertEquals('<div class="alert alert-info">info</div>', $this->n->showInfo());
+        $notification = $this->getNotification();
+        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $notification->container('test'));
     }
 
-    public function testShowErrorMethod()
+    public function testNotificationBagInstanceOnNonExistingContainerWithResolvedParams()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
-        $this->n->errorInstant('error');
-
-        $this->assertEquals('<div class="alert alert-error">error</div>', $this->n->showError());
+        $notification = $this->getNotification();
+        $notification->setContainerTypes('test', array('success'));
+        $notification->setContainerFormat('test', ':message');
+        $notification->setContainerFormats('test', array('success' => ':message - OK'));
+        $container = $notification->container('test');
+        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $container);
+        $this->assertEquals(array('success'), $container->getTypes());
+        $this->assertEquals(':message', $container->getDefaultFormat());
+        $this->assertEquals(':message - OK', $container->getFormat('success'));
     }
 
-    public function testShowWarningMethod()
+    public function testCallbackOnNotificationBag()
     {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
-        $this->n->warningInstant('warning');
-
-        $this->assertEquals('<div class="alert alert-warning">warning</div>', $this->n->showWarning());
-    }
-
-    public function testShowAllWithACustomFormat()
-    {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-        $this->n->getSessionStore()->shouldReceive('flash');
-
-        $this->n->warningInstant('warning');
-        $this->n->errorInstant('error');
-        $this->n->infoInstant('info');
-        $this->n->successInstant('success');
-        $this->n->success('success flash');
-
-        $this->assertEquals('warning error info success ', $this->n->showAll(null, ':message '));
-    }
-
-    public function testAddToMoreThanOneContainerAndShowOneOfThem()
-    {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-        $this->n->getSessionStore()->shouldReceive('flash');
-
-        $this->n->warningInstant('warning');
-        $this->n->errorInstant('error');
-        $this->n->infoInstant('info');
-        $this->n->successInstant('success');
-        $this->n->success('success flash');
-
-        $this->n->container('a')->warningInstant('warning');
-
-        $this->n->container('b')->warning('warning flash');
-
-        $this->assertEquals('<div class="alert alert-warning">warning</div>', $this->n->showAll('a'));
-        $this->assertEquals('', $this->n->showAll('b'));
-    }
-
-    public function testAddInstantMessageAndInstantlyShowIt()
-    {
-        $this->n->getConfigRepository()->shouldReceive('get')->with('notification::default_container')->andReturn('test');
-
-        $this->assertEquals('<div class="alert alert-info">instant</div>', (string) $this->n->container('instant')->infoInstant('instant'));
-    }
-
-    public function testAddingMessagesInAClosure()
-    {
-        $this->n->container('a', function($bag)
-        {
-            $bag->infoInstant('info');
-            $bag->errorInstant('error');
+        $notification = $this->getNotification();
+        $this->assertEquals(array(), $notification->container('default')->getTypes());
+        $notification->container('default', function ($container) {
+            $container->addType('info');
         });
+        $this->assertEquals(array('info'), $notification->container('default')->getTypes());
+    }
 
-        $this->assertCount(2, $this->n->container('a'));
+    public function testCreateNewEmptyMessageInstance()
+    {
+        $notification = $this->getNotification();
+        $message = $notification->message();
+        $this->assertInstanceOf('Krucas\Notification\Message', $message);
+        $this->assertNull($message->getMessage());
+    }
+
+    public function testCreateNewMessageInstanceWithMessage()
+    {
+        $notification = $this->getNotification();
+        $message = $notification->message('test');
+        $this->assertInstanceOf('Krucas\Notification\Message', $message);
+        $this->assertEquals('test', $message->getMessage());
+    }
+
+    public function testSetEventDispatcher()
+    {
+        $notification = $this->getNotification();
+        $this->assertNull($notification->getEventDispatcher());
+        $notification->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+        $this->assertEquals($events, $notification->getEventDispatcher());
+        $notification->unsetEventDispatcher();
+        $this->assertNull($notification->getEventDispatcher());
+    }
+
+    public function testAddFlashMessageProcess()
+    {
+        $notification = $this->getNotification();
+        $notification->setContainerTypes('default', array('info'));
+        $notification->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(true);
+        $message->shouldReceive('getPosition')->andReturn(null);
+        $message->shouldReceive('getAlias')->andReturn(null);
+        $message->shouldReceive('getFormat')->andReturn(':message');
+
+        $events->shouldReceive('fire')->once()->with('notification.flash: default', array($notification, $notification->container(), $message));
+        $notification->container()->info($message);
+    }
+
+    public function testAddInstantMessageProcess()
+    {
+        $notification = $this->getNotification();
+        $notification->setContainerTypes('default', array('info'));
+        $notification->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('getPosition')->andReturn(null);
+        $message->shouldReceive('getAlias')->andReturn(null);
+        $message->shouldReceive('getFormat')->andReturn(':message');
+
+        $events->shouldReceive('fire')->once()->with('notification.added: default', array($notification, $notification->container(), $message));
+        $notification->container()->infoInstant($message);
+    }
+
+    protected function getNotification()
+    {
+        return new \Krucas\Notification\Notification('default');
+    }
+
+    protected function getMessage()
+    {
+        $message = m::mock('Krucas\Notification\Message');
+        return $message;
     }
 }

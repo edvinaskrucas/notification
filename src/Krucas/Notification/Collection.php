@@ -1,10 +1,7 @@
 <?php namespace Krucas\Notification;
 
-use Illuminate\Support\Contracts\ArrayableInterface;
-use Illuminate\Support\Contracts\JsonableInterface;
 use Illuminate\Support\Contracts\RenderableInterface;
 use Illuminate\Support\Collection as BaseCollection;
-use Krucas\Notification\Message;
 use Session;
 
 class Collection extends BaseCollection implements RenderableInterface
@@ -13,10 +10,19 @@ class Collection extends BaseCollection implements RenderableInterface
      * Add message to collection.
      *
      * @param Message $message
-     * @return Collection
+     * @return \Krucas\Notification\Collection
      */
     public function add(Message $message)
     {
+        if ($this->count() > 0) {
+            for ($i = 0; $i <= $this->indexOf($this->last()) + 1; $i++) {
+                if (!$this->offsetExists($i)) {
+                    $this->setAtPosition($i, $message);
+                    return $this;
+                }
+            }
+        }
+
         $this->items[] = $message;
 
         return $this;
@@ -26,27 +32,88 @@ class Collection extends BaseCollection implements RenderableInterface
      * Adds message to collection only if it is unique.
      *
      * @param Message $message
-     * @return Collection
+     * @return \Krucas\Notification\Collection
      */
     public function addUnique(Message $message)
     {
-        if(!$this->contains($message))
-        {
+        if (!$this->contains($message)) {
             return $this->add($message);
         }
 
         return $this;
     }
+    
+    /**
+     * Sets item at given position.
+     *
+     * @param $position
+     * @param \Krucas\Notification\Message $message
+     * @return \Krucas\Notification\Collection
+     */
+    public function setAtPosition($position, Message $message)
+    {
+        $tmp = array();
+
+        array_set($tmp, $position, $message);
+
+        foreach ($this->items as $key => $item) {
+            $i = $key;
+            while (array_key_exists($i, $tmp)) {
+                $i++;
+            }
+            $tmp[$i] = $item;
+        }
+
+        $this->items = $tmp;
+
+        ksort($this->items);
+
+        return $this;
+    }
 
     /**
-     * Determines if given message is already in collection.
+     * Returns item on a given position.
+     *
+     * @param $position
+     * @return \Krucas\Notification\Message
+     */
+    public function getAtPosition($position)
+    {
+        return $this->offsetGet($position);
+    }
+
+    /**
+     * Returns aliased message or null if not found.
+     *
+     * @param $alias
+     * @return \Krucas\Notification\Message|null
+     */
+    public function getAliased($alias)
+    {
+        foreach ($this as $message) {
+            if ($message->getAlias() == $alias) {
+                return $message;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns index value of a given message.
      *
      * @param Message $message
-     * @return bool
+     * @return bool|int
      */
-    public function contains(Message $message)
+    public function indexOf(Message $message)
     {
-        return in_array($message, $this->items);
+        foreach ($this as $index => $m) {
+            if ($message === $m) {
+                return $index;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -58,8 +125,7 @@ class Collection extends BaseCollection implements RenderableInterface
     {
         $output = '';
 
-        foreach($this->items as $message)
-        {
+        foreach ($this->items as $message) {
             $output .= $message->render();
         }
 

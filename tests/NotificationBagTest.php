@@ -2,482 +2,920 @@
 
 use Mockery as m;
 
+require_once 'Mocks/NotificationsBagMock.php';
+
 class NotificationBagTest extends PHPUnit_Framework_TestCase
 {
-    private $bag;
-
     public function tearDown()
     {
         m::close();
     }
 
-    protected function setUp()
+    public function testIsConstructed()
     {
-        $session = m::mock('Illuminate\Session\Store');
-        $config = m::mock('Illuminate\Config\Repository');
-
-        $session->shouldReceive('get')
-            ->once()
-            ->andReturn('[{"type":"error","message":"test error","format":":message!"},{"type":"warning","message":"test warning","format":":message..."}]');
-
-        $config->shouldReceive('get')->with('notification::default_format')->andReturn('<div class="alert alert-:type">:message</div>');
-        $config->shouldReceive('get')->with('notification::default_formats')->andReturn(array('__' => array()));
-
-        $this->bag = new \Krucas\Notification\NotificationsBag('test',$session, $config);
+        $notificationBag = $this->getNotificationBag();
+        $this->assertEquals('test', $notificationBag->getName());
+        $this->assertEquals(array(), $notificationBag->getTypes());
+        $this->assertNull($notificationBag->getDefaultFormat());
     }
 
-    public function testConstructor()
+    public function testAddType()
     {
-        $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $this->bag);
+        $notificationBag = $this->getNotificationBag();
+        $this->assertEquals(array(), $notificationBag->getTypes());
 
-        return $this->bag;
+        $notificationBag->addType('warning');
+        $this->assertEquals(array('warning'), $notificationBag->getTypes());
     }
 
-    /**
-     * @depends testConstructor
-     */
-    public function testIsSetDefaultFormatFromConfig(\Krucas\Notification\NotificationsBag $bag)
+    public function testAddTypesArray()
     {
-        $this->assertEquals('<div class="alert alert-:type">:message</div>', $bag->getFormat());
+        $notificationBag = $this->getNotificationBag();
+        $this->assertEquals(array(), $notificationBag->getTypes());
 
-        return $bag;
+        $notificationBag->addType(array('info', 'danger'));
+        $this->assertEquals(array('info', 'danger'), $notificationBag->getTypes());
     }
 
-    /**
-     * @depends testIsSetDefaultFormatFromConfig
-     */
-    public function testMessagesIsLoadedFromFlash(\Krucas\Notification\NotificationsBag $bag)
+    public function testAddTypesArrayAsIndividualParam()
     {
-        $this->assertCount(2, $bag);
-        $this->assertCount(2, $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Collection', $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Message', $bag->all()->first());
-        $this->assertEquals('test error', $bag->all()->first()->getMessage());
-        $this->assertEquals('error', $bag->all()->first()->getType());
-        $this->assertEquals(':message!', $bag->all()->first()->getFormat());
+        $notificationBag = $this->getNotificationBag();
+        $this->assertEquals(array(), $notificationBag->getTypes());
 
-        return $bag;
+        $notificationBag->addType('info', 'danger');
+        $this->assertEquals(array('info', 'danger'), $notificationBag->getTypes());
     }
 
-    /**
-     * @depends testMessagesIsLoadedFromFlash
-     */
-    public function testAddFlashableSuccessMessageWithCustomFormat(\Krucas\Notification\NotificationsBag $bag)
+    public function testAddExistingType()
     {
-        $bag->getSessionStore()
-            ->shouldReceive('flash')
-            ->once()
-            ->with(
-                'notifications_test',
-                '[{"message":"all ok","format":"custom: :message","type":"success","flashable":true}]'
-            );
+        $notificationBag = $this->getNotificationBag();
 
-        $bag->success('all ok', 'custom: :message');
+        $notificationBag->addType('warning');
+        $this->assertEquals(array('warning'), $notificationBag->getTypes());
 
-        $this->assertCount(3, $bag);
-        $this->assertCount(3, $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Collection', $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Message', $bag->get('success')->first());
-        $this->assertEquals('all ok', $bag->get('success')->first()->getMessage());
-        $this->assertEquals('success', $bag->get('success')->first()->getType());
-        $this->assertEquals('custom: :message', $bag->get('success')->first()->getFormat());
-        $this->assertTrue($bag->get('success')->first()->isFlashable());
-
-        return $bag;
+        $notificationBag->addType('warning');
+        $this->assertEquals(array('warning'), $notificationBag->getTypes());
     }
 
-    /**
-     * @depends testAddFlashableSuccessMessageWithCustomFormat
-     */
-    public function testAddFlashableWarningMessage(\Krucas\Notification\NotificationsBag $bag)
+    public function testCheckIfTypeIsAvailable()
     {
-        $bag->getSessionStore()->shouldReceive('flash')->once();
+        $notificationBag = $this->getNotificationBag();
+        $this->assertFalse($notificationBag->typeIsAvailable('warning'));
 
-        $bag->warning('second message');
-
-        $this->assertCount(3, $bag);
-        $this->assertCount(4, $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Collection', $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Message', $bag->get('warning')->first());
-        $this->assertEquals('test warning', $bag->get('warning')->first()->getMessage());
-        $this->assertEquals('warning', $bag->get('warning')->first()->getType());
-        $this->assertEquals(':message...', $bag->get('warning')->first()->getFormat());
-        $this->assertFalse($bag->get('warning')->first()->isFlashable());
-
-        return $bag;
+        $notificationBag->addType('warning');
+        $this->assertTrue($notificationBag->typeIsAvailable('warning'));
     }
 
-    /**
-     * @depends testAddFlashableWarningMessage
-     */
-    public function testAddFlashableInfoMessage(\Krucas\Notification\NotificationsBag $bag)
+    public function testClearTypes()
     {
-        $bag->getSessionStore()->shouldReceive('flash')->once();
+        $notificationBag = $this->getNotificationBag();
+        $this->assertEquals(array(), $notificationBag->getTypes());
 
-        $bag->info('info m');
+        $notificationBag->addType('warning');
+        $this->assertEquals(array('warning'), $notificationBag->getTypes());
 
-        $this->assertCount(4, $bag);
-        $this->assertCount(5, $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Collection', $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Message', $bag->get('info')->first());
-        $this->assertEquals('info m', $bag->get('info')->first()->getMessage());
-        $this->assertEquals('info', $bag->get('info')->first()->getType());
-        $this->assertEquals('<div class="alert alert-:type">:message</div>', $bag->get('info')->first()->getFormat());
-        $this->assertTrue($bag->get('info')->first()->isFlashable());
-
-        return $bag;
+        $notificationBag->clearTypes();
+        $this->assertEquals(array(), $notificationBag->getTypes());
     }
 
-    /**
-     * @depends testAddFlashableInfoMessage
-     */
-    public function testAddFlashableErrorMessage(\Krucas\Notification\NotificationsBag $bag)
+    public function testExtractType()
     {
-        $bag->getSessionStore()->shouldReceive('flash')->once();
+        $notificationBag = $this->getNotificationBag();
+        $this->assertFalse($notificationBag->extractType('info'));
 
-        $bag->error('e m');
-
-        $this->assertCount(4, $bag);
-        $this->assertCount(6, $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Collection', $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Message', $bag->get('error')->first());
-        $this->assertEquals('test error', $bag->get('error')->first()->getMessage());
-        $this->assertEquals('error', $bag->get('error')->first()->getType());
-        $this->assertEquals(':message!', $bag->get('error')->first()->getFormat());
-        $this->assertFalse($bag->get('error')->first()->isFlashable());
-
-        return $bag;
+        $notificationBag->addType(array('info', 'success'));
+        $this->assertEquals(array('info', 'add'), $notificationBag->extractType('info'));
+        $this->assertEquals(array('info', 'instant'), $notificationBag->extractType('infoInstant'));
+        $this->assertEquals(array('info', 'clear'), $notificationBag->extractType('clearInfo'));
+        $this->assertEquals(array('info', 'show'), $notificationBag->extractType('showInfo'));
+        $this->assertEquals(array('success', 'add'), $notificationBag->extractType('success'));
     }
 
-    /**
-     * @depends testAddFlashableErrorMessage
-     */
-    public function testAddInstantSuccessMessage(\Krucas\Notification\NotificationsBag $bag)
+    public function testExtractTypeInvalid()
     {
-        $bag->successInstant('s m');
+        $notificationBag = $this->getNotificationBag();
 
-        $this->assertCount(4, $bag);
-        $this->assertCount(7, $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Collection', $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Message', $bag->get('success')[1]);
-        $this->assertEquals('s m', $bag->get('success')[1]->getMessage());
-        $this->assertEquals('success', $bag->get('success')[1]->getType());
-        $this->assertEquals('<div class="alert alert-:type">:message</div>', $bag->get('success')[1]->getFormat());
-        $this->assertFalse($bag->get('success')[1]->isFlashable());
-
-        return $bag;
+        $notificationBag->addType(array('info', 'success'));
+        $this->assertFalse($notificationBag->extractType('ShowInfo'));
+        $this->assertFalse($notificationBag->extractType('infoinstant'));
     }
 
-    /**
-     * @depends testAddInstantSuccessMessage
-     */
-    public function testAddInstantInfoMessage(\Krucas\Notification\NotificationsBag $bag)
+    public function testSetDefaultFormat()
     {
-        $bag->infoInstant('i m');
-
-        $this->assertCount(4, $bag);
-        $this->assertCount(8, $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Collection', $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Message', $bag->get('info')[1]);
-        $this->assertEquals('i m', $bag->get('info')[1]->getMessage());
-        $this->assertEquals('info', $bag->get('info')[1]->getType());
-        $this->assertEquals('<div class="alert alert-:type">:message</div>', $bag->get('info')[1]->getFormat());
-        $this->assertFalse($bag->get('info')[1]->isFlashable());
-
-        return $bag;
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->setDefaultFormat(':type - :message');
+        $this->assertEquals(':type - :message', $notificationBag->getDefaultFormat());
     }
 
-    /**
-     * @depends testAddInstantInfoMessage
-     */
-    public function testAddInstantWarningMessage(\Krucas\Notification\NotificationsBag $bag)
+    public function testSetFormatForType()
     {
-        $bag->warningInstant('w m');
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('success');
+        $this->assertFalse($notificationBag->getFormat('success'));
 
-        $this->assertCount(4, $bag);
-        $this->assertCount(9, $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Collection', $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Message', $bag->get('warning')[2]);
-        $this->assertEquals('w m', $bag->get('warning')[2]->getMessage());
-        $this->assertEquals('warning', $bag->get('warning')[2]->getType());
-        $this->assertEquals('<div class="alert alert-:type">:message</div>', $bag->get('warning')[2]->getFormat());
-        $this->assertFalse($bag->get('warning')[2]->isFlashable());
-
-        return $bag;
+        $notificationBag->setFormat('success', 'OK - :message');
+        $this->assertEquals('OK - :message', $notificationBag->getFormat('success'));
     }
 
-    /**
-     * @depends testAddInstantWarningMessage
-     */
-    public function testAddInstantErrorMessage(\Krucas\Notification\NotificationsBag $bag)
+    public function testSetFormatsArray()
     {
-        $bag->errorInstant('e m');
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $this->assertFalse($notificationBag->getFormat('success'));
+        $this->assertFalse($notificationBag->getFormat('info'));
 
-        $this->assertCount(4, $bag);
-        $this->assertCount(10, $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Collection', $bag->all());
-        $this->assertInstanceOf('Krucas\Notification\Message', $bag->get('error')[2]);
-        $this->assertEquals('e m', $bag->get('error')[2]->getMessage());
-        $this->assertEquals('error', $bag->get('error')[2]->getType());
-        $this->assertEquals('<div class="alert alert-:type">:message</div>', $bag->get('error')[2]->getFormat());
-        $this->assertFalse($bag->get('error')[2]->isFlashable());
-
-        return $bag;
+        $notificationBag->setFormats(
+            array(
+                'success'   => 'OK - :message',
+                'info'      => 'INFO - :message',
+            )
+        );
+        $this->assertEquals('OK - :message', $notificationBag->getFormat('success'));
+        $this->assertEquals('INFO - :message', $notificationBag->getFormat('info'));
     }
 
-    /**
-     * @depends testAddInstantErrorMessage
-     */
-    public function testHowManyContainersCreated(\Krucas\Notification\NotificationsBag $bag)
+    public function testSetFormatForNonExistingType()
     {
-        $this->assertCount(4, $bag);
+        $notificationBag = $this->getNotificationBag();
+        $this->assertFalse($notificationBag->getFormat('success'));
 
-        return $bag;
+        $notificationBag->setFormat('success', 'OK - :message');
+        $this->assertFalse($notificationBag->getFormat('success'));
     }
 
-    /**
-     * @depends testHowManyContainersCreated
-     */
-    public function testHowManyMessagesAdded(\Krucas\Notification\NotificationsBag $bag)
+    public function testGetFormatWhenJustDefaultIsSet()
     {
-        $this->assertCount(10, $bag->all());
-
-        return $bag;
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('success');
+        $this->assertFalse($notificationBag->getFormat('success'));
+        $notificationBag->setDefaultFormat(':type - :message');
+        $this->assertEquals(':type - :message', $notificationBag->getFormat('success'));
     }
 
-    /**
-     * @depends testHowManyMessagesAdded
-     */
-    public function testGetErrorMessageContainer(\Krucas\Notification\NotificationsBag $bag)
+    public function testClearFormat()
     {
-        $this->assertCount(3, $bag->get('error'));
-        $this->assertInstanceOf('Krucas\Notification\Collection', $bag->get('error'));
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $this->assertFalse(false, $notificationBag->getFormat('success'));
+        $this->assertFalse(false, $notificationBag->getFormat('info'));
 
-        return $bag;
+        $notificationBag->setFormats(
+            array(
+                'success'   => 'OK - :message',
+                'info'      => 'INFO - :message',
+            )
+        );
+        $this->assertEquals('OK - :message', $notificationBag->getFormat('success'));
+        $this->assertEquals('INFO - :message', $notificationBag->getFormat('info'));
+
+        $notificationBag->clearFormat('success');
+        $this->assertFalse($notificationBag->getFormat('success'));
+        $this->assertEquals('INFO - :message', $notificationBag->getFormat('info'));
     }
 
-    /**
-     * @depends testGetErrorMessageContainer
-     */
-    public function testGetFirstMessageFromContainer(\Krucas\Notification\NotificationsBag $bag)
+    public function testClearAllFormats()
     {
-        $this->assertInstanceOf('Krucas\Notification\Message', $bag->get('error')->first());
-        $this->assertEquals('test error', $bag->get('error')->first()->getMessage());
-        $this->assertEquals('error', $bag->get('error')->first()->getType());
-        $this->assertEquals(':message!', $bag->get('error')->first()->getFormat());
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $this->assertFalse(false, $notificationBag->getFormat('success'));
+        $this->assertFalse(false, $notificationBag->getFormat('info'));
 
-        return $bag;
+        $notificationBag->setFormats(
+            array(
+                'success'   => 'OK - :message',
+                'info'      => 'INFO - :message',
+            )
+        );
+        $this->assertEquals('OK - :message', $notificationBag->getFormat('success'));
+        $this->assertEquals('INFO - :message', $notificationBag->getFormat('info'));
+
+        $notificationBag->clearFormats();
+        $this->assertFalse($notificationBag->getFormat('success'));
+        $this->assertFalse($notificationBag->getFormat('info'));
     }
 
-    /**
-     * @depends testGetFirstMessageFromContainer
-     */
-    public function testOverrideMessageFormat(\Krucas\Notification\NotificationsBag $bag)
+    public function testAddMessageWithCustomFormat()
     {
-        $this->assertEquals('<div class="alert alert-:type">:message</div>', $bag->getFormat());
-        $bag->setFormat(':message');
-        $this->assertEquals(':message', $bag->getFormat());
-        $bag->setFormat(':message!', 'error');
-        $this->assertEquals(':message!', $bag->getFormat('error'));
-        $this->assertEquals(':message', $bag->getFormat());
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('success');
+        $this->assertCount(0, $notificationBag);
 
-        return $bag;
+        $notificationBag->add('success', 'test', false, 'customFormat');
+        $this->assertCount(1, $notificationBag);
+        $notifications = $notificationBag->all();
+        $this->assertEquals('customFormat', $notifications[0]->getFormat());
     }
 
-    /**
-     * @depends testOverrideMessageFormat
-     */
-    public function testToArray(\Krucas\Notification\NotificationsBag $bag)
+    public function testAddInstantMessageUsingNamedMethod()
     {
-        $this->assertEquals(array(
-            'collections'   => array(
-                'error'     => array(
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('success');
+        $this->assertCount(0, $notificationBag);
+
+        $notificationBag->successInstant('test');
+        $this->assertCount(1, $notificationBag);
+    }
+
+    public function testAddMessageForNonExistingType()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $this->assertCount(0, $notificationBag);
+
+        $notificationBag->add('success', 'test', false);
+        $this->assertCount(0, $notificationBag);
+    }
+
+    public function testAddMessagesForMultipleTypes()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $this->assertCount(0, $notificationBag);
+
+        $notificationBag->add('success', 'test', false);
+        $notificationBag->add('info', 'test', false);
+        $this->assertCount(2, $notificationBag);
+    }
+
+    public function testAddMessagesForMultipleTypesUsingNamedMethods()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $this->assertCount(0, $notificationBag);
+
+        $notificationBag->add('success', 'test', false);
+        $notificationBag->add('info', 'test', false);
+        $this->assertCount(2, $notificationBag);
+    }
+
+    public function testAddInstantMessageWithMessageInstance()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('getPosition')->andReturn(null);
+        $message->shouldReceive('getAlias')->andReturn(null);
+        $message->shouldReceive('getFormat')->andReturn(':message');
+        $notificationBag->add('info', $message, false);
+        $this->assertCount(1, $notificationBag);
+    }
+
+    public function testAddFlashMessageWithMessageInstance()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(true);
+        $message->shouldReceive('getPosition')->andReturn(null);
+        $message->shouldReceive('getAlias')->andReturn(null);
+        $message->shouldReceive('getFormat')->andReturn(':message');
+        $this->assertCount(0, $notificationBag);
+
+        $notificationBag->add('info', $message);
+        $this->assertCount(0, $notificationBag);
+    }
+
+    public function testAddInstantMessageWithMessageInstanceUsingNamedMethods()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('getPosition')->andReturn(null);
+        $message->shouldReceive('getAlias')->andReturn(null);
+        $message->shouldReceive('getFormat')->andReturn(':message');
+        $notificationBag->infoInstant($message);
+        $this->assertCount(1, $notificationBag);
+    }
+
+    public function testAddInstantMessageWithMessageInstanceUsingNamedMethodsOverrideFlashStatus()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(true, false);
+        $message->shouldReceive('setFlashable')->with(false)->andReturn($message);
+        $message->shouldReceive('getPosition')->andReturn(null);
+        $message->shouldReceive('getAlias')->andReturn(null);
+        $message->shouldReceive('getFormat')->andReturn(':message');
+        $notificationBag->infoInstant($message);
+        $this->assertCount(1, $notificationBag);
+    }
+
+    public function testAddInstantMessageWithMessageInstanceSetFormatIfNotSet()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $notificationBag->setDefaultFormat(':message');
+        $this->assertCount(0, $notificationBag);
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('getFormat')->andReturn(null);
+        $message->shouldReceive('setFormat')->once()->with(':message')->andReturn($message);
+        $message->shouldReceive('getPosition')->andReturn(null);
+        $message->shouldReceive('getAlias')->andReturn(null);
+        $notificationBag->add('info', $message, false);
+        $this->assertCount(1, $notificationBag);
+    }
+
+    public function testAddInstantMessageWithMessageInstanceAndOverrideFormat()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('getFormat')->andReturn('m');
+        $message->shouldReceive('setFormat')->with(':message')->andReturn($message);
+        $message->shouldReceive('getPosition')->andReturn(null);
+        $message->shouldReceive('getAlias')->andReturn(null);
+        $notificationBag->add('info', $message, false, ':message');
+        $this->assertCount(1, $notificationBag);
+    }
+
+    public function testAddMessageAtPosition()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('getPosition')->andReturn(5);
+        $message->shouldReceive('getAlias')->andReturn(null);
+        $message->shouldReceive('getFormat')->andReturn(':message');
+        $notificationBag->add('info', $message, false);
+        $this->assertCount(1, $notificationBag);
+        $this->assertEquals($message, $notificationBag->getAtPosition(5));
+    }
+
+    public function testAddMessagesAtSamePosition()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $message1 = $this->getMessage();
+        $message1->shouldReceive('setType')->with('info')->andReturn($message1);
+        $message1->shouldReceive('isFlashable')->andReturn(false);
+        $message1->shouldReceive('getPosition')->andReturn(5);
+        $message1->shouldReceive('getAlias')->andReturn(null);
+        $message1->shouldReceive('getFormat')->andReturn(':message');
+
+        $message2 = $this->getMessage();
+        $message2->shouldReceive('setType')->with('info')->andReturn($message2);
+        $message2->shouldReceive('isFlashable')->andReturn(false);
+        $message2->shouldReceive('getPosition')->andReturn(5);
+        $message2->shouldReceive('getAlias')->andReturn(null);
+        $message2->shouldReceive('getFormat')->andReturn(':message');
+
+        $notificationBag->add('info', $message1, false);
+        $notificationBag->add('info', $message2, false);
+
+        $this->assertCount(2, $notificationBag);
+        $this->assertEquals($message2, $notificationBag->getAtPosition(5));
+        $this->assertEquals($message1, $notificationBag->getAtPosition(6));
+    }
+
+    public function testAddMessageWithAlias()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('getPosition')->andReturn(null);
+        $message->shouldReceive('getAlias')->andReturn('test_alias');
+        $message->shouldReceive('getFormat')->andReturn(':message');
+        $notificationBag->add('info', $message, false);
+        $this->assertCount(1, $notificationBag);
+        $this->assertEquals($message, $notificationBag->getAliased('test_alias'));
+    }
+
+    public function testAddMessagesWithSameAlias()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('info', 'danger'));
+        $this->assertCount(0, $notificationBag);
+
+        $message1 = $this->getMessage();
+        $message1->shouldReceive('setType')->with('info')->andReturn($message1);
+        $message1->shouldReceive('isFlashable')->andReturn(false);
+        $message1->shouldReceive('getPosition')->andReturn(null);
+        $message1->shouldReceive('getAlias')->andReturn('test_alias');
+        $message1->shouldReceive('getFormat')->andReturn(':message');
+
+        $message2 = $this->getMessage();
+        $message2->shouldReceive('setType')->with('danger')->andReturn($message2);
+        $message2->shouldReceive('isFlashable')->andReturn(false);
+        $message2->shouldReceive('getPosition')->andReturn(null);
+        $message2->shouldReceive('getAlias')->andReturn('test_alias');
+        $message2->shouldReceive('getFormat')->andReturn(':message');
+
+        $notificationBag->add('info', $message1, false);
+        $notificationBag->add('danger', $message2, false);
+        $this->assertCount(1, $notificationBag);
+        $this->assertEquals($message2, $notificationBag->getAliased('test_alias'));
+    }
+
+    public function testAddMessageWithAliasAndPosition()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('getPosition')->andReturn(5);
+        $message->shouldReceive('getAlias')->andReturn('test_alias');
+        $message->shouldReceive('getFormat')->andReturn(':message');
+
+        $notificationBag->add('info', $message, false);
+        $this->assertCount(1, $notificationBag);
+        $this->assertEquals($message, $notificationBag->getAtPosition(5));
+        $this->assertEquals($message, $notificationBag->getAliased('test_alias'));
+    }
+
+    public function testAddMessagesWithSameAliasDifferentPositions()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('info', 'danger'));
+        $this->assertCount(0, $notificationBag);
+
+        $message1 = $this->getMessage();
+        $message1->shouldReceive('setType')->with('info')->andReturn($message1);
+        $message1->shouldReceive('isFlashable')->andReturn(false);
+        $message1->shouldReceive('getPosition')->andReturn(5);
+        $message1->shouldReceive('getAlias')->andReturn('test_alias');
+        $message1->shouldReceive('getFormat')->andReturn(':message');
+
+        $message2 = $this->getMessage();
+        $message2->shouldReceive('setType')->with('danger')->andReturn($message2);
+        $message2->shouldReceive('isFlashable')->andReturn(false);
+        $message2->shouldReceive('getPosition')->andReturn(9);
+        $message2->shouldReceive('getAlias')->andReturn('test_alias');
+        $message2->shouldReceive('getFormat')->andReturn(':message');
+
+        $notificationBag->add('info', $message1, false);
+        $notificationBag->add('danger', $message2, false);
+        $this->assertCount(1, $notificationBag);
+        $this->assertEquals($message2, $notificationBag->getAtPosition(9));
+        $this->assertEquals($message2, $notificationBag->getAliased('test_alias'));
+    }
+
+    public function testAddArrayOfMessagesForGivenType()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $notificationBag->add('info', array('test1', 'test2'), false);
+        $this->assertCount(2, $notificationBag);
+        $notifications = $notificationBag->all();
+        $this->assertEquals('test1', $notifications[0]->getMessage());
+        $this->assertEquals('test2', $notifications[1]->getMessage());
+    }
+
+    public function testAddArrayOfMessagesForGivenTypeOverrideFormat()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $notificationBag->add('info', array('test1', 'test2'), false, 'custom');
+        $this->assertCount(2, $notificationBag);
+        $notifications = $notificationBag->all();
+        $this->assertEquals('test1', $notifications[0]->getMessage());
+        $this->assertEquals('custom', $notifications[0]->getFormat());
+        $this->assertEquals('test2', $notifications[1]->getMessage());
+        $this->assertEquals('custom', $notifications[1]->getFormat());
+    }
+
+    public function testAddArrayOfMessagesWithFormats()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $notificationBag->add('info', array(array('test1', 'custom1'), array('test2', 'custom2')), false);
+        $this->assertCount(2, $notificationBag);
+        $notifications = $notificationBag->all();
+        $this->assertEquals('test1', $notifications[0]->getMessage());
+        $this->assertEquals('custom1', $notifications[0]->getFormat());
+        $this->assertEquals('test2', $notifications[1]->getMessage());
+        $this->assertEquals('custom2', $notifications[1]->getFormat());
+    }
+
+    public function testAddArrayOfMessagesWithFormatsOverrideFormat()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $notificationBag->add('info', array(array('test1', 'custom1'), 'test2'), false, 'c');
+        $this->assertCount(2, $notificationBag);
+        $notifications = $notificationBag->all();
+        $this->assertEquals('test1', $notifications[0]->getMessage());
+        $this->assertEquals('custom1', $notifications[0]->getFormat());
+        $this->assertEquals('test2', $notifications[1]->getMessage());
+        $this->assertEquals('c', $notifications[1]->getFormat());
+    }
+
+    public function testAddArrayOfMessagesWithAssociativeArrayAsParams()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $messages = array(
+            array(
+                'message'       => 'm1',
+                'format'        => 'f1',
+                'alias'         => 'a1',
+                'position'      => 5
+            ),
+            array(
+                'message'       => 'm2',
+                'format'        => 'f2',
+                'alias'         => 'a2',
+                'position'      => 9
+            ),
+        );
+        $notificationBag->add('info', $messages, false);
+        $this->assertCount(2, $notificationBag);
+    }
+
+    public function testAddArrayOfMessagesInstances()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $this->assertCount(0, $notificationBag);
+
+        $messages = array();
+
+        $messages[0] = $this->getMessage();
+        $messages[0]->shouldReceive('setType')->with('info')->andReturn($messages[0]);
+        $messages[0]->shouldReceive('isFlashable')->andReturn(false);
+        $messages[0]->shouldReceive('getPosition')->andReturn(null);
+        $messages[0]->shouldReceive('getAlias')->andReturn(null);
+        $messages[0]->shouldReceive('getFormat')->andReturn(':message');
+        $notificationBag->add('info', $messages[0], false);
+
+        $messages[1] = $this->getMessage();
+        $messages[1]->shouldReceive('setType')->with('info')->andReturn($messages[1]);
+        $messages[1]->shouldReceive('isFlashable')->andReturn(false);
+        $messages[1]->shouldReceive('getPosition')->andReturn(null);
+        $messages[1]->shouldReceive('getAlias')->andReturn(null);
+        $messages[1]->shouldReceive('getFormat')->andReturn(':message');
+        $notificationBag->add('info', $messages[1], false);
+
+        $this->assertCount(2, $notificationBag);
+        $notifications = $notificationBag->all();
+        $this->assertEquals($messages[0], $notifications[0]);
+        $this->assertEquals($messages[1], $notifications[1]);
+    }
+
+    public function testGetInstantMessagesForGivenType()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $this->assertCount(0, $notificationBag);
+
+        $notificationBag->successInstant('test');
+        $notificationBag->successInstant('test2');
+        $notificationBag->infoInstant('test');
+        $this->assertCount(3, $notificationBag);
+        $this->assertCount(2, $notificationBag->get('success'));
+        $this->assertCount(1, $notificationBag->get('info'));
+    }
+
+    public function testGetInstantMessagesForGivenTypeWhenMessageHasPosition()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('info', 'danger'));
+        $this->assertCount(0, $notificationBag);
+
+        $message = $this->getMessage();
+        $message->shouldReceive('setType')->with('info')->andReturn($message);
+        $message->shouldReceive('getType')->andReturn('info');
+        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('getPosition')->andReturn(5);
+        $message->shouldReceive('getAlias')->andReturn(null);
+        $message->shouldReceive('getFormat')->andReturn(':message');
+
+        $notificationBag->add('info', $message, false);
+        $notificationBag->add('danger', 'test', false);
+        $this->assertCount(2, $notificationBag);
+        $this->assertCount(1, $notificationBag->get('info'));
+        $this->assertEquals($message, $notificationBag->get('info')->getAtPosition(5));
+    }
+
+    public function testClearMessagesForGivenType()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $this->assertCount(0, $notificationBag->get('success'));
+        $this->assertCount(0, $notificationBag->get('info'));
+
+        $notificationBag->add('success', 'test', false);
+        $notificationBag->add('info', 'test', false);
+        $this->assertCount(1, $notificationBag->get('success'));
+        $this->assertCount(1, $notificationBag->get('info'));
+
+        $notificationBag->clear('success');
+        $this->assertCount(0, $notificationBag->get('success'));
+        $this->assertCount(1, $notificationBag->get('info'));
+
+        $notificationBag->clear('info');
+        $this->assertCount(0, $notificationBag->get('success'));
+        $this->assertCount(0, $notificationBag->get('info'));
+    }
+
+    public function testClearMessagesForGivenTypeUsingNamedMethod()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $this->assertCount(0, $notificationBag->get('success'));
+        $this->assertCount(0, $notificationBag->get('info'));
+
+        $notificationBag->add('success', 'test', false);
+        $notificationBag->add('info', 'test', false);
+        $this->assertCount(1, $notificationBag->get('success'));
+        $this->assertCount(1, $notificationBag->get('info'));
+
+        $notificationBag->clearSuccess();
+        $this->assertCount(0, $notificationBag->get('success'));
+        $this->assertCount(1, $notificationBag->get('info'));
+
+        $notificationBag->clearInfo();
+        $this->assertCount(0, $notificationBag->get('success'));
+        $this->assertCount(0, $notificationBag->get('info'));
+    }
+
+    public function testClearAllMessages()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $this->assertCount(0, $notificationBag->get('success'));
+        $this->assertCount(0, $notificationBag->get('info'));
+
+        $notificationBag->add('success', 'test', false);
+        $notificationBag->add('info', 'test', false);
+        $this->assertCount(1, $notificationBag->get('success'));
+        $this->assertCount(1, $notificationBag->get('info'));
+
+        $notificationBag->clearAll();
+        $this->assertCount(0, $notificationBag->get('success'));
+        $this->assertCount(0, $notificationBag->get('info'));
+    }
+
+    public function testClearAllMessageWithoutGivenType()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $this->assertCount(0, $notificationBag->get('success'));
+        $this->assertCount(0, $notificationBag->get('info'));
+
+        $notificationBag->add('success', 'test', false);
+        $notificationBag->add('info', 'test', false);
+        $this->assertCount(1, $notificationBag->get('success'));
+        $this->assertCount(1, $notificationBag->get('info'));
+
+        $notificationBag->clear();
+        $this->assertCount(0, $notificationBag->get('success'));
+        $this->assertCount(0, $notificationBag->get('info'));
+    }
+
+    public function testGetAllMessages()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $this->assertCount(0, $notificationBag);
+
+        $notificationBag->add('success', 'test', false);
+        $notificationBag->add('info', 'test', false);
+        $this->assertCount(2, $notificationBag->all());
+    }
+
+    public function testGetFirstMessage()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $this->assertCount(0, $notificationBag);
+        $this->assertNull($notificationBag->first());
+
+        $notificationBag->add('success', 'test', false);
+        $notificationBag->add('info', 'test', false);
+        $this->assertCount(2, $notificationBag);
+        $this->assertEquals('success', $notificationBag->first()->getType());
+        $this->assertEquals('test', $notificationBag->first()->getMessage());
+    }
+
+    public function testShowMessagesForGivenType()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->setDefaultFormat(':type - :message');
+        $this->assertCount(0, $notificationBag);
+
+        $notificationBag->add('success', 'test', false);
+        $notificationBag->add('info', 'test', false);
+        $this->assertCount(2, $notificationBag);
+        $this->assertEquals('success - test', $notificationBag->show('success'));
+        $this->assertEquals('info - test', $notificationBag->show('info'));
+    }
+
+    public function testShowMessagesForGivenTypeWithCustomFormat()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('success');
+        $notificationBag->setDefaultFormat(':type - :message');
+        $this->assertCount(0, $notificationBag);
+
+        $notificationBag->add('success', 'test', false);
+        $this->assertCount(1, $notificationBag);
+        $this->assertEquals('test - OK', $notificationBag->show('success', ':message - OK'));
+    }
+
+    public function testShowMessagesForGivenTypeUsingNamedMethods()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->setDefaultFormat(':type - :message');
+        $this->assertCount(0, $notificationBag);
+
+        $notificationBag->add('success', 'test', false);
+        $notificationBag->add('info', 'test', false);
+        $this->assertCount(2, $notificationBag);
+        $this->assertEquals('success - test', $notificationBag->showSuccess());
+        $this->assertEquals('info - test', $notificationBag->showInfo());
+    }
+
+    public function testShowAllMessages()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->setDefaultFormat(':type - :message');
+        $this->assertCount(0, $notificationBag);
+
+        $notificationBag->add('success', 'test', false);
+        $notificationBag->add('info', 'test', false);
+        $this->assertCount(2, $notificationBag);
+        $this->assertEquals('success - testinfo - test', $notificationBag->show());
+        $this->assertEquals('success - testinfo - test', $notificationBag->showAll());
+    }
+
+    public function testAddTypesForGroupedRendering()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $this->assertEquals(array(), $notificationBag->getGroupingForRender());
+
+        $notificationBag->addToGrouping('success');
+        $this->assertEquals(array('success'), $notificationBag->getGroupingForRender());
+
+        $notificationBag->addToGrouping('info');
+        $this->assertEquals(array('success', 'info'), $notificationBag->getGroupingForRender());
+    }
+
+    public function testAddAndRemoveTypesForGroupedRendering()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $this->assertEquals(array(), $notificationBag->getGroupingForRender());
+
+        $notificationBag->addToGrouping('success');
+        $this->assertEquals(array('success'), $notificationBag->getGroupingForRender());
+
+        $notificationBag->addToGrouping('info');
+        $this->assertEquals(array('success', 'info'), $notificationBag->getGroupingForRender());
+
+        $notificationBag->removeFromGrouping('success');
+        $this->assertEquals(array('info'), $notificationBag->getGroupingForRender());
+    }
+
+    public function testAddTypesForGroupedRenderingInvalidType()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $this->assertEquals(array(), $notificationBag->getGroupingForRender());
+
+        $notificationBag->addToGrouping('success');
+        $this->assertEquals(array(), $notificationBag->getGroupingForRender());
+    }
+
+    public function testShowGroupedMessages()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->setDefaultFormat(':type - :message');
+        $notificationBag->add('success', 'test', false);
+        $notificationBag->add('info', 'test2', false);
+        $this->assertEquals('success - test', $notificationBag->group('success')->show());
+        $this->assertEquals('info - test2success - test', $notificationBag->group('info', 'success')->show());
+    }
+
+    public function testSetNotificationInstance()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $this->assertNull($notificationBag->getEventDispatcher());
+        $notificationBag->setNotification($notification = m::mock('Krucas\Notification\Notification'));
+        $this->assertEquals($notification, $notificationBag->getNotification());
+        $notificationBag->unsetNotification();
+        $this->assertNull($notificationBag->getNotification());
+    }
+
+    public function testToString()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $notificationBag->setDefaultFormat(':type - :message');
+        $notificationBag->add('info', 'ok', false);
+        $this->assertEquals('info - ok', (string) $notificationBag);
+    }
+
+    public function testToArray()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $notificationBag->setDefaultFormat(':message');
+        $notificationBag->add('info', 'test', false);
+
+        $this->assertEquals(
+            array(
+                'container'     => 'test',
+                'format'        => ':message',
+                'types'         => array('info'),
+                'notifications' => array(
                     array(
-                        'message'   => 'test error',
-                        'type'      => 'error',
-                        'format'    => ':message!',
-                        'flashable' => false
-                    ),
-                    array(
-                        'message'   => 'e m',
-                        'type'      => 'error',
-                        'format'    => '<div class="alert alert-:type">:message</div>',
-                        'flashable' => true
-                    ),
-                    array(
-                        'message'   => 'e m',
-                        'type'      => 'error',
-                        'format'    => '<div class="alert alert-:type">:message</div>',
-                        'flashable' => false
-                    )
-                ),
-                'success'   => array(
-                    array(
-                        'message'   => 'all ok',
-                        'type'      => 'success',
-                        'format'    => 'custom: :message',
-                        'flashable' => true
-                    ),
-                    array(
-                        'message'   => 's m',
-                        'type'      => 'success',
-                        'format'    => '<div class="alert alert-:type">:message</div>',
-                        'flashable' => false
-                    )
-                ),
-                'warning'   => array(
-                    array(
-                        'message'   => 'test warning',
-                        'type'      => 'warning',
-                        'format'    => ':message...',
-                        'flashable' => false
-                    ),
-                    array(
-                        'message'   => 'second message',
-                        'type'      => 'warning',
-                        'format'    => '<div class="alert alert-:type">:message</div>',
-                        'flashable' => true
-                    ),
-                    array(
-                        'message'   => 'w m',
-                        'type'      => 'warning',
-                        'format'    => '<div class="alert alert-:type">:message</div>',
-                        'flashable' => false
-                    )
-                ),
-                'info'      => array(
-                    array(
-                        'message'   => 'info m',
+                        'message'   => 'test',
+                        'format'    => ':message',
                         'type'      => 'info',
-                        'format'    => '<div class="alert alert-:type">:message</div>',
-                        'flashable' => true
-                    ),
-                    array(
-                        'message'   => 'i m',
-                        'type'      => 'info',
-                        'format'    => '<div class="alert alert-:type">:message</div>',
-                        'flashable' => false
+                        'flashable' => false,
+                        'alias'     => null,
+                        'position'  => null
                     )
                 )
             ),
-            'container'     => 'test',
-            'format'        => ':message'
-        ), $bag->toArray());
-
-
-        return $bag;
+            $notificationBag->toArray()
+        );
     }
 
-    /**
-     * @depends testToArray
-     */
-    public function testToJson(\Krucas\Notification\NotificationsBag $bag)
+    public function testToJson()
     {
-        $this->assertContains('"container":"test"', $bag->toJson());
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType('info');
+        $notificationBag->setDefaultFormat(':message');
+        $notificationBag->add('info', 'test', false);
 
-        return $bag;
+        $this->assertEquals(
+            json_encode(
+                array(
+                    'container'     => 'test',
+                    'format'        => ':message',
+                    'types'         => array('info'),
+                    'notifications' => array(
+                        array(
+                            'message'   => 'test',
+                            'format'    => ':message',
+                            'type'      => 'info',
+                            'flashable' => false,
+                            'alias'     => null,
+                            'position'  => null
+                        )
+                    )
+                )
+            ),
+            $notificationBag->toJson()
+        );
     }
 
-    /**
-     * @depends testToJson
-     */
-    public function testShowWarningContainer(\Krucas\Notification\NotificationsBag $bag)
-    {
-        $this->assertContains('<div class="alert alert-warning">w m</div>', $bag->show('warning'));
 
-        return $bag;
+    protected function getNotificationBag()
+    {
+        return new NotificationsBagMock('test');
     }
 
-    /**
-     * @depends testShowWarningContainer
-     */
-    public function testShowAllContainers(\Krucas\Notification\NotificationsBag $bag)
+    protected function getMessage()
     {
-        $this->assertContains('<div class="alert alert-warning">w m</div>', $bag->show());
-
-        return $bag;
-    }
-
-    /**
-     * @depends testShowAllContainers
-     */
-    public function testShowAllContainersWithACustomFormat(\Krucas\Notification\NotificationsBag $bag)
-    {
-        $this->assertContains('w m', $bag->show(null, ':message'));
-
-        return $bag;
-    }
-
-    /**
-     * @depends testShowAllContainersWithACustomFormat
-     */
-    public function testToString(\Krucas\Notification\NotificationsBag $bag)
-    {
-        $this->assertContains('info m', (string) $bag);
-
-        return $bag;
-    }
-
-    public function testAddingMessageArray()
-    {
-        $this->bag->infoInstant(array(
-            'first',
-            'second'
-        ));
-
-        $this->assertCount(2, $this->bag->get('info'));
-        $this->assertInstanceOf('Krucas\Notification\Message', $this->bag->get('info')->first());
-        $this->assertEquals('first', $this->bag->get('info')->first()->getMessage());
-        $this->assertEquals('info', $this->bag->get('info')->first()->getType());
-        $this->assertEquals('<div class="alert alert-:type">:message</div>', $this->bag->get('info')->first()->getFormat());
-        $this->assertFalse($this->bag->get('info')->first()->isFlashable());
-    }
-
-    public function testAddingMessageArrayWithCustomFormat()
-    {
-        $this->bag->infoInstant(array(
-            array('first', ':message'),
-            'second'
-        ));
-
-        $this->assertCount(2, $this->bag->get('info'));
-        $this->assertInstanceOf('Krucas\Notification\Message', $this->bag->get('info')->first());
-        $this->assertEquals('first', $this->bag->get('info')->first()->getMessage());
-        $this->assertEquals('info', $this->bag->get('info')->first()->getType());
-        $this->assertEquals(':message', $this->bag->get('info')->first()->getFormat());
-        $this->assertFalse($this->bag->get('info')->first()->isFlashable());
-
-        $this->assertInstanceOf('Krucas\Notification\Message', $this->bag->get('info')[1]);
-        $this->assertEquals('second', $this->bag->get('info')[1]->getMessage());
-        $this->assertEquals('info', $this->bag->get('info')[1]->getType());
-        $this->assertEquals('<div class="alert alert-:type">:message</div>', $this->bag->get('info')[1]->getFormat());
-        $this->assertFalse($this->bag->get('info')[1]->isFlashable());
-    }
-
-    public function testSetCustomFormatAndDisplayAMessage()
-    {
-        $this->bag->setFormat('no format');
-
-        $this->bag->infoInstant(array(
-            array('first', ':message'),
-            'second'
-        ));
-
-        $this->assertEquals('no format', $this->bag->getFormat());
-
-        $this->assertCount(2, $this->bag->get('info'));
-        $this->assertInstanceOf('Krucas\Notification\Message', $this->bag->get('info')->first());
-        $this->assertEquals('first', $this->bag->get('info')->first()->getMessage());
-        $this->assertEquals('info', $this->bag->get('info')->first()->getType());
-        $this->assertEquals(':message', $this->bag->get('info')->first()->getFormat());
-        $this->assertFalse($this->bag->get('info')->first()->isFlashable());
-
-        $this->assertInstanceOf('Krucas\Notification\Message', $this->bag->get('info')[1]);
-        $this->assertEquals('second', $this->bag->get('info')[1]->getMessage());
-        $this->assertEquals('info', $this->bag->get('info')[1]->getType());
-        $this->assertEquals('no format', $this->bag->get('info')[1]->getFormat());
-        $this->assertFalse($this->bag->get('info')[1]->isFlashable());
-
-        $this->assertEquals('test error!test warning...firstno format', $this->bag->show());
+        $message = m::mock('Krucas\Notification\Message');
+        return $message;
     }
 }

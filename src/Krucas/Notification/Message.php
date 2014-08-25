@@ -6,7 +6,6 @@ use Illuminate\Support\Contracts\ArrayableInterface;
 
 class Message implements RenderableInterface, JsonableInterface, ArrayableInterface
 {
-
     /**
      * Notification message.
      *
@@ -41,19 +40,43 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
     protected $flashable = true;
 
     /**
+     * Message allias.
+     *
+     * @var string|null
+     */
+    protected $alias = null;
+
+    /**
+     * Message position.
+     *
+     * @var int|null
+     */
+    protected $position = null;
+
+    /**
      * Construct default message object.
      *
      * @param null $type
      * @param null $message
      * @param bool $flashable
      * @param null $format
+     * @param null $alias
+     * @param null $position
      */
-    public function __construct($type = null, $message = null, $flashable = true, $format = null)
-    {
+    public function __construct(
+        $type = null,
+        $message = null,
+        $flashable = true,
+        $format = null,
+        $alias = null,
+        $position = null
+    ) {
         $this->setType($type);
         $this->setMessage($message);
         $this->setFlashable($flashable);
         $this->setFormat($format);
+        $this->setAlias($alias);
+        $this->setPosition($position);
     }
 
     /**
@@ -70,7 +93,7 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
      * Sets message value, and returns message object.
      *
      * @param $message
-     * @return Message
+     * @return \Krucas\Notification\Message
      */
     public function setMessage($message)
     {
@@ -93,7 +116,7 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
      * Sets flashable value, and returns message object.
      *
      * @param $flashable
-     * @return Message
+     * @return \Krucas\Notification\Message
      */
     public function setFlashable($flashable)
     {
@@ -116,7 +139,7 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
      * Sets message format, and returns message object.
      *
      * @param $format
-     * @return Message
+     * @return \Krucas\Notification\Message
      */
     public function setFormat($format)
     {
@@ -139,11 +162,139 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
      * Sets message type, and returns message object.
      *
      * @param $type
-     * @return Message
+     * @return \Krucas\Notification\Message
      */
     public function setType($type)
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Returns message alias.
+     *
+     * @return null|string
+     */
+    public function getAlias()
+    {
+        return $this->alias;
+    }
+
+    /**
+     * Sets message alias.
+     *
+     * @param $alias
+     * @return \Krucas\Notification\Message
+     */
+    public function setAlias($alias)
+    {
+        $this->alias = $alias;
+
+        return $this;
+    }
+
+    /**
+     * Returns message position.
+     *
+     * @return int|null
+     */
+    public function getPosition()
+    {
+        return $this->position;
+    }
+
+    /**
+     * Sets message position.
+     *
+     * @param $position
+     * @return \Krucas\Notification\Message
+     */
+    public function setPosition($position)
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+    /**
+     * Set message.
+     * Shortcut for `setMessage()`
+     *
+     * @param $message
+     * @return \Krucas\Notification\Message
+     */
+    public function message($message)
+    {
+        $this->setMessage($message);
+
+        return $this;
+    }
+
+    /**
+     * Set format.
+     * Shortcut for `setFormat()`
+     *
+     * @param $format
+     * @return \Krucas\Notification\Message
+     */
+    public function format($format)
+    {
+        $this->setFormat($format);
+
+        return $this;
+    }
+
+    /**
+     * Set message to be instant.
+     * Shortcut for `setFlashable()`
+     *
+     * @return \Krucas\Notification\Message
+     */
+    public function instant()
+    {
+        $this->setFlashable(false);
+
+        return $this;
+    }
+
+    /**
+     * Set message to be flashable.
+     * Shortcut for `setFlashable()`
+     *
+     * @return \Krucas\Notification\Message
+     */
+    public function flash()
+    {
+        $this->setFlashable(true);
+
+        return $this;
+    }
+
+    /**
+     * Set message alias.
+     * Shortcut for `setAlias()`
+     *
+     * @param $alias
+     * @return \Krucas\Notification\Message
+     */
+    public function alias($alias)
+    {
+        $this->setAlias($alias);
+
+        return $this;
+    }
+
+    /**
+     * Set message position.
+     * Shortcut for `setPosition()`
+     *
+     * @param $position
+     * @return \Krucas\Notification\Message
+     */
+    public function position($position)
+    {
+        $this->setPosition($position);
 
         return $this;
     }
@@ -188,6 +339,4 @@ class Message implements RenderableInterface, JsonableInterface, ArrayableInterf
     {
         return $this->render();
     }
-
-
 }

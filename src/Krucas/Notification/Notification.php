@@ -1,25 +1,16 @@
 <?php namespace Krucas\Notification;
 
-use Krucas\Notification\NotificationsBag;
 use Closure;
-use Illuminate\Config\Repository;
-use Illuminate\Session\Store as SessionStore;
+use Illuminate\Events\Dispatcher;
 
 class Notification
 {
     /**
-     * Config repository.
+     * Default container name.
      *
-     * @var \Illuminate\Config\Repository
+     * @var string
      */
-    protected $configRepository;
-
-    /**
-     * Session store instance.
-     *
-     * @var \Illuminate\Session\Store
-     */
-    protected $sessionStore;
+    protected $defaultContainer;
 
     /**
      * List of instantiated containers.
@@ -29,136 +20,175 @@ class Notification
     protected $containers = array();
 
     /**
-     * Creates new instance.
+     * Default types for new containers.
      *
-     * @param Repository $configRepository
-     * @param SessionStore $sessionStore
+     * @var array
      */
-    public function __construct(Repository $configRepository, SessionStore $sessionStore)
+    protected $types = array();
+
+    /**
+     * Default format for new containers.
+     *
+     * @var array
+     */
+    protected $format = array();
+
+    /**
+     * Default formats for new containers.
+     *
+     * @var array
+     */
+    protected $formats = array();
+
+    /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Events\Dispatcher
+     */
+    protected static $dispatcher;
+
+    /**
+     * Create new instance.
+     *
+     * @param string $container
+     * @param array $types
+     * @param array $format
+     * @param array $formats
+     */
+    public function __construct($container = 'default', $types = array(), $format = array(), $formats = array())
     {
-        $this->configRepository = $configRepository;
-        $this->sessionStore = $sessionStore;
+        $this->defaultContainer = $container;
+        $this->types = $types;
+        $this->format = $format;
+        $this->formats = $formats;
     }
 
     /**
-     * Adds success message to default container.
+     * Return name of default container.
      *
-     * @param $message
-     * @param null $format
-     * @return NotificationBag
+     * @return string
      */
-    public function success($message, $format = null)
+    public function getDefaultContainerName()
     {
-        return $this->addMessage(null, 'success', $message, true, $format);
+        return $this->defaultContainer;
     }
 
     /**
-     * Adds instant success message. It will be shown in same request.
-     *
-     * @param $message
-     * @param null $format
-     * @return NotificationBag
-     */
-    public function successInstant($message, $format = null)
-    {
-        return $this->addMessage(null, 'success', $message, false, $format);
-    }
-
-    /**
-     * Adds error message to default container.
-     *
-     * @param $message
-     * @param null $format
-     * @return NotificationBag
-     */
-    public function error($message, $format = null)
-    {
-        return $this->addMessage(null, 'error', $message, true, $format);
-    }
-
-    /**
-     * Adds instant error message. It will be shown in same request.
-     *
-     * @param $message
-     * @param null $format
-     * @return NotificationBag
-     */
-    public function errorInstant($message, $format = null)
-    {
-        return $this->addMessage(null, 'error', $message, false, $format);
-    }
-
-    /**
-     * Adds warning message to default container.
-     *
-     * @param $message
-     * @param null $format
-     * @return NotificationBag
-     */
-    public function warning($message, $format = null)
-    {
-        return $this->addMessage(null, 'warning', $message, true, $format);
-    }
-
-    /**
-     * Adds instant warning message. It will be shown in same request.
-     *
-     * @param $message
-     * @param null $format
-     * @return NotificationBag
-     */
-    public function warningInstant($message, $format = null)
-    {
-        return $this->addMessage(null, 'warning', $message, false, $format);
-    }
-
-    /**
-     * Adds info message to default container.
-     *
-     * @param $message
-     * @param null $format
-     * @return NotificationBag
-     */
-    public function info($message, $format = null)
-    {
-        return $this->addMessage(null, 'info', $message, true, $format);
-    }
-
-    /**
-     * Adds instant info message. It will be shown in same request.
-     *
-     * @param $message
-     * @param null $format
-     * @return NotificationBag
-     */
-    public function infoInstant($message, $format = null)
-    {
-        return $this->addMessage(null, 'info', $message, false, $format);
-    }
-
-    /**
-     * Returns container.
+     * Set types for a container.
      *
      * @param $container
-     * @return mixed
+     * @param array $types
+     * @return \Krucas\Notification\Notification
      */
-    public function get($container)
+    public function setContainerTypes($container, $types = array())
     {
-        return $this->container($container);
+        $this->types[$container] = $types;
+
+        return $this;
     }
 
     /**
-     * Adds message to container.
+     * Return types for a container.
      *
      * @param $container
-     * @param $type
-     * @param $message
-     * @param bool $flash
-     * @param null $format
+     * @return array
      */
-    protected function addMessage($container, $type, $message, $flash = true, $format = null)
+    public function getContainerTypes($container)
     {
-        return $this->container($container)->add($type, $message, $flash, $format);
+        if (isset($this->types[$container])) {
+            return $this->types[$container];
+        }
+
+        return array();
+    }
+
+    /**
+     * Set format for a container.
+     *
+     * @param $container
+     * @param null $format
+     * @return \Krucas\Notification\Notification
+     */
+    public function setContainerFormat($container, $format = null)
+    {
+        $this->format[$container] = $format;
+
+        return $this;
+    }
+
+    /**
+     * Return format for a container.
+     *
+     * @param $container
+     * @return string|null
+     */
+    public function getContainerFormat($container)
+    {
+        if (isset($this->format[$container])) {
+            return $this->format[$container];
+        }
+
+        return null;
+    }
+
+    /**
+     * Set formats for a container.
+     *
+     * @param $container
+     * @param array $formats
+     * @return \Krucas\Notification\Notification
+     */
+    public function setContainerFormats($container, $formats = array())
+    {
+        $this->formats[$container] = $formats;
+
+        return $this;
+    }
+
+    /**
+     * Return formats for a container.
+     *
+     * @param $container
+     * @return array
+     */
+    public function getContainerFormats($container)
+    {
+        if (isset($this->formats[$container])) {
+            return $this->formats[$container];
+        }
+
+        return array();
+    }
+
+    /**
+     * Add new container.
+     *
+     * @param $container
+     * @param array $types
+     * @param null $defaultFormat
+     * @param array $formats
+     * @return \Krucas\Notification\Notification
+     */
+    public function addContainer($container, $types = array(), $defaultFormat = null, $formats = array())
+    {
+        if (isset($this->containers[$container])) {
+            return $this;
+        }
+
+        $this->containers[$container] = new NotificationsBag($container, $types, $defaultFormat, $formats);
+        $this->containers[$container]->setNotification($this);
+
+        return $this;
+    }
+
+    /**
+     * Return array of available containers.
+     *
+     * @return array
+     */
+    public function getContainers()
+    {
+        return $this->containers;
     }
 
     /**
@@ -170,15 +200,18 @@ class Notification
      */
     public function container($container = null, Closure $callback = null)
     {
-        $container = is_null($container) ? $this->configRepository->get('notification::default_container') : $container;
+        $container = is_null($container) ? $this->defaultContainer : $container;
 
-        if(!isset($this->containers[$container]))
-        {
-            $this->containers[$container] = new NotificationsBag($container, $this->sessionStore, $this->configRepository);
+        if (!isset($this->containers[$container])) {
+            $this->addContainer(
+                $container,
+                $this->getContainerTypes($container),
+                $this->getContainerFormat($container),
+                $this->getContainerFormats($container)
+            );
         }
 
-        if(is_callable($callback))
-        {
+        if (is_callable($callback)) {
             $callback($this->containers[$container]);
         }
 
@@ -186,96 +219,77 @@ class Notification
     }
 
     /**
-     * Renders each message by given type (or all) in container.
+     * Create new message instance.
      *
-     * @param null $type
-     * @param null $container
-     * @param null $format
-     * @return mixed
+     * @param null $message
+     * @return \Krucas\Notification\Message
      */
-    protected function show($type = null, $container = null, $format = null)
+    public function message($message = null)
     {
-        return $this->container($container)->show($type, $format);
+        $m = new Message();
+        $m->setMessage($message);
+        return $m;
     }
 
     /**
-     * Renders error messages in given container.
+     * Fire given event.
      *
-     * @param null $container
-     * @param null $format
-     * @return mixed
+     * @param $event
+     * @param \Krucas\Notification\NotificationsBag $notificationBag
+     * @param \Krucas\Notification\Message $message
+     * @return array|bool|null
      */
-    public function showError($container = null, $format = null)
+    public function fire($event, NotificationsBag $notificationBag, Message $message)
     {
-        return $this->show('error', $container, $format);
+        if (!isset(static::$dispatcher)) {
+            return true;
+        }
+
+        $event = "notification.{$event}: ".$notificationBag->getName();
+
+        return static::$dispatcher->fire($event, array($this, $notificationBag, $message));
     }
 
     /**
-     * Renders success messages in given container.
+     * Get the event dispatcher instance.
      *
-     * @param null $container
-     * @param null $format
-     * @return mixed
+     * @return \Illuminate\Events\Dispatcher
      */
-    public function showSuccess($container = null, $format = null)
+    public static function getEventDispatcher()
     {
-        return $this->show('success', $container, $format);
+        return static::$dispatcher;
     }
 
     /**
-     * Renders info messages in given container.
+     * Set the event dispatcher instance.
      *
-     * @param null $container
-     * @param null $format
-     * @return mixed
+     * @param \Illuminate\Events\Dispatcher $dispatcher
+     * @return void
      */
-    public function showInfo($container = null, $format = null)
+    public static function setEventDispatcher(Dispatcher $dispatcher)
     {
-        return $this->show('info', $container, $format);
+        static::$dispatcher = $dispatcher;
     }
 
     /**
-     * Renders warning messages in given container.
+     * Unset the event dispatcher for models.
      *
-     * @param null $container
-     * @param null $format
-     * @return mixed
+     * @return void
      */
-    public function showWarning($container = null, $format = null)
+    public static function unsetEventDispatcher()
     {
-        return $this->show('warning', $container, $format);
+        static::$dispatcher = null;
     }
 
     /**
-     * Renders all messages in given container.
+     * Calls NotificationBag function for a default container.
      *
-     * @param null $container
-     * @param null $format
-     * @return mixed
+     * @param $name
+     * @param $arguments
+     * @return \Krucas\Notification\NotificationBag|null
      */
-    public function showAll($container = null, $format = null)
+    public function __call($name, $arguments)
     {
-        return $this->show(null, $container, $format);
+        return call_user_func_array(array($this->container(null), $name), $arguments);
     }
-
-    /**
-     * Returns config repository instance.
-     *
-     * @return Repository
-     */
-    public function getConfigRepository()
-    {
-        return $this->configRepository;
-    }
-
-    /**
-     * Returns session store instance.
-     *
-     * @return SessionStore
-     */
-    public function getSessionStore()
-    {
-        return $this->sessionStore;
-    }
-
 }
