@@ -2,8 +2,8 @@
 
 use Countable;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Contracts\ArrayableInterface;
-use Illuminate\Support\Contracts\JsonableInterface;
+use Illuminate\Contracts\Support\ArrayableInterface;
+use Illuminate\Contracts\Support\JsonableInterface;
 
 class NotificationsBag implements ArrayableInterface, JsonableInterface, Countable
 {

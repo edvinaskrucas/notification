@@ -1,6 +1,6 @@
 <?php namespace Krucas\Notification;
 
-use Illuminate\Support\Contracts\RenderableInterface;
+use Illuminate\Contracts\Support\RenderableInterface;
 use Illuminate\Support\Collection as BaseCollection;
 use Session;
 
@@ -42,7 +42,7 @@ class Collection extends BaseCollection implements RenderableInterface
 
         return $this;
     }
-    
+
     /**
      * Sets item at given position.
      *
