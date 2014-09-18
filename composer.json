@@ -11,10 +11,10 @@
     "license": "MIT",
     "require": {
         "php": ">=5.4.0",
-        "illuminate/support": "4.*",
-        "illuminate/session": "4.*",
-        "illuminate/config": "4.*",
-        "illuminate/events": "4.*"
+        "illuminate/support": "4.*|~5.0",
+        "illuminate/session": "4.*|~5.0",
+        "illuminate/config": "4.*|~5.0",
+        "illuminate/events": "4.*|~5.0"
     },
     "require-dev": {
         "mockery/mockery": "0.7.*"
