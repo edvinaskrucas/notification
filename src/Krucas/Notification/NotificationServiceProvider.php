@@ -31,42 +31,24 @@ class NotificationServiceProvider extends ServiceProvider
     {
         $this->app['config']->package('edvinaskrucas/notification', __DIR__.'/../config');
 
-<<<<<<< HEAD
-		$this->app['notification'] = $this->app->share(function($app)
-        {
-            return new Notification($this->app['config'], $this->app['session.store']);
-        });
-	}
-
-	/**
-	 * Get the services provided by the provider.
-	 *
-	 * @return array
-	 */
-	public function provides()
-	{
-		return array();
-	}
-
-=======
         $this->app['notification'] = $this->app->share(function ($app) {
-            $config = $app['config'];
+                $config = $app['config'];
 
-            $notification = new Notification(
-                $config->get('notification::default_container'),
-                $config->get('notification::default_types'),
-                $config->get('notification::default_format'),
-                $config->get('notification::default_formats')
-            );
+                $notification = new Notification(
+                    $config->get('notification::default_container'),
+                    $config->get('notification::default_types'),
+                    $config->get('notification::default_format'),
+                    $config->get('notification::default_formats')
+                );
 
-            $notification->setEventDispatcher($app['events']);
+                $notification->setEventDispatcher($app['events']);
 
-            return $notification;
-        });
+                return $notification;
+            });
 
         $this->app->bind('Krucas\Notification\Subscriber', function ($app) {
-            return new Subscriber($app['session'], $app['config']);
-        });
+                return new Subscriber($app['session'], $app['config']);
+            });
 
         $this->app['events']->subscribe('Krucas\Notification\Subscriber');
     }
@@ -80,5 +62,4 @@ class NotificationServiceProvider extends ServiceProvider
     {
         return array();
     }
->>>>>>> master
 }
