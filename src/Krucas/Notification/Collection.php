@@ -1,10 +1,10 @@
 <?php namespace Krucas\Notification;
 
-use Illuminate\Contracts\Support\RenderableInterface;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Collection as BaseCollection;
 use Session;
 
-class Collection extends BaseCollection implements RenderableInterface
+class Collection extends BaseCollection implements Renderable
 {
     /**
      * Add message to collection.
