@@ -1,10 +1,10 @@
 <?php namespace Krucas\Notification;
 
-use Illuminate\Support\Contracts\RenderableInterface;
-use Illuminate\Support\Contracts\JsonableInterface;
-use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
 
-class Message implements RenderableInterface, JsonableInterface, ArrayableInterface
+class Message implements Renderable, Jsonable, Arrayable
 {
     /**
      * Notification message.

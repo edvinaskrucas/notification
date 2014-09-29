@@ -2,10 +2,10 @@
 
 use Countable;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Contracts\ArrayableInterface;
-use Illuminate\Support\Contracts\JsonableInterface;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 
-class NotificationsBag implements ArrayableInterface, JsonableInterface, Countable
+class NotificationsBag implements Arrayable, Jsonable, Countable
 {
     /**
      * NotificationBag container name.
