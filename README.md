@@ -21,11 +21,7 @@ A simple notification management package for Laravel4.
 
 ## Installation
 
-Just place require new package for your laravel installation via composer.json
-
-    "edvinaskrucas/notification": "4.*"
-
-Then hit ```composer update```
+    composer require "edvinaskrucas/notification:4.*"
 
 ### Registering to use it with laravel
 
