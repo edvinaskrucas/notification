@@ -42,6 +42,19 @@ class Collection extends BaseCollection implements RenderableInterface
 
         return $this;
     }
+
+    private function contains(Message $currentMessage)
+    {
+        $isContained = false;
+
+        foreach ($this->items as $message)
+        {
+            if ($message->getMessage() === $currentMessage->getMessage())
+                $isContained = true;
+        }
+
+        return $isContained;
+    }
     
     /**
      * Sets item at given position.
