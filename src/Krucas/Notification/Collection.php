@@ -2,7 +2,6 @@
 
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Collection as BaseCollection;
-use Session;
 
 class Collection extends BaseCollection implements Renderable
 {
