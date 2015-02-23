@@ -31,8 +31,8 @@ Then hit ```composer update```
 
 | Laravel Version       | Package version          |
 | --------------------- | ------------------------ |
-| >= 5                  | 5.*                      |
-| >= 4, < 5             | 2.*, 3.*                 |
+| >= 5                  | >= 5                     |
+| >= 4, < 5             | >= 2, <= 3               |
 
 ### Registering to use it with laravel
 
