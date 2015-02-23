@@ -63,6 +63,7 @@ class NotificationServiceProvider extends ServiceProvider
         return array(
             'Krucas\Notification\Notification',
             'Krucas\Notification\Subscriber',
+            'notification',
         );
     }
 }
