@@ -124,7 +124,7 @@ class SubscriberTest extends PHPUnit_Framework_TestCase
 
     protected function getConfigRepository()
     {
-        return m::mock('Illuminate\Config\Repository');
+        return m::mock('Illuminate\Contracts\Config\Repository');
     }
 
     protected function getNotification()

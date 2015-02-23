@@ -1,6 +1,6 @@
 <?php namespace Krucas\Notification;
 
-use Illuminate\Config\Repository;
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Session\Store;
 
 class Subscriber
@@ -22,7 +22,7 @@ class Subscriber
     /**
      * Config repository.
      *
-     * @var \Illuminate\Config\Repository
+     * @var \Illuminate\Contracts\Config\Repository
      */
     protected $config;
 
@@ -30,7 +30,7 @@ class Subscriber
      * Create new subscriber.
      *
      * @param \Illuminate\Session\Store $session
-     * @param \Illuminate\Config\Repository $config
+     * @param \Illuminate\Contracts\Config\Repository $config
      */
     public function __construct(Store $session, Repository $config)
     {
