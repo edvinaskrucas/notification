@@ -1,3 +1,11 @@
+#5.0.0
+---
+
+* Fully supported Laravel 5
+
+---
+
+
 #4.0.0
 ---
 
