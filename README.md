@@ -1,4 +1,4 @@
-# Notification package for Laravel4
+# Notification package for Laravel4 / Laravel5
 
 [![Build Status](https://travis-ci.org/edvinaskrucas/notification.png?branch=master)](https://travis-ci.org/edvinaskrucas/notification)
 
