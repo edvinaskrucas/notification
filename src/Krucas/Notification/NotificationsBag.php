@@ -1,7 +1,6 @@
 <?php namespace Krucas\Notification;
 
 use Countable;
-use Illuminate\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 
@@ -53,13 +52,6 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      * @var \Krucas\Notification\Collection|null
      */
     protected $notifications;
-
-    /**
-     * The event dispatcher instance.
-     *
-     * @var \Illuminate\Events\Dispatcher
-     */
-    protected static $dispatcher;
 
     /**
      * Sequence of how messages should be rendered by its type.

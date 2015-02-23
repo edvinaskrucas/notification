@@ -14,16 +14,15 @@ class SubscriberTest extends PHPUnit_Framework_TestCase
     public function testIsConstructed()
     {
         $subscriber = $this->getSubscriber();
-        $this->assertInstanceOf('Illuminate\Session\SessionManager', $subscriber->getSession());
-        $this->assertInstanceOf('Illuminate\Config\Repository', $subscriber->getConfig());
+        $this->assertInstanceOf('Illuminate\Session\Store', $subscriber->getSession());
+        $this->assertInstanceOf('Illuminate\Contracts\Config\Repository', $subscriber->getConfig());
     }
 
     public function testSubscribe()
     {
         $subscriber = $this->getSubscriber();
-        $events = m::mock('Illuminate\Events\Dispatcher');
+        $events = m::mock('Illuminate\Contracts\Events\Dispatcher');
         $events->shouldReceive('listen')->once()->with('notification.flash: *', 'Krucas\Notification\Subscriber@onFlash');
-        $events->shouldReceive('listen')->once()->with('notification.booted', 'Krucas\Notification\Subscriber@onBoot');
         $this->assertNull($subscriber->subscribe($events));
     }
 
@@ -31,7 +30,7 @@ class SubscriberTest extends PHPUnit_Framework_TestCase
     {
         $subscriber = $this->getSubscriber();
         $subscriber->getSession()->shouldReceive('flash')->once()->with('notifications_containers', array('test'));
-        $subscriber->getConfig()->shouldReceive('get')->once()->with('notification::session_prefix')->andReturn('notifications_');
+        $subscriber->getConfig()->shouldReceive('get')->once()->with('notification.session_prefix')->andReturn('notifications_');
 
         $notification = $this->getNotification();
         $notificationsBag = $this->getNotificationsBag();
@@ -70,7 +69,7 @@ class SubscriberTest extends PHPUnit_Framework_TestCase
 
     public function testOnFlash()
     {
-        $session = $this->getSessionManager();
+        $session = $this->getSessionStore();
         $config = $this->getConfigRepository();
         $subscriber = m::mock('SubscriberMock[flashContainerNames,generateMessageKey,getSession,getConfig]');
 
@@ -82,7 +81,7 @@ class SubscriberTest extends PHPUnit_Framework_TestCase
         $message = $this->getMessage();
 
         $subscriber->shouldReceive('flashContainerNames')->once()->with($notification);
-        $config->shouldReceive('get')->once()->with('notification::session_prefix')->andReturn('notifications_');
+        $config->shouldReceive('get')->once()->with('notification.session_prefix')->andReturn('notifications_');
         $notificationsBag->shouldReceive('getName')->once()->andReturn('test');
         $subscriber->shouldReceive('generateMessageKey')->once()->with($message)->andReturn('test_key');
         $message->shouldReceive('toJson')->once()->andReturn('test_message');
@@ -91,41 +90,20 @@ class SubscriberTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($subscriber->onFlash($notification, $notificationsBag, $message));
     }
 
-    public function testOnBoot()
-    {
-        $subscriber = $this->getSubscriber();
-        $subscriber->getConfig()->shouldReceive('get')->once()->with('notification::session_prefix')->andReturn('notifications_');
-        $subscriber->getSession()->shouldReceive('get')->once()->with('notifications_containers', array())->andReturn(array('test'));
-        $flasedMessages = array(
-            'notifications_test_1' => '{"message":"test message","format":":type: :message","type":"info","flashable":false,"alias":null,"position":null}',
-            'notifications_test_2' => '{"message":"test message","format":":type: :message","type":"error","flashable":false,"alias":null,"position":null}',
-        );
-        $subscriber->getSession()->shouldReceive('all')->once()->andReturn($flasedMessages);
-
-        $notificationsBag = $this->getNotificationsBag();
-        $notificationsBag->shouldReceive('add')->once()->with('info', m::type('Krucas\Notification\Message'), false);
-        $notificationsBag->shouldReceive('add')->once()->with('error', m::type('Krucas\Notification\Message'), false);
-
-        $notification = $this->getNotification();
-        $notification->shouldReceive('container')->twice()->with('test')->andReturn($notificationsBag);
-
-        $this->assertTrue($subscriber->onBoot($notification));
-    }
-
     protected function getSubscriber()
     {
-        $subscriber = new SubscriberMock($this->getSessionManager(), $this->getConfigRepository());
+        $subscriber = new SubscriberMock($this->getSessionStore(), $this->getConfigRepository());
         return $subscriber;
     }
 
-    protected function getSessionManager()
+    protected function getSessionStore()
     {
-        return m::mock('Illuminate\Session\SessionManager');
+        return m::mock('Illuminate\Session\Store');
     }
 
     protected function getConfigRepository()
     {
-        return m::mock('Illuminate\Config\Repository');
+        return m::mock('Illuminate\Contracts\Config\Repository');
     }
 
     protected function getNotification()

@@ -1,4 +1,4 @@
-# Notification package for Laravel4
+# Notification package for Laravel4 / Laravel5
 
 [![Build Status](https://travis-ci.org/edvinaskrucas/notification.png?branch=master)](https://travis-ci.org/edvinaskrucas/notification)
 
@@ -23,9 +23,16 @@ A simple notification management package for Laravel4.
 
 Just place require new package for your laravel installation via composer.json
 
-    "edvinaskrucas/notification": "4.*"
+    "edvinaskrucas/notification": "5.*"
 
 Then hit ```composer update```
+
+### Version matrix
+
+| Laravel Version       | Package version          |
+| --------------------- | ------------------------ |
+| >= 5                  | >= 5                     |
+| >= 4, < 5             | >= 2, <= 3               |
 
 ### Registering to use it with laravel
 
@@ -42,13 +49,18 @@ Alias array
 'Notification' => 'Krucas\Notification\Facades\Notification'
 ```
 
+Kernel middleware array (```must be placed after 'Illuminate\Session\Middleware\StartSession' middleware```)
+```php
+'Krucas\Notification\Middleware\NotificationMiddleware'
+```
+
 Now you are able to use it with Laravel4.
 
 ### Publishing config file
 
 If you want to edit default config file, just publish it to your app folder.
 
-    php artisan config:publish edvinaskrucas/notification
+    php artisan vendor:publish --provider="Krucas\Notification" --tag="config"
 
 ## Usage
 
@@ -137,24 +149,24 @@ Notification::success(
 
 You can access and show just first notification in container
 ```php
-{{ Notification::container('myContainer')->get('success')->first() }}
+{!! Notification::container('myContainer')->get('success')->first() !!}
 ```
 
 Accessing first notification from all types
 ```php
-{{ Notification::container('myContainer')->all()->first() }}
+{!! Notification::container('myContainer')->all()->first() !!}
 ```
 
 ### Displaying notifications
 
 To display all notifications in a default container you need to add just one line to your view file
 ```php
-{{ Notification::showAll() }}
+{!! Notification::showAll() !!}
 ```
 
 When using ```showAll()``` you may want to group your messages by type, it can be done like this
 ```php
-{{ Notification::group('info', 'success', 'error', 'warning')->showAll() }}
+{!! Notification::group('info', 'success', 'error', 'warning')->showAll() !!}
 ```
 This will group all your messages in group and output it, also you can use just one, two or three groups.
 
@@ -165,15 +177,15 @@ Notification::addToGrouping('success')->removeFromGrouping('error');
 
 Display notifications by type in default container, you can pass custom format
 ```php
-{{ Notification::showError() }}
-{{ Notification::showInfo() }}
-{{ Notification::showWarning() }}
-{{ Notification::showSuccess(':message') }}
+{!! Notification::showError() !!}
+{!! Notification::showInfo() !!}
+{!! Notification::showWarning() !!}
+{!! Notification::showSuccess(':message') !!}
 ```
 
 Displaying notifications in a specific container with custom format.
 ```php
-{{ Notification::container('myContainer')->showInfo(':message') }}
+{!! Notification::container('myContainer')->showInfo(':message') !!}
 ```
 
 ### Message aliasing
@@ -244,14 +256,14 @@ Notification::clearAll();
 Want to add message in a view file and display it? Its very simple:
 
 ```php
-{{ Notification::container('myInstant')
-        ->infoInstant('Instant message added in a view and displayed!') }}
+{!! Notification::container('myInstant')
+        ->infoInstant('Instant message added in a view and displayed!') !!}
 ```
 
 You can also add multiple messages
 
 ```php
-{{ Notification::container('myInstant')
+{!! Notification::container('myInstant')
         ->infoInstant('Instant message added in a view and displayed!')
-        ->errorInstant('Error...') }}
+        ->errorInstant('Error...') !!}
 ```

@@ -181,7 +181,7 @@ class NotificationTest extends PHPUnit_Framework_TestCase
     {
         $notification = $this->getNotification();
         $this->assertNull($notification->getEventDispatcher());
-        $notification->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+        $notification->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
         $this->assertEquals($events, $notification->getEventDispatcher());
         $notification->unsetEventDispatcher();
         $this->assertNull($notification->getEventDispatcher());
@@ -191,7 +191,7 @@ class NotificationTest extends PHPUnit_Framework_TestCase
     {
         $notification = $this->getNotification();
         $notification->setContainerTypes('default', array('info'));
-        $notification->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+        $notification->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 
         $message = $this->getMessage();
         $message->shouldReceive('setType')->with('info')->andReturn($message);
@@ -208,7 +208,7 @@ class NotificationTest extends PHPUnit_Framework_TestCase
     {
         $notification = $this->getNotification();
         $notification->setContainerTypes('default', array('info'));
-        $notification->setEventDispatcher($events = m::mock('Illuminate\Events\Dispatcher'));
+        $notification->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 
         $message = $this->getMessage();
         $message->shouldReceive('setType')->with('info')->andReturn($message);
