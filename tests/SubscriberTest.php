@@ -31,7 +31,7 @@ class SubscriberTest extends PHPUnit_Framework_TestCase
     {
         $subscriber = $this->getSubscriber();
         $subscriber->getSession()->shouldReceive('flash')->once()->with('notifications_containers', array('test'));
-        $subscriber->getConfig()->shouldReceive('get')->once()->with('notification::session_prefix')->andReturn('notifications_');
+        $subscriber->getConfig()->shouldReceive('get')->once()->with('notification.session_prefix')->andReturn('notifications_');
 
         $notification = $this->getNotification();
         $notificationsBag = $this->getNotificationsBag();
@@ -82,7 +82,7 @@ class SubscriberTest extends PHPUnit_Framework_TestCase
         $message = $this->getMessage();
 
         $subscriber->shouldReceive('flashContainerNames')->once()->with($notification);
-        $config->shouldReceive('get')->once()->with('notification::session_prefix')->andReturn('notifications_');
+        $config->shouldReceive('get')->once()->with('notification.session_prefix')->andReturn('notifications_');
         $notificationsBag->shouldReceive('getName')->once()->andReturn('test');
         $subscriber->shouldReceive('generateMessageKey')->once()->with($message)->andReturn('test_key');
         $message->shouldReceive('toJson')->once()->andReturn('test_message');
@@ -94,7 +94,7 @@ class SubscriberTest extends PHPUnit_Framework_TestCase
     public function testOnBoot()
     {
         $subscriber = $this->getSubscriber();
-        $subscriber->getConfig()->shouldReceive('get')->once()->with('notification::session_prefix')->andReturn('notifications_');
+        $subscriber->getConfig()->shouldReceive('get')->once()->with('notification.session_prefix')->andReturn('notifications_');
         $subscriber->getSession()->shouldReceive('get')->once()->with('notifications_containers', array())->andReturn(array('test'));
         $flasedMessages = array(
             'notifications_test_1' => '{"message":"test message","format":":type: :message","type":"info","flashable":false,"alias":null,"position":null}',
