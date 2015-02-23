@@ -60,6 +60,9 @@ class NotificationServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array();
+        return array(
+            'Krucas\Notification\Notification',
+            'Krucas\Notification\Subscriber',
+        );
     }
 }
