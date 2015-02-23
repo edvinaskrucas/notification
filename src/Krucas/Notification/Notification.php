@@ -286,7 +286,7 @@ class Notification
      *
      * @param $name
      * @param $arguments
-     * @return \Krucas\Notification\NotificationBag|null
+     * @return \Krucas\Notification\NotificationsBag|null
      */
     public function __call($name, $arguments)
     {
