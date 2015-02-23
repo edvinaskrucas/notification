@@ -27,6 +27,13 @@ Just place require new package for your laravel installation via composer.json
 
 Then hit ```composer update```
 
+### Version matrix
+
+| Laravel Version       | Package version          |
+| --------------------- | ------------------------ |
+| >= 5                  | 5.*                      |
+| >= 4, < 5             | 2.*, 3.*                 |
+
 ### Registering to use it with laravel
 
 Add following lines to ```app/config/app.php```
