@@ -1,6 +1,7 @@
 <?php namespace Krucas\Notification;
 
 use Illuminate\Support\ServiceProvider;
+use Krucas\Notification\Middleware\NotificationMiddleware;
 
 class NotificationServiceProvider extends ServiceProvider
 {
@@ -18,8 +19,11 @@ class NotificationServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->package('edvinaskrucas/notification');
-        $this->app['events']->fire('notification.booted', $this->app['notification']);
+        $this->publishes(array(
+            __DIR__ . '/../../config/notification.php' => config_path('notification.php'),
+        ), 'config');
+
+        $this->app['events']->subscribe('Krucas\Notification\Subscriber');
     }
 
     /**
@@ -29,28 +33,38 @@ class NotificationServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app['config']->package('edvinaskrucas/notification', __DIR__.'/../config');
+        $this->mergeConfigFrom(__DIR__ . '/../../config/notification.php', 'notification');
 
-        $this->app['notification'] = $this->app->share(function ($app) {
-                $config = $app['config'];
+        $this->app->singleton('Krucas\Notification\Notification', function ($app) {
+            return $app['notification'];
+        });
 
-                $notification = new Notification(
-                    $config->get('notification::default_container'),
-                    $config->get('notification::default_types'),
-                    $config->get('notification::default_format'),
-                    $config->get('notification::default_formats')
-                );
+        $this->app->singleton('notification', function ($app) {
+            $config = $app['config'];
 
-                $notification->setEventDispatcher($app['events']);
+            $notification = new Notification(
+                $config->get('notification.default_container'),
+                $config->get('notification.default_types'),
+                $config->get('notification.default_format'),
+                $config->get('notification.default_formats')
+            );
 
-                return $notification;
-            });
+            $notification->setEventDispatcher($app['events']);
 
-        $this->app->bind('Krucas\Notification\Subscriber', function ($app) {
-                return new Subscriber($app['session'], $app['config']);
-            });
+            return $notification;
+        });
 
-        $this->app['events']->subscribe('Krucas\Notification\Subscriber');
+        $this->app->singleton('Krucas\Notification\Subscriber', function ($app) {
+            return new Subscriber($app['session.store'], $app['config']);
+        });
+
+        $this->app->singleton('Krucas\Notification\Middleware\NotificationMiddleware', function ($app) {
+            return new NotificationMiddleware(
+                $app['session.store'],
+                $app['notification'],
+                $app['config']->get('notification.session_prefix')
+            );
+        });
     }
 
     /**
