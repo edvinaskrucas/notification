@@ -1,7 +1,7 @@
 <?php namespace Krucas\Notification;
 
 use Illuminate\Config\Repository;
-use Illuminate\Session\SessionManager;
+use Illuminate\Session\Store;
 
 class Subscriber
 {
@@ -15,7 +15,7 @@ class Subscriber
     /**
      * Session instance for flashing messages.
      *
-     * @var \Illuminate\Session\SessionManager
+     * @var \Illuminate\Session\Store
      */
     protected $session;
 
@@ -29,10 +29,10 @@ class Subscriber
     /**
      * Create new subscriber.
      *
-     * @param \Illuminate\Session\SessionManager $session
+     * @param \Illuminate\Session\Store $session
      * @param \Illuminate\Config\Repository $config
      */
-    public function __construct(SessionManager $session, Repository $config)
+    public function __construct(Store $session, Repository $config)
     {
         $this->session = $session;
         $this->config = $config;
@@ -41,7 +41,7 @@ class Subscriber
     /**
      * Get session instance.
      *
-     * @return \Illuminate\Session\SessionManager
+     * @return \Illuminate\Session\Store
      */
     public function getSession()
     {
@@ -59,44 +59,6 @@ class Subscriber
     }
 
     /**
-     * Execute this event when notification package is booted.
-     * Load flash messages and add them as instant.
-     *
-     * @param Notification $notification
-     * @return bool
-     */
-    public function onBoot(Notification $notification)
-    {
-        $sessionPrefix = $this->getConfig()->get('notification::session_prefix');
-
-        $containerNames = $this->getSession()->get($sessionPrefix.'containers', array());
-
-        $sessionVariables = $this->getSession()->all();
-
-        foreach ($containerNames as $containerName) {
-            foreach ($sessionVariables as $sessionKey => $value) {
-                if (strpos($sessionKey, $sessionPrefix.$containerName) === 0 && is_string($value)) {
-                    $jsonMessage = json_decode($value);
-                    $notification->container($containerName)->add(
-                        $jsonMessage->type,
-                        new Message(
-                            $jsonMessage->type,
-                            $jsonMessage->message,
-                            false,
-                            $jsonMessage->format,
-                            $jsonMessage->alias,
-                            $jsonMessage->position
-                        ),
-                        false
-                    );
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * Execute this event to flash messages.
      *
      * @param Notification $notification
@@ -108,7 +70,7 @@ class Subscriber
     {
         $this->flashContainerNames($notification);
 
-        $sessionKey  = $this->getConfig()->get('notification::session_prefix');
+        $sessionKey  = $this->getConfig()->get('notification.session_prefix');
         $sessionKey .= $notificationBag->getName();
         $sessionKey .= '_'.$this->generateMessageKey($message);
 
@@ -131,7 +93,7 @@ class Subscriber
             $names[] = $container->getName();
         }
 
-        $this->getSession()->flash($this->getConfig()->get('notification::session_prefix').'containers', $names);
+        $this->getSession()->flash($this->getConfig()->get('notification.session_prefix').'containers', $names);
     }
 
     /**
@@ -156,6 +118,5 @@ class Subscriber
     public function subscribe($events)
     {
         $events->listen('notification.flash: *', 'Krucas\Notification\Subscriber@onFlash');
-        $events->listen('notification.booted', 'Krucas\Notification\Subscriber@onBoot');
     }
 }
