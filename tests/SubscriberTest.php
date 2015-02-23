@@ -21,9 +21,8 @@ class SubscriberTest extends PHPUnit_Framework_TestCase
     public function testSubscribe()
     {
         $subscriber = $this->getSubscriber();
-        $events = m::mock('Illuminate\Events\Dispatcher');
+        $events = m::mock('Illuminate\Contracts\Events\Dispatcher');
         $events->shouldReceive('listen')->once()->with('notification.flash: *', 'Krucas\Notification\Subscriber@onFlash');
-        $events->shouldReceive('listen')->once()->with('notification.booted', 'Krucas\Notification\Subscriber@onBoot');
         $this->assertNull($subscriber->subscribe($events));
     }
 
