@@ -12,8 +12,7 @@ class MessageTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('error', $message->getType());
         $this->assertEquals('test message', $message->getMessage());
         $this->assertEquals(':type: :message', $message->getFormat());
-        $this->assertEquals('test', $message->getAlias());
-        $this->assertFalse($message->isFlashable());
+        $this->assertFalse($message->isFlash());
         $this->assertEquals(4, $message->getPosition());
     }
 
@@ -25,22 +24,19 @@ class MessageTest extends PHPUnit_Framework_TestCase
         $this->assertNull($message->getType());
         $this->assertNull($message->getMessage());
         $this->assertNull($message->getFormat());
-        $this->assertTrue($message->isFlashable());
-        $this->assertNull($message->getAlias());
+        $this->assertTrue($message->isFlash());
         $this->assertNull($message->getPosition());
 
-        $message->setFlashable(false)
+        $message->setFlash(false)
             ->setFormat('Test: :message')
             ->setType('warning')
             ->setMessage('test')
-            ->setAlias('test')
             ->setPosition(5);
 
         $this->assertEquals('warning', $message->getType());
         $this->assertEquals('test', $message->getMessage());
         $this->assertEquals('Test: :message', $message->getFormat());
-        $this->assertFalse($message->isFlashable());
-        $this->assertEquals('test', $message->getAlias());
+        $this->assertFalse($message->isFlash());
         $this->assertEquals(5, $message->getPosition());
     }
 
@@ -66,8 +62,7 @@ class MessageTest extends PHPUnit_Framework_TestCase
             'message' => 'test message',
             'format' => ':type: :message',
             'type' => 'error',
-            'flashable' => false,
-            'alias' => null,
+            'flash' => false,
             'position' => null
         ), $message->toArray());
     }
@@ -76,7 +71,10 @@ class MessageTest extends PHPUnit_Framework_TestCase
     {
         $message = new \Krucas\Notification\Message('error', 'test message', false, ':type: :message');
 
-        $this->assertEquals('{"message":"test message","format":":type: :message","type":"error","flashable":false,"alias":null,"position":null}', $message->toJson());
+        $this->assertEquals(
+            '{"message":"test message","format":":type: :message","type":"error","flash":false,"position":null}',
+            $message->toJson()
+        );
     }
 
     public function testMethodsShortcuts()
@@ -84,21 +82,19 @@ class MessageTest extends PHPUnit_Framework_TestCase
         $message = new \Krucas\Notification\Message();
         $this->assertNull($message->getMessage());
         $this->assertNull($message->getFormat());
-        $this->assertNull($message->getAlias());
         $this->assertNull($message->getPosition());
-        $this->assertTrue($message->isFlashable());
+        $this->assertTrue($message->isFlash());
 
-        $message->message('test')->format(':message')->alias('alias')->position(5);
+        $message->message('test')->format(':message')->position(5);
         $this->assertEquals('test', $message->getMessage());
         $this->assertEquals(':message', $message->getFormat());
-        $this->assertEquals('alias', $message->getAlias());
         $this->assertEquals(5, $message->getPosition());
-        $this->assertTrue($message->isFlashable());
+        $this->assertTrue($message->isFlash());
 
         $message->instant();
-        $this->assertFalse($message->isFlashable());
+        $this->assertFalse($message->isFlash());
 
         $message->flash();
-        $this->assertTrue($message->isFlashable());
+        $this->assertTrue($message->isFlash());
     }
 }
