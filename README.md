@@ -60,7 +60,7 @@ Now you are able to use it with Laravel4.
 
 If you want to edit default config file, just publish it to your app folder.
 
-    php artisan vendor:publish --provider="Krucas\Notification" --tag="config"
+    php artisan vendor:publish --provider="Krucas\Notification\NotificationServiceProvider" --tag="config"
 
 ## Usage
 
