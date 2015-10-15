@@ -6,7 +6,7 @@ class MessageTest extends PHPUnit_Framework_TestCase
 {
     public function testMessageConstructor()
     {
-        $message = new \Krucas\Notification\Message('error', 'test message', false, ':type: :message', 'test', 4);
+        $message = new \Krucas\Notification\Message('error', 'test message', false, ':type: :message', 4);
 
         $this->assertInstanceOf('Krucas\Notification\Message', $message);
         $this->assertEquals('error', $message->getType());

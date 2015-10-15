@@ -195,9 +195,8 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
         $message = $this->getMessage();
         $message->shouldReceive('setType')->with('info')->andReturn($message);
-        $message->shouldReceive('isFlashable')->andReturn(true);
+        $message->shouldReceive('isFlash')->andReturn(true);
         $message->shouldReceive('getPosition')->andReturn(null);
-        $message->shouldReceive('getAlias')->andReturn(null);
         $message->shouldReceive('getFormat')->andReturn(':message');
 
         $events->shouldReceive('fire')->once()->with('notification.flash: default', array($notification, $notification->container(), $message));
@@ -212,9 +211,8 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
         $message = $this->getMessage();
         $message->shouldReceive('setType')->with('info')->andReturn($message);
-        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('isFlash')->andReturn(false);
         $message->shouldReceive('getPosition')->andReturn(null);
-        $message->shouldReceive('getAlias')->andReturn(null);
         $message->shouldReceive('getFormat')->andReturn(':message');
 
         $events->shouldReceive('fire')->once()->with('notification.added: default', array($notification, $notification->container(), $message));

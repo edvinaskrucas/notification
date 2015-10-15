@@ -68,8 +68,8 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $message2->setPosition(1);
 
         $collection
-            ->add($message2)
-            ->add($message1);
+            ->add($message1)
+            ->add($message2);
 
         $this->assertEquals($message2, $collection[0]);
         $this->assertEquals($message1, $collection[1]);

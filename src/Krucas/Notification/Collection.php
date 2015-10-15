@@ -36,7 +36,7 @@ class Collection extends BaseCollection implements Renderable
      */
     public function add(Message $message)
     {
-        $this->queue->insert($message, $message->getPosition());
+        $this->queue->insert($message, is_null($message->getPosition()) ? null : -$message->getPosition());
 
         $this->copyQueue(clone $this->queue);
 
