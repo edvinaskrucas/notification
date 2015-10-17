@@ -1,12 +1,10 @@
 <?php namespace Krucas\Notification\Middleware;
 
 use Closure;
-use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Session\Store;
-use Krucas\Notification\Message;
 use Krucas\Notification\Notification;
 
-class NotificationMiddleware implements Middleware
+class NotificationMiddleware
 {
     /**
      * @var \Illuminate\Session\Store
@@ -21,18 +19,18 @@ class NotificationMiddleware implements Middleware
     /**
      * @var string
      */
-    protected $sessionPrefix;
+    protected $key;
 
     /**
      * @param \Illuminate\Session\Store $session
      * @param \Krucas\Notification\Notification $notification
-     * @param string $sessionPrefix
+     * @param string $key
      */
-    public function __construct(Store $session, Notification $notification, $sessionPrefix)
+    public function __construct(Store $session, Notification $notification, $key)
     {
         $this->session = $session;
         $this->notification = $notification;
-        $this->sessionPrefix = $sessionPrefix;
+        $this->key = $key;
     }
 
     /**
@@ -44,29 +42,18 @@ class NotificationMiddleware implements Middleware
      */
     public function handle($request, Closure $next)
     {
-        $containerNames = $this->session->get($this->sessionPrefix.'containers', array());
+        $containers = $this->session->get($this->key, []);
 
-        $sessionVariables = $this->session->all();
-
-        foreach ($containerNames as $containerName) {
-            foreach ($sessionVariables as $sessionKey => $value) {
-                if (strpos($sessionKey, $this->sessionPrefix.$containerName) === 0 && is_string($value)) {
-                    $jsonMessage = json_decode($value);
-                    $this->notification->container($containerName)->add(
-                        $jsonMessage->type,
-                        new Message(
-                            $jsonMessage->type,
-                            $jsonMessage->message,
-                            false,
-                            $jsonMessage->format,
-                            $jsonMessage->alias,
-                            $jsonMessage->position
-                        ),
-                        false
-                    );
+        if (count($containers) > 0) {
+            foreach ($containers as $name => $messages) {
+                /** @var \Krucas\Notification\Message $message */
+                foreach ($messages as $message) {
+                    $this->notification->container($name)->add($message->getType(), $message, false);
                 }
             }
         }
+
+        $this->session->forget($this->key);
 
         return $next($request);
     }
