@@ -4,13 +4,13 @@ return array(
 
     /*
     |--------------------------------------------------------------------------
-    | Session prefix name
+    | Session key
     |--------------------------------------------------------------------------
     |
-    | This will be used to prefix flash messages.
+    | Session key for messages.
     |
     */
-    'session_prefix'                        => 'notifications_',
+    'session_key'                           => 'notifications',
 
     /*
     |--------------------------------------------------------------------------
