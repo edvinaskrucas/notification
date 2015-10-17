@@ -219,9 +219,56 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $notification->container()->infoInstant($message);
     }
 
+    public function testCreateNewContainerWithDefaults()
+    {
+        $notification = new \Krucas\Notification\Notification(
+            'default',
+            ['info', 'warning', 'success', 'error'],
+            [],
+            ':type :message',
+            [],
+            [],
+            []
+        );
+
+        $container = $notification->container('test');
+
+        $this->assertEquals('test', $container->getName());
+        $this->assertEquals(':type :message', $container->getDefaultFormat());
+        $this->assertEquals(['info', 'warning', 'success', 'error'], $container->getTypes());
+    }
+
+    public function testCreateNewContainerFromDefined()
+    {
+        $notification = new \Krucas\Notification\Notification(
+            'default',
+            ['info', 'warning', 'success', 'error'],
+            [
+                'test' => ['info']
+            ],
+            ':type :message',
+            [
+                'test' => ':message',
+            ],
+            [],
+            [
+                'test' => [
+                    'info' => 'info :message',
+                ]
+            ]
+        );
+
+        $container = $notification->container('test');
+
+        $this->assertEquals('test', $container->getName());
+        $this->assertEquals(':message', $container->getDefaultFormat());
+        $this->assertEquals(['info'], $container->getTypes());
+        $this->assertEquals('info :message', $container->getFormat('info'));
+    }
+
     protected function getNotification()
     {
-        return new \Krucas\Notification\Notification('default');
+        return new \Krucas\Notification\Notification('default', [], [], null, [], [], []);
     }
 
     protected function getMessage()
