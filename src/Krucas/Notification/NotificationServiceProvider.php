@@ -1,7 +1,9 @@
 <?php namespace Krucas\Notification;
 
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 use Krucas\Notification\Middleware\NotificationMiddleware;
+use Blade;
 
 class NotificationServiceProvider extends ServiceProvider
 {
@@ -15,15 +17,24 @@ class NotificationServiceProvider extends ServiceProvider
     /**
      * Bootstrap the application events.
      *
+     * @param \Illuminate\Contracts\Events\Dispatcher $dispatcher
      * @return void
      */
-    public function boot()
+    public function boot(Dispatcher $dispatcher)
     {
         $this->publishes(array(
             __DIR__ . '/../../config/notification.php' => config_path('notification.php'),
         ), 'config');
 
-        $this->app['events']->subscribe('Krucas\Notification\Subscriber');
+        $dispatcher->subscribe('Krucas\Notification\Subscriber');
+
+        Blade::directive('notification', function ($container = null) {
+            if (strcasecmp('()', $container) === 0) {
+                $container = null;
+            }
+
+            return "<?php echo app('notification')->container({$container})->show(); ?>";
+        });
     }
 
     /**
@@ -35,18 +46,17 @@ class NotificationServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../../config/notification.php', 'notification');
 
-        $this->app->singleton('Krucas\Notification\Notification', function ($app) {
-            return $app['notification'];
-        });
-
         $this->app->singleton('notification', function ($app) {
             $config = $app['config'];
 
             $notification = new Notification(
                 $config->get('notification.default_container'),
                 $config->get('notification.default_types'),
+                $config->get('notification.types'),
                 $config->get('notification.default_format'),
-                $config->get('notification.default_formats')
+                $config->get('notification.format'),
+                $config->get('notification.default_formats'),
+                $config->get('notification.formats')
             );
 
             $notification->setEventDispatcher($app['events']);
@@ -54,15 +64,17 @@ class NotificationServiceProvider extends ServiceProvider
             return $notification;
         });
 
+        $this->app->alias('notification', 'Krucas\Notification\Notification');
+
         $this->app->singleton('Krucas\Notification\Subscriber', function ($app) {
-            return new Subscriber($app['session.store'], $app['config']);
+            return new Subscriber($app['session.store'], $app['config']['notification.session_key']);
         });
 
         $this->app->singleton('Krucas\Notification\Middleware\NotificationMiddleware', function ($app) {
             return new NotificationMiddleware(
                 $app['session.store'],
                 $app['notification'],
-                $app['config']->get('notification.session_prefix')
+                $app['config']->get('notification.session_key')
             );
         });
     }
