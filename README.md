@@ -12,9 +12,8 @@ A simple notification management package for Laravel4.
 * Notification collections
 * Notification messages
 * Formats for notifications
-* Flashable notifications
+* Flash / instant notifications
 * Method chaining
-* Message aliasing
 * Message positioning
 
 ---
@@ -41,7 +40,7 @@ Add following lines to ```app/config/app.php```
 ServiceProvider array
 
 ```php
-'Krucas\Notification\NotificationServiceProvider'
+Krucas\Notification\NotificationServiceProvider::class,
 ```
 
 Alias array
@@ -51,7 +50,7 @@ Alias array
 
 Kernel middleware array (```must be placed after 'Illuminate\Session\Middleware\StartSession' middleware```)
 ```php
-'Krucas\Notification\Middleware\NotificationMiddleware'
+\Krucas\Notification\Middleware\NotificationMiddleware::class,
 ```
 
 Now you are able to use it with Laravel4.
@@ -116,17 +115,6 @@ Want a custom format for single message? No problem
 Notification::success('Success message', 'Custom format :message');
 ```
 
-### Add multiple messages
-
-If you want to add multiple notifications you can pass notication message as array
-```php
-Notification::success(array(
-    'Message one',
-    array('Message two with its format', 'My format: :message')
-    array('message' => 'ok', 'format' => ':message', 'alias' => 'okMsg', 'position' => 5)
-));
-```
-
 Also you can still pass second param (format), to format messages, but you can format individual messages as shown above.
 
 ### Add message as object
@@ -143,6 +131,15 @@ When adding message as object you can add additional params to message
 Notification::success(
     Notification::message('Sample text')->format(':message')
 );
+```
+
+### Add message as closure
+
+You can add messages by using a closure
+```php
+Notification::success(function (Message $message) {
+    $message->setMessage('Sample text')->setPosition(1);
+});
 ```
 
 ### Accessing first notification from container
@@ -188,56 +185,20 @@ Displaying notifications in a specific container with custom format.
 {!! Notification::container('myContainer')->showInfo(':message') !!}
 ```
 
-### Message aliasing
-
-You can add message with an alias, then if you want to override that message just add new one with same alias.
-It works in a same type scope.
+Or you can just use blade extension
 ```php
-Notification::success(Notification::message('ok')->alias('okMsg'));
+@notification() // will render default container
 
-// We need to override first success message, just alias it with same alias name.
-Notification::success(Notification::message('ok2')->alias('okMsg'));
+@notification('custom') // will render 'custom' container
 ```
-
-With aliasing you can override message type too
-```php
-Notification::info(Notification::message('info')->alias('loginMsg'));
-
-// Overrides info message with error message
-Notification::error(Notification::message('error')->alias('loginMsg'));
-```
-
-Getting aliased message instance.
-```php
-Notification::getAliased('loginMsg');
-```
-Method ```getAliased($alias)``` is available in all scopes (Notification, NotificationBag and Collection),
-if no message will be found with given alias, ```null``` will be returned.
 
 ### Message positioning
 
 There is ability to add message to certain position.
-It works in same type scope.
 ```php
 // This will add message at 5th position
 Notification::info(Notification::message('info')->position(5));
 Notification::info(Notification::message('info2')->position(1);
-```
-
-Retrieving messages at certain position
-```php
-Notification::getAtPosition(5);
-```
-Above example will return message at fifth position in a default container.
-
-### Aliasing with a position
-
-You can alias message and add it to a certain position.
-It works in same type scope.
-```php
-Notification::info(Notification::message('info')->alias('infoMsg')->position(4));
-// If we want to override and set other position
-Notification::info(Notification::message('info2')->alias('infoMsg')->position(1));
 ```
 
 ### Clearing messages

@@ -17,28 +17,49 @@ class Notification
      *
      * @var array
      */
-    protected $containers = array();
+    protected $containers = [];
 
     /**
-     * Default types for new containers.
+     * Default types available for new containers.
      *
      * @var array
      */
-    protected $types = array();
+    protected $defaultTypes = [];
 
     /**
-     * Default format for new containers.
+     * Types for defined containers.
      *
      * @var array
      */
-    protected $format = array();
+    protected $types = [];
+
+    /**
+     * Default format for each container type.
+     *
+     * @var string
+     */
+    protected $defaultFormat;
+
+    /**
+     * Default format for each defined container.
+     *
+     * @var array
+     */
+    protected $format = [];
 
     /**
      * Default formats for new containers.
      *
      * @var array
      */
-    protected $formats = array();
+    protected $defaultFormats = [];
+
+    /**
+     * Formats for defined containers.
+     *
+     * @var array
+     */
+    protected $formats = [];
 
     /**
      * The event dispatcher instance.
@@ -50,16 +71,29 @@ class Notification
     /**
      * Create new instance.
      *
-     * @param string $container
+     * @param string $defaultContainer
+     * @param array $defaultTypes
      * @param array $types
+     * @param string $defaultFormat
      * @param array $format
+     * @param array $defaultFormats
      * @param array $formats
      */
-    public function __construct($container = 'default', $types = array(), $format = array(), $formats = array())
-    {
-        $this->defaultContainer = $container;
+    public function __construct(
+        $defaultContainer,
+        $defaultTypes,
+        $types,
+        $defaultFormat,
+        $format,
+        $defaultFormats,
+        $formats
+    ) {
+        $this->defaultContainer = $defaultContainer;
+        $this->defaultTypes = $defaultTypes;
         $this->types = $types;
+        $this->defaultFormat = $defaultFormat;
         $this->format = $format;
+        $this->defaultFormats = $defaultFormats;
         $this->formats = $formats;
     }
 
@@ -76,11 +110,11 @@ class Notification
     /**
      * Set types for a container.
      *
-     * @param $container
+     * @param string $container
      * @param array $types
      * @return \Krucas\Notification\Notification
      */
-    public function setContainerTypes($container, $types = array())
+    public function setContainerTypes($container, $types = [])
     {
         $this->types[$container] = $types;
 
@@ -99,7 +133,7 @@ class Notification
             return $this->types[$container];
         }
 
-        return array();
+        return $this->defaultTypes;
     }
 
     /**
@@ -128,7 +162,7 @@ class Notification
             return $this->format[$container];
         }
 
-        return null;
+        return $this->defaultFormat;
     }
 
     /**
@@ -157,19 +191,19 @@ class Notification
             return $this->formats[$container];
         }
 
-        return array();
+        return $this->defaultFormats;
     }
 
     /**
      * Add new container.
      *
-     * @param $container
+     * @param string $container
      * @param array $types
      * @param null $defaultFormat
      * @param array $formats
      * @return \Krucas\Notification\Notification
      */
-    public function addContainer($container, $types = array(), $defaultFormat = null, $formats = array())
+    public function addContainer($container, $types = [], $defaultFormat = null, $formats = [])
     {
         if (isset($this->containers[$container])) {
             return $this;
@@ -194,9 +228,9 @@ class Notification
     /**
      * Returns container instance.
      *
-     * @param null $container
+     * @param null|string $container
      * @param callable $callback
-     * @return mixed
+     * @return \Krucas\Notification\NotificationsBag
      */
     public function container($container = null, Closure $callback = null)
     {
