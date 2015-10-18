@@ -3,6 +3,7 @@
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Closure;
 
 class NotificationsBag implements Arrayable, Jsonable, Countable
 {
@@ -298,7 +299,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      * Flashes flashable messages.
      *
      * @param $type
-     * @@param string|array $message
+     * @@param string|\Krucas\Notification\Message|\Closure $message
      * @param bool $flash
      * @param null $format
      * @return \Krucas\Notification\NotificationsBag
@@ -311,6 +312,10 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
 
         if ($message instanceof \Krucas\Notification\Message) {
             $m = $message;
+            $this->addInstance($m, $type, $flash, $format);
+        } elseif ($message instanceof Closure) {
+            $m = new Message($type, null, $flash, $format);
+            call_user_func_array($message, [$m]);
             $this->addInstance($m, $type, $flash, $format);
         } else {
             $m = new Message($type, $message, $flash, $this->checkFormat($format, $type));

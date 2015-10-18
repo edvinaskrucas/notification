@@ -194,6 +194,18 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($notificationBag->getFormat('info'));
     }
 
+    public function testAddMessageViaClosure()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('info'));
+
+        $notificationBag->add('info', function (\Krucas\Notification\Message $message) {
+            $message->setMessage('test');
+        }, false, null);
+
+        $this->assertCount(1, $notificationBag);
+    }
+
     public function testAddMessageWithCustomFormat()
     {
         $notificationBag = $this->getNotificationBag();
