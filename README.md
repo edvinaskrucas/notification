@@ -45,7 +45,7 @@ Krucas\Notification\NotificationServiceProvider::class,
 
 Alias array
 ```php
-'Notification' => 'Krucas\Notification\Facades\Notification'
+'Notification' => Krucas\Notification\Facades\Notification::class,
 ```
 
 Kernel middleware array (```must be placed after 'Illuminate\Session\Middleware\StartSession' middleware```)
