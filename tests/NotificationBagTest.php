@@ -194,6 +194,18 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($notificationBag->getFormat('info'));
     }
 
+    public function testAddMessageViaClosure()
+    {
+        $notificationBag = $this->getNotificationBag();
+        $notificationBag->addType(array('info'));
+
+        $notificationBag->add('info', function (\Krucas\Notification\Message $message) {
+            $message->setMessage('test');
+        }, false, null);
+
+        $this->assertCount(1, $notificationBag);
+    }
+
     public function testAddMessageWithCustomFormat()
     {
         $notificationBag = $this->getNotificationBag();
@@ -255,9 +267,8 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $message = $this->getMessage();
         $message->shouldReceive('setType')->with('info')->andReturn($message);
-        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('isFlash')->andReturn(false);
         $message->shouldReceive('getPosition')->andReturn(null);
-        $message->shouldReceive('getAlias')->andReturn(null);
         $message->shouldReceive('getFormat')->andReturn(':message');
         $notificationBag->add('info', $message, false);
         $this->assertCount(1, $notificationBag);
@@ -269,9 +280,8 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $notificationBag->addType('info');
         $message = $this->getMessage();
         $message->shouldReceive('setType')->with('info')->andReturn($message);
-        $message->shouldReceive('isFlashable')->andReturn(true);
+        $message->shouldReceive('isFlash')->andReturn(true);
         $message->shouldReceive('getPosition')->andReturn(null);
-        $message->shouldReceive('getAlias')->andReturn(null);
         $message->shouldReceive('getFormat')->andReturn(':message');
         $this->assertCount(0, $notificationBag);
 
@@ -287,9 +297,8 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $message = $this->getMessage();
         $message->shouldReceive('setType')->with('info')->andReturn($message);
-        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('isFlash')->andReturn(false);
         $message->shouldReceive('getPosition')->andReturn(null);
-        $message->shouldReceive('getAlias')->andReturn(null);
         $message->shouldReceive('getFormat')->andReturn(':message');
         $notificationBag->infoInstant($message);
         $this->assertCount(1, $notificationBag);
@@ -303,10 +312,9 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $message = $this->getMessage();
         $message->shouldReceive('setType')->with('info')->andReturn($message);
-        $message->shouldReceive('isFlashable')->andReturn(true, false);
-        $message->shouldReceive('setFlashable')->with(false)->andReturn($message);
+        $message->shouldReceive('isFlash')->andReturn(true, false);
+        $message->shouldReceive('setFlash')->with(false)->andReturn($message);
         $message->shouldReceive('getPosition')->andReturn(null);
-        $message->shouldReceive('getAlias')->andReturn(null);
         $message->shouldReceive('getFormat')->andReturn(':message');
         $notificationBag->infoInstant($message);
         $this->assertCount(1, $notificationBag);
@@ -321,11 +329,10 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $message = $this->getMessage();
         $message->shouldReceive('setType')->with('info')->andReturn($message);
-        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('isFlash')->andReturn(false);
         $message->shouldReceive('getFormat')->andReturn(null);
         $message->shouldReceive('setFormat')->once()->with(':message')->andReturn($message);
         $message->shouldReceive('getPosition')->andReturn(null);
-        $message->shouldReceive('getAlias')->andReturn(null);
         $notificationBag->add('info', $message, false);
         $this->assertCount(1, $notificationBag);
     }
@@ -338,259 +345,12 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
 
         $message = $this->getMessage();
         $message->shouldReceive('setType')->with('info')->andReturn($message);
-        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('isFlash')->andReturn(false);
         $message->shouldReceive('getFormat')->andReturn('m');
         $message->shouldReceive('setFormat')->with(':message')->andReturn($message);
         $message->shouldReceive('getPosition')->andReturn(null);
-        $message->shouldReceive('getAlias')->andReturn(null);
         $notificationBag->add('info', $message, false, ':message');
         $this->assertCount(1, $notificationBag);
-    }
-
-    public function testAddMessageAtPosition()
-    {
-        $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType('info');
-        $this->assertCount(0, $notificationBag);
-
-        $message = $this->getMessage();
-        $message->shouldReceive('setType')->with('info')->andReturn($message);
-        $message->shouldReceive('isFlashable')->andReturn(false);
-        $message->shouldReceive('getPosition')->andReturn(5);
-        $message->shouldReceive('getAlias')->andReturn(null);
-        $message->shouldReceive('getFormat')->andReturn(':message');
-        $notificationBag->add('info', $message, false);
-        $this->assertCount(1, $notificationBag);
-        $this->assertEquals($message, $notificationBag->getAtPosition(5));
-    }
-
-    public function testAddMessagesAtSamePosition()
-    {
-        $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType('info');
-        $this->assertCount(0, $notificationBag);
-
-        $message1 = $this->getMessage();
-        $message1->shouldReceive('setType')->with('info')->andReturn($message1);
-        $message1->shouldReceive('isFlashable')->andReturn(false);
-        $message1->shouldReceive('getPosition')->andReturn(5);
-        $message1->shouldReceive('getAlias')->andReturn(null);
-        $message1->shouldReceive('getFormat')->andReturn(':message');
-
-        $message2 = $this->getMessage();
-        $message2->shouldReceive('setType')->with('info')->andReturn($message2);
-        $message2->shouldReceive('isFlashable')->andReturn(false);
-        $message2->shouldReceive('getPosition')->andReturn(5);
-        $message2->shouldReceive('getAlias')->andReturn(null);
-        $message2->shouldReceive('getFormat')->andReturn(':message');
-
-        $notificationBag->add('info', $message1, false);
-        $notificationBag->add('info', $message2, false);
-
-        $this->assertCount(2, $notificationBag);
-        $this->assertEquals($message2, $notificationBag->getAtPosition(5));
-        $this->assertEquals($message1, $notificationBag->getAtPosition(6));
-    }
-
-    public function testAddMessageWithAlias()
-    {
-        $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType('info');
-        $this->assertCount(0, $notificationBag);
-
-        $message = $this->getMessage();
-        $message->shouldReceive('setType')->with('info')->andReturn($message);
-        $message->shouldReceive('isFlashable')->andReturn(false);
-        $message->shouldReceive('getPosition')->andReturn(null);
-        $message->shouldReceive('getAlias')->andReturn('test_alias');
-        $message->shouldReceive('getFormat')->andReturn(':message');
-        $notificationBag->add('info', $message, false);
-        $this->assertCount(1, $notificationBag);
-        $this->assertEquals($message, $notificationBag->getAliased('test_alias'));
-    }
-
-    public function testAddMessagesWithSameAlias()
-    {
-        $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('info', 'danger'));
-        $this->assertCount(0, $notificationBag);
-
-        $message1 = $this->getMessage();
-        $message1->shouldReceive('setType')->with('info')->andReturn($message1);
-        $message1->shouldReceive('isFlashable')->andReturn(false);
-        $message1->shouldReceive('getPosition')->andReturn(null);
-        $message1->shouldReceive('getAlias')->andReturn('test_alias');
-        $message1->shouldReceive('getFormat')->andReturn(':message');
-
-        $message2 = $this->getMessage();
-        $message2->shouldReceive('setType')->with('danger')->andReturn($message2);
-        $message2->shouldReceive('isFlashable')->andReturn(false);
-        $message2->shouldReceive('getPosition')->andReturn(null);
-        $message2->shouldReceive('getAlias')->andReturn('test_alias');
-        $message2->shouldReceive('getFormat')->andReturn(':message');
-
-        $notificationBag->add('info', $message1, false);
-        $notificationBag->add('danger', $message2, false);
-        $this->assertCount(1, $notificationBag);
-        $this->assertEquals($message2, $notificationBag->getAliased('test_alias'));
-    }
-
-    public function testAddMessageWithAliasAndPosition()
-    {
-        $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType('info');
-        $this->assertCount(0, $notificationBag);
-
-        $message = $this->getMessage();
-        $message->shouldReceive('setType')->with('info')->andReturn($message);
-        $message->shouldReceive('isFlashable')->andReturn(false);
-        $message->shouldReceive('getPosition')->andReturn(5);
-        $message->shouldReceive('getAlias')->andReturn('test_alias');
-        $message->shouldReceive('getFormat')->andReturn(':message');
-
-        $notificationBag->add('info', $message, false);
-        $this->assertCount(1, $notificationBag);
-        $this->assertEquals($message, $notificationBag->getAtPosition(5));
-        $this->assertEquals($message, $notificationBag->getAliased('test_alias'));
-    }
-
-    public function testAddMessagesWithSameAliasDifferentPositions()
-    {
-        $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('info', 'danger'));
-        $this->assertCount(0, $notificationBag);
-
-        $message1 = $this->getMessage();
-        $message1->shouldReceive('setType')->with('info')->andReturn($message1);
-        $message1->shouldReceive('isFlashable')->andReturn(false);
-        $message1->shouldReceive('getPosition')->andReturn(5);
-        $message1->shouldReceive('getAlias')->andReturn('test_alias');
-        $message1->shouldReceive('getFormat')->andReturn(':message');
-
-        $message2 = $this->getMessage();
-        $message2->shouldReceive('setType')->with('danger')->andReturn($message2);
-        $message2->shouldReceive('isFlashable')->andReturn(false);
-        $message2->shouldReceive('getPosition')->andReturn(9);
-        $message2->shouldReceive('getAlias')->andReturn('test_alias');
-        $message2->shouldReceive('getFormat')->andReturn(':message');
-
-        $notificationBag->add('info', $message1, false);
-        $notificationBag->add('danger', $message2, false);
-        $this->assertCount(1, $notificationBag);
-        $this->assertEquals($message2, $notificationBag->getAtPosition(9));
-        $this->assertEquals($message2, $notificationBag->getAliased('test_alias'));
-    }
-
-    public function testAddArrayOfMessagesForGivenType()
-    {
-        $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType('info');
-        $this->assertCount(0, $notificationBag);
-
-        $notificationBag->add('info', array('test1', 'test2'), false);
-        $this->assertCount(2, $notificationBag);
-        $notifications = $notificationBag->all();
-        $this->assertEquals('test1', $notifications[0]->getMessage());
-        $this->assertEquals('test2', $notifications[1]->getMessage());
-    }
-
-    public function testAddArrayOfMessagesForGivenTypeOverrideFormat()
-    {
-        $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType('info');
-        $this->assertCount(0, $notificationBag);
-
-        $notificationBag->add('info', array('test1', 'test2'), false, 'custom');
-        $this->assertCount(2, $notificationBag);
-        $notifications = $notificationBag->all();
-        $this->assertEquals('test1', $notifications[0]->getMessage());
-        $this->assertEquals('custom', $notifications[0]->getFormat());
-        $this->assertEquals('test2', $notifications[1]->getMessage());
-        $this->assertEquals('custom', $notifications[1]->getFormat());
-    }
-
-    public function testAddArrayOfMessagesWithFormats()
-    {
-        $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType('info');
-        $this->assertCount(0, $notificationBag);
-
-        $notificationBag->add('info', array(array('test1', 'custom1'), array('test2', 'custom2')), false);
-        $this->assertCount(2, $notificationBag);
-        $notifications = $notificationBag->all();
-        $this->assertEquals('test1', $notifications[0]->getMessage());
-        $this->assertEquals('custom1', $notifications[0]->getFormat());
-        $this->assertEquals('test2', $notifications[1]->getMessage());
-        $this->assertEquals('custom2', $notifications[1]->getFormat());
-    }
-
-    public function testAddArrayOfMessagesWithFormatsOverrideFormat()
-    {
-        $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType('info');
-        $this->assertCount(0, $notificationBag);
-
-        $notificationBag->add('info', array(array('test1', 'custom1'), 'test2'), false, 'c');
-        $this->assertCount(2, $notificationBag);
-        $notifications = $notificationBag->all();
-        $this->assertEquals('test1', $notifications[0]->getMessage());
-        $this->assertEquals('custom1', $notifications[0]->getFormat());
-        $this->assertEquals('test2', $notifications[1]->getMessage());
-        $this->assertEquals('c', $notifications[1]->getFormat());
-    }
-
-    public function testAddArrayOfMessagesWithAssociativeArrayAsParams()
-    {
-        $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType('info');
-        $this->assertCount(0, $notificationBag);
-
-        $messages = array(
-            array(
-                'message'       => 'm1',
-                'format'        => 'f1',
-                'alias'         => 'a1',
-                'position'      => 5
-            ),
-            array(
-                'message'       => 'm2',
-                'format'        => 'f2',
-                'alias'         => 'a2',
-                'position'      => 9
-            ),
-        );
-        $notificationBag->add('info', $messages, false);
-        $this->assertCount(2, $notificationBag);
-    }
-
-    public function testAddArrayOfMessagesInstances()
-    {
-        $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType('info');
-        $this->assertCount(0, $notificationBag);
-
-        $messages = array();
-
-        $messages[0] = $this->getMessage();
-        $messages[0]->shouldReceive('setType')->with('info')->andReturn($messages[0]);
-        $messages[0]->shouldReceive('isFlashable')->andReturn(false);
-        $messages[0]->shouldReceive('getPosition')->andReturn(null);
-        $messages[0]->shouldReceive('getAlias')->andReturn(null);
-        $messages[0]->shouldReceive('getFormat')->andReturn(':message');
-        $notificationBag->add('info', $messages[0], false);
-
-        $messages[1] = $this->getMessage();
-        $messages[1]->shouldReceive('setType')->with('info')->andReturn($messages[1]);
-        $messages[1]->shouldReceive('isFlashable')->andReturn(false);
-        $messages[1]->shouldReceive('getPosition')->andReturn(null);
-        $messages[1]->shouldReceive('getAlias')->andReturn(null);
-        $messages[1]->shouldReceive('getFormat')->andReturn(':message');
-        $notificationBag->add('info', $messages[1], false);
-
-        $this->assertCount(2, $notificationBag);
-        $notifications = $notificationBag->all();
-        $this->assertEquals($messages[0], $notifications[0]);
-        $this->assertEquals($messages[1], $notifications[1]);
     }
 
     public function testGetInstantMessagesForGivenType()
@@ -616,16 +376,15 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
         $message = $this->getMessage();
         $message->shouldReceive('setType')->with('info')->andReturn($message);
         $message->shouldReceive('getType')->andReturn('info');
-        $message->shouldReceive('isFlashable')->andReturn(false);
+        $message->shouldReceive('isFlash')->andReturn(false);
         $message->shouldReceive('getPosition')->andReturn(5);
-        $message->shouldReceive('getAlias')->andReturn(null);
         $message->shouldReceive('getFormat')->andReturn(':message');
 
         $notificationBag->add('info', $message, false);
         $notificationBag->add('danger', 'test', false);
         $this->assertCount(2, $notificationBag);
         $this->assertCount(1, $notificationBag->get('info'));
-        $this->assertEquals($message, $notificationBag->get('info')->getAtPosition(5));
+        $this->assertEquals($message, $notificationBag->get('info')[0]);
     }
 
     public function testClearMessagesForGivenType()
@@ -868,8 +627,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
                         'message'   => 'test',
                         'format'    => ':message',
                         'type'      => 'info',
-                        'flashable' => false,
-                        'alias'     => null,
+                        'flash'     => false,
                         'position'  => null
                     )
                 )
@@ -896,8 +654,7 @@ class NotificationBagTest extends PHPUnit_Framework_TestCase
                             'message'   => 'test',
                             'format'    => ':message',
                             'type'      => 'info',
-                            'flashable' => false,
-                            'alias'     => null,
+                            'flash'     => false,
                             'position'  => null
                         )
                     )

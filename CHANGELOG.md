@@ -1,10 +1,21 @@
+#5.1.0
+---
+
+* Improved configuration options
+* Create new containers dynamically
+* Add messages via closures
+* Removed message aliasing
+* Improved message positioning
+* Render messages via blade extension
+
+---
+
 #5.0.0
 ---
 
 * Fully supported Laravel 5
 
 ---
-
 
 #4.0.0
 ---

@@ -32,19 +32,12 @@ class Message implements Renderable, Jsonable, Arrayable
 
     /**
      * Is notification flashable?
-     * If flashable, then it will be displayed on next request.
+     * If flash, then it will be displayed on next request.
      * If no, it will be displayed in same request.
      *
      * @var bool
      */
-    protected $flashable = true;
-
-    /**
-     * Message allias.
-     *
-     * @var string|null
-     */
-    protected $alias = null;
+    protected $flash = true;
 
     /**
      * Message position.
@@ -58,24 +51,16 @@ class Message implements Renderable, Jsonable, Arrayable
      *
      * @param null $type
      * @param null $message
-     * @param bool $flashable
+     * @param bool $flash
      * @param null $format
-     * @param null $alias
      * @param null $position
      */
-    public function __construct(
-        $type = null,
-        $message = null,
-        $flashable = true,
-        $format = null,
-        $alias = null,
-        $position = null
-    ) {
+    public function __construct($type = null, $message = null, $flash = true, $format = null, $position = null)
+    {
         $this->setType($type);
         $this->setMessage($message);
-        $this->setFlashable($flashable);
+        $this->setFlash($flash);
         $this->setFormat($format);
-        $this->setAlias($alias);
         $this->setPosition($position);
     }
 
@@ -107,20 +92,20 @@ class Message implements Renderable, Jsonable, Arrayable
      *
      * @return bool
      */
-    public function isFlashable()
+    public function isFlash()
     {
-        return $this->flashable;
+        return $this->flash;
     }
 
     /**
-     * Sets flashable value, and returns message object.
+     * Sets flash value, and returns message object.
      *
-     * @param $flashable
+     * @param $flash
      * @return \Krucas\Notification\Message
      */
-    public function setFlashable($flashable)
+    public function setFlash($flash)
     {
-        $this->flashable = $flashable;
+        $this->flash = $flash;
 
         return $this;
     }
@@ -167,29 +152,6 @@ class Message implements Renderable, Jsonable, Arrayable
     public function setType($type)
     {
         $this->type = $type;
-
-        return $this;
-    }
-
-    /**
-     * Returns message alias.
-     *
-     * @return null|string
-     */
-    public function getAlias()
-    {
-        return $this->alias;
-    }
-
-    /**
-     * Sets message alias.
-     *
-     * @param $alias
-     * @return \Krucas\Notification\Message
-     */
-    public function setAlias($alias)
-    {
-        $this->alias = $alias;
 
         return $this;
     }
@@ -247,40 +209,26 @@ class Message implements Renderable, Jsonable, Arrayable
 
     /**
      * Set message to be instant.
-     * Shortcut for `setFlashable()`
+     * Shortcut for `setFlash()`
      *
      * @return \Krucas\Notification\Message
      */
     public function instant()
     {
-        $this->setFlashable(false);
+        $this->setFlash(false);
 
         return $this;
     }
 
     /**
      * Set message to be flashable.
-     * Shortcut for `setFlashable()`
+     * Shortcut for `setFlash()`
      *
      * @return \Krucas\Notification\Message
      */
     public function flash()
     {
-        $this->setFlashable(true);
-
-        return $this;
-    }
-
-    /**
-     * Set message alias.
-     * Shortcut for `setAlias()`
-     *
-     * @param $alias
-     * @return \Krucas\Notification\Message
-     */
-    public function alias($alias)
-    {
-        $this->setAlias($alias);
+        $this->setFlash(true);
 
         return $this;
     }
@@ -306,7 +254,8 @@ class Message implements Renderable, Jsonable, Arrayable
      */
     public function render()
     {
-        return is_null($this->getMessage()) ? '' : str_replace(array(':message', ':type'), array($this->getMessage(), $this->getType()), $this->getFormat());
+        return is_null($this->getMessage())
+            ? '' : str_replace([':message', ':type'], [$this->getMessage(), $this->getType()], $this->getFormat());
     }
 
     /**

@@ -6,13 +6,6 @@ use Illuminate\Session\Store;
 class Subscriber
 {
     /**
-     * Count of flashed messages.
-     *
-     * @var int
-     */
-    protected static $flashCount = 0;
-
-    /**
      * Session instance for flashing messages.
      *
      * @var \Illuminate\Session\Store
@@ -20,22 +13,22 @@ class Subscriber
     protected $session;
 
     /**
-     * Config repository.
+     * Session key.
      *
-     * @var \Illuminate\Contracts\Config\Repository
+     * @var string
      */
-    protected $config;
+    protected $key;
 
     /**
      * Create new subscriber.
      *
      * @param \Illuminate\Session\Store $session
-     * @param \Illuminate\Contracts\Config\Repository $config
+     * @param string $key
      */
-    public function __construct(Store $session, Repository $config)
+    public function __construct(Store $session, $key)
     {
         $this->session = $session;
-        $this->config = $config;
+        $this->key = $key;
     }
 
     /**
@@ -49,13 +42,13 @@ class Subscriber
     }
 
     /**
-     * Get config repository instance.
+     * Get session key.
      *
-     * @return \Illuminate\Config\Repository
+     * @return string
      */
-    public function getConfig()
+    public function getKey()
     {
-        return $this->config;
+        return $this->key;
     }
 
     /**
@@ -68,45 +61,11 @@ class Subscriber
      */
     public function onFlash(Notification $notification, NotificationsBag $notificationBag, Message $message)
     {
-        $this->flashContainerNames($notification);
+        $key = implode('.', [$this->key, $notificationBag->getName()]);
 
-        $sessionKey  = $this->getConfig()->get('notification.session_prefix');
-        $sessionKey .= $notificationBag->getName();
-        $sessionKey .= '_'.$this->generateMessageKey($message);
-
-        $this->getSession()->flash($sessionKey, $message->toJson());
+        $this->session->push($key, $message);
 
         return true;
-    }
-
-    /**
-     * Flash used container names.
-     *
-     * @param Notification $notification
-     * @return void
-     */
-    protected function flashContainerNames(Notification $notification)
-    {
-        $names = array();
-
-        foreach ($notification->getContainers() as $container) {
-            $names[] = $container->getName();
-        }
-
-        $this->getSession()->flash($this->getConfig()->get('notification.session_prefix').'containers', $names);
-    }
-
-    /**
-     * Generate session suffix for given message.
-     *
-     * @param Message $message
-     * @return string
-     */
-    protected function generateMessageKey(Message $message)
-    {
-        static::$flashCount++;
-
-        return static::$flashCount;
     }
 
     /**
