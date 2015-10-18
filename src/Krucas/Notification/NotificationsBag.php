@@ -311,16 +311,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
 
         if ($message instanceof \Krucas\Notification\Message) {
             $m = $message;
-            $m->setType($type);
-            if ($m->isFlash() != $flash) {
-                $m->setFlash($flash);
-            }
-            if (is_null($m->getFormat())) {
-                $m->setFormat($this->getFormat($type));
-            }
-            if (!is_null($format)) {
-                $m->setFormat($this->checkFormat($format, $type));
-            }
+            $this->addInstance($m, $type, $flash, $format);
         } else {
             $m = new Message($type, $message, $flash, $this->checkFormat($format, $type));
         }
@@ -333,6 +324,28 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
         }
 
         return $this;
+    }
+
+    /**
+     * Add message by instance.
+     *
+     * @param \Krucas\Notification\Message $message
+     * @param string $type
+     * @param bool $flash
+     * @param null $format
+     */
+    protected function addInstance(Message $message, $type, $flash = true, $format = null)
+    {
+        $message->setType($type);
+        if ($message->isFlash() != $flash) {
+            $message->setFlash($flash);
+        }
+        if (is_null($message->getFormat())) {
+            $message->setFormat($this->getFormat($type));
+        }
+        if (!is_null($format)) {
+            $message->setFormat($this->checkFormat($format, $type));
+        }
     }
 
     /**
