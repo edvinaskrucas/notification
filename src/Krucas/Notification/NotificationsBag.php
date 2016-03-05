@@ -299,7 +299,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      * Flashes flashable messages.
      *
      * @param $type
-     * @@param string|\Krucas\Notification\Message|\Closure $message
+     * @param string|\Krucas\Notification\Message|\Closure $message
      * @param bool $flash
      * @param null $format
      * @return \Krucas\Notification\NotificationsBag
