@@ -615,19 +615,19 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      */
     public function has($type = null)
     {
-	    if( $this->count() === 0 )
-			return false;
+        if( $this->count() === 0 )
+            return false;
 
-	    if (is_null($type) )
-			return true;
+        if (is_null($type) )
+            return true;
 
-		if( !$this->typeIsAvailable($type) )
-			return false;
+        if( !$this->typeIsAvailable($type) )
+            return false;
 
         foreach ($this->notifications as $key => $message) {
             if ($message->getType() == $type)
-				return true;
-		}
+                return true;
+        }
 
         return false;
     }
