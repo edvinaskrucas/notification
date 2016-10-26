@@ -53,6 +53,8 @@ class NotificationServiceProvider extends ServiceProvider
                 $config->get('notification.default_container'),
                 $config->get('notification.default_types'),
                 $config->get('notification.types'),
+                $config->get('notification.default_laravel_validation_error_type'),
+                $config->get('notification.laravel_validation_error_type'),
                 $config->get('notification.default_format'),
                 $config->get('notification.format'),
                 $config->get('notification.default_formats'),

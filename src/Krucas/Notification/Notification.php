@@ -34,6 +34,20 @@ class Notification
     protected $types = [];
 
     /**
+     * Default Laravel Validation error type available for new containers.
+     *
+     * @var string
+     */
+    protected $defaultLaravelValidationErrorType;
+
+    /**
+     * Laravel Validation error types for defined containers.
+     *
+     * @var array
+     */
+    protected $laravelValidationErrorType = [];
+
+    /**
      * Default format for each container type.
      *
      * @var string
@@ -83,6 +97,8 @@ class Notification
         $defaultContainer,
         $defaultTypes,
         $types,
+        $defaultLaravelValidationErrorType,
+        $laravelValidationErrorType,
         $defaultFormat,
         $format,
         $defaultFormats,
@@ -91,6 +107,8 @@ class Notification
         $this->defaultContainer = $defaultContainer;
         $this->defaultTypes = $defaultTypes;
         $this->types = $types;
+        $this->defaultLaravelValidationErrorType = $defaultLaravelValidationErrorType;
+        $this->laravelValidationErrorType = $laravelValidationErrorType;
         $this->defaultFormat = $defaultFormat;
         $this->format = $format;
         $this->defaultFormats = $defaultFormats;
@@ -134,6 +152,35 @@ class Notification
         }
 
         return $this->defaultTypes;
+    }
+
+    /**
+     * Set Laravel Validation error type for a container.
+     *
+     * @param string $container
+     * @param array $types
+     * @return \Krucas\Notification\Notification
+     */
+    public function setContainerLaravelValidationErrorType($container, $type)
+    {
+        $this->laravelValidationErrorType[$container] = $type;
+
+        return $this;
+    }
+
+    /**
+     * Return Laravel Validation error type for a container.
+     *
+     * @param $container
+     * @return array
+     */
+    public function getContainerLaravelValidationErrorType($container)
+    {
+        if (isset($this->laravelValidationErrorType[$container])) {
+            return $this->laravelValidationErrorType[$container];
+        }
+
+        return $this->defaultLaravelValidationErrorType;
     }
 
     /**
@@ -203,13 +250,13 @@ class Notification
      * @param array $formats
      * @return \Krucas\Notification\Notification
      */
-    public function addContainer($container, $types = [], $defaultFormat = null, $formats = [])
+    public function addContainer($container, $types = [], $laravelValidationErrorType = null, $defaultFormat = null, $formats = [])
     {
         if (isset($this->containers[$container])) {
             return $this;
         }
 
-        $this->containers[$container] = new NotificationsBag($container, $types, $defaultFormat, $formats);
+        $this->containers[$container] = new NotificationsBag($container, $types, $laravelValidationErrorType, $defaultFormat, $formats);
         $this->containers[$container]->setNotification($this);
 
         return $this;
@@ -240,6 +287,7 @@ class Notification
             $this->addContainer(
                 $container,
                 $this->getContainerTypes($container),
+                $this->getContainerLaravelValidationErrorType($container),
                 $this->getContainerFormat($container),
                 $this->getContainerFormats($container)
             );
