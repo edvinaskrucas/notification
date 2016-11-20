@@ -1,6 +1,5 @@
 <?php namespace Krucas\Notification;
 
-use Illuminate\Contracts\Config\Repository;
 use Illuminate\Session\Store;
 
 class Subscriber
