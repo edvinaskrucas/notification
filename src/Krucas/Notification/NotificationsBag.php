@@ -608,6 +608,31 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
     }
 
     /**
+     * Check if a message is set for given type.
+     *
+     * @param $type
+     * @return bool
+     */
+    public function has($type = null)
+    {
+        if( $this->count() === 0 )
+            return false;
+
+        if (is_null($type) )
+            return true;
+
+        if( !$this->typeIsAvailable($type) )
+            return false;
+
+        foreach ($this->notifications as $key => $message) {
+            if ($message->getType() == $type)
+                return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Fire event for a given message.
      *
      * @param $event
