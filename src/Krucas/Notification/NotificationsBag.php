@@ -3,7 +3,6 @@
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Closure;
 
 class NotificationsBag implements Arrayable, Jsonable, Countable
@@ -21,13 +20,6 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      * @var array
      */
     protected $types = array();
-
-    /**
-     * The Laravel Validation error type
-     * 
-     * @var string
-     */
-    protected $laravelValidationErrorType;
 
     /**
      * Array of matcher for extracting types.
@@ -84,11 +76,10 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      * @param null $defaultFormat
      * @param array $formats
      */
-    public function __construct($container, $types = array(), $laravelValidationErrorType = null, $defaultFormat = null, $formats = array())
+    public function __construct($container, $types = array(), $defaultFormat = null, $formats = array())
     {
         $this->container = $container;
         $this->addType($types);
-        $this->setLaravelValidationErrorType($laravelValidationErrorType);
         $this->setDefaultFormat($defaultFormat);
         $this->setFormats($formats);
         $this->notifications = new Collection();
@@ -127,18 +118,6 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
                 }
             }
         }
-
-        return $this;
-    }
-
-    /**
-     * Set the Laravel Validation error type
-     * 
-     * @param string $type The message type of the Laravel Validation errors
-     */
-    public function setLaravelValidationErrorType($type)
-    {
-        $this->laravelValidationErrorType = $type;
 
         return $this;
     }
@@ -371,23 +350,6 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
         }
         if (!is_null($format)) {
             $message->setFormat($this->checkFormat($format, $type));
-        }
-    }
-
-    /**
-     * Add all the Laravel Validation erors to this collection.
-     * 
-     * @param \Illuminate\Contracts\Validation\Validator $validator
-     * @param string            $type      Can be used to overwrite the Laravel  
-     *                                     Validation error type for this collection.
-     * @param boolean           $flash     
-     * @param string            $format    
-     */
-    public function addLaravelValidationErrors(ValidatorContract $validator, $type = null, $flash = true, $format = null) {
-        if ($type === null) $type = $this->laravelValidationErrorType;
-
-        foreach($validator->errors()->all() as $message) {
-            $this->add($type, $message, $flash, $format);
         }
     }
 
