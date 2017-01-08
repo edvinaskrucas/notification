@@ -254,8 +254,9 @@ class Message implements Renderable, Jsonable, Arrayable
      */
     public function render()
     {
-        return is_null($this->getMessage())
-            ? '' : str_replace([':message', ':type'], [$this->getMessage(), $this->getType()], $this->getFormat());
+        $message = htmlspecialchars($this->getMessage(), ENT_QUOTES, null, false);
+        return is_null($message)
+            ? '' : str_replace([':message', ':type'], [$message, $this->getType()], $this->getFormat());
     }
 
     /**
