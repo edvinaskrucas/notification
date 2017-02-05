@@ -1,3 +1,6 @@
+dist: trusty
+sudo: required
+
 language: php
 
 php:
@@ -6,8 +9,10 @@ php:
   - 7.0
   - hhvm
 
+
 before_script:
-  - curl -s http://getcomposer.org/installer | php
-  - php composer.phar install --dev
+  - composer self-update
+  - composer install --no-interaction
+
 
 script: phpunit
