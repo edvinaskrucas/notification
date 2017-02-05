@@ -1,5 +1,6 @@
 <?php
 
+use Krucas\Notification\Event\FlashEvent;
 use Mockery as m;
 
 class SubscriberTest extends PHPUnit_Framework_TestCase
@@ -35,7 +36,7 @@ class SubscriberTest extends PHPUnit_Framework_TestCase
         $notificationsBag->shouldReceive('getName')->once()->andReturn('test');
         $subscriber->getSession()->shouldReceive('push')->once()->with('notifications.test', $message);
 
-        $this->assertTrue($subscriber->onFlash($notification, $notificationsBag, $message));
+        $this->assertTrue($subscriber->onFlash('notification.flash: default', [new FlashEvent( $notificationsBag, $message)]));
     }
 
     protected function getSubscriber()
