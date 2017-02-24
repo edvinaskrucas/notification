@@ -54,13 +54,25 @@ class Subscriber
     /**
      * Execute this event to flash messages.
      *
-     * @param Notification $notification
-     * @param NotificationsBag $notificationBag
-     * @param Message $message
+     * @param string $eventName
+     * @param array  $data       Event payload. Should be an array containing 3 elements:
+     *                           [ Notification, NotificationsBag, Message ]
      * @return bool
      */
-    public function onFlash(Notification $notification, NotificationsBag $notificationBag, Message $message)
+    public function onFlash($eventName, array $data)
     {
+        // Data array should have 3 elements with sequential keys: Notification, NotificationsBag and Message
+        if ( ! array_key_exists(0, $data) || ! array_key_exists(1, $data) || ! array_key_exists(2, $data)) {
+            throw new \InvalidArgumentException(sprintf('%s expects 3 elements in data array, %s given.', __METHOD__, count($data)));
+        }
+        if ( ! $data[0] instanceof Notification || ! $data[1] instanceof NotificationsBag || ! $data[2] instanceof Message) {
+            throw new \InvalidArgumentException(sprintf('%s expects a data array containing [%s], actually given [%s]', __METHOD__, implode(', ', [Notification::class, NotificationsBag::class, Message::class]), implode(', ', array_map(function ($element) {
+                return is_object($element) ? get_class($element) : '{' . gettype($element) . '}';
+            }, $data))));
+        }
+
+        list($notification, $notificationBag, $message) = $data;
+
         $key = implode('.', [$this->key, $notificationBag->getName()]);
 
         $this->session->push($key, $message);
