@@ -32,10 +32,13 @@ class SubscriberTest extends PHPUnit_Framework_TestCase
         $notificationsBag = $this->getNotificationsBag();
         $message = $this->getMessage();
 
-        $notificationsBag->shouldReceive('getName')->once()->andReturn('test');
-        $subscriber->getSession()->shouldReceive('push')->once()->with('notifications.test', $message);
+        $notificationsBag->shouldReceive('getName')->once()->andReturn('my_test_bag');
+        $subscriber->getSession()->shouldReceive('push')->once()->with('notifications.my_test_bag', $message);
 
-        $this->assertTrue($subscriber->onFlash($notification, $notificationsBag, $message));
+        // As of Laravel 5.4 wildcard event subscribers now receive the event
+        // name as their first argument and the array of event data as their
+        // second argument
+        $this->assertTrue($subscriber->onFlash('notification.flash: default', [$notification, $notificationsBag, $message]));
     }
 
     protected function getSubscriber()
