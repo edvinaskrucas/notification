@@ -11,8 +11,8 @@
     "license": "MIT",
     "require": {
         "php" : "^5.5|^7.0",
-        "illuminate/support": "^5.1",
-        "illuminate/session": "^5.1"
+        "illuminate/support": "^5.4",
+        "illuminate/session": "^5.4"
     },
     "require-dev": {
         "mockery/mockery": "0.7.*"
