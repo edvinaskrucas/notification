@@ -41,10 +41,28 @@ class SubscriberTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($subscriber->onFlash('notification.flash: default', [$notification, $notificationsBag, $message]));
     }
 
+    public function testOnFlashValidation()
+    {
+        $subscriber = $this->getSubscriber();
+
+        try {
+            $subscriber->onFlash('notification.flash: default', [new \stdClass]);
+            $this->fail('Failed to throw expected InvalidArgumentException when passing incorrect number of event data array elements to Krucas\Notification\Subscriber::onFlash');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('Krucas\Notification\Subscriber::onFlash expects 3 elements in data array, 1 given.', $e->getMessage());
+        }
+
+        try {
+            $subscriber->onFlash('notification.flash: default', [new \stdClass, new \stdClass, new \stdClass]);
+            $this->fail('Failed to throw expected InvalidArgumentException when passing incorrect type of event data array elements to Krucas\Notification\Subscriber::onFlash');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('Krucas\Notification\Subscriber::onFlash expects a data array containing [Krucas\Notification\Notification, Krucas\Notification\NotificationsBag, Krucas\Notification\Message], actually given [stdClass, stdClass, stdClass]', $e->getMessage());
+        }
+    }
+
     protected function getSubscriber()
     {
-        $subscriber = new \Krucas\Notification\Subscriber($this->getSessionStore(), 'notifications');
-        return $subscriber;
+        return new \Krucas\Notification\Subscriber($this->getSessionStore(), 'notifications');
     }
 
     protected function getSessionStore()
