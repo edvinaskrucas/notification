@@ -61,15 +61,7 @@ class Subscriber
      */
     public function onFlash($eventName, array $data)
     {
-        // Data array should have 3 elements with sequential keys: Notification, NotificationsBag and Message
-        if ( ! array_key_exists(0, $data) || ! array_key_exists(1, $data) || ! array_key_exists(2, $data)) {
-            throw new \InvalidArgumentException(sprintf('%s expects 3 elements in data array, %s given.', __METHOD__, count($data)));
-        }
-        if ( ! $data[0] instanceof Notification || ! $data[1] instanceof NotificationsBag || ! $data[2] instanceof Message) {
-            throw new \InvalidArgumentException(sprintf('%s expects a data array containing [%s], actually given [%s]', __METHOD__, implode(', ', [Notification::class, NotificationsBag::class, Message::class]), implode(', ', array_map(function ($element) {
-                return is_object($element) ? get_class($element) : '{' . gettype($element) . '}';
-            }, $data))));
-        }
+        $this->validateEventData($data);
 
         list($notification, $notificationBag, $message) = $data;
 
@@ -89,5 +81,39 @@ class Subscriber
     public function subscribe($events)
     {
         $events->listen('notification.flash: *', 'Krucas\Notification\Subscriber@onFlash');
+    }
+
+    /**
+     * Validates that the correct event data has been passed to self::onFlash()
+     *
+     * Data array should have 3 elements with sequential keys: Notification, NotificationsBag and Message
+     *
+     * @param  array  $data
+     * @throws InvalidArgumentException  If the event data is invalid.
+     */
+    private function validateEventData(array $data)
+    {
+        if ( ! array_key_exists(0, $data) || ! array_key_exists(1, $data) || ! array_key_exists(2, $data)) {
+            throw new \InvalidArgumentException(sprintf(
+                '%s expects 3 elements in data array, %s given.',
+                sprintf('%s::onFlash', __CLASS__),
+                count($data)
+            ));
+        }
+
+        if ( ! $data[0] instanceof Notification || ! $data[1] instanceof NotificationsBag || ! $data[2] instanceof Message) {
+            $expected = [Notification::class, NotificationsBag::class, Message::class];
+
+            $actual = array_map(function ($element) {
+                return is_object($element) ? get_class($element) : '{' . gettype($element) . '}';
+            }, $data);
+
+            throw new \InvalidArgumentException(sprintf(
+                '%s expects a data array containing [%s], actually given [%s]',
+                sprintf('%s::onFlash', __CLASS__),
+                implode(', ', $expected),
+                implode(', ', $actual)
+            ));
+        }
     }
 }
