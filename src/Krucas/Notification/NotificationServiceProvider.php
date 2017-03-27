@@ -3,7 +3,6 @@
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 use Krucas\Notification\Middleware\NotificationMiddleware;
-use Blade;
 
 class NotificationServiceProvider extends ServiceProvider
 {
@@ -28,7 +27,7 @@ class NotificationServiceProvider extends ServiceProvider
 
         $dispatcher->subscribe('Krucas\Notification\Subscriber');
 
-        $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
+        $this->app->afterResolving('blade.compiler', function ($bladeCompiler) {
             $bladeCompiler->directive('notification', function ($container = null) {
                 if (strcasecmp('()', $container) === 0) {
                     $container = null;
