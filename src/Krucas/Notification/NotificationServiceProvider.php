@@ -28,12 +28,14 @@ class NotificationServiceProvider extends ServiceProvider
 
         $dispatcher->subscribe('Krucas\Notification\Subscriber');
 
-        Blade::directive('notification', function ($container = null) {
-            if (strcasecmp('()', $container) === 0) {
-                $container = null;
-            }
+        $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
+            $bladeCompiler->directive('notification', function ($container = null) {
+                if (strcasecmp('()', $container) === 0) {
+                    $container = null;
+                }
 
-            return "<?php echo app('notification')->container({$container})->show(); ?>";
+                return "<?php echo app('notification')->container({$container})->show(); ?>";
+            });
         });
     }
 
