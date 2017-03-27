@@ -2,6 +2,7 @@
 
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
+use Krucas\Notification\Event\FlashEvent;
 
 class Notification
 {
@@ -281,8 +282,9 @@ class Notification
 
         $event = "notification.{$event}: ".$notificationBag->getName();
 
-        return static::$dispatcher->fire($event, array($this, $notificationBag, $message));
+        return static::$dispatcher->fire($event,new FlashEvent($notificationBag,$message));
     }
+
 
     /**
      * Get the event dispatcher instance.

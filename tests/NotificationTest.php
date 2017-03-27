@@ -1,5 +1,6 @@
 <?php
 
+use Krucas\Notification\Event\FlashEvent;
 use Mockery as m;
 
 class NotificationTest extends PHPUnit_Framework_TestCase
@@ -199,7 +200,9 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $message->shouldReceive('getPosition')->andReturn(null);
         $message->shouldReceive('getFormat')->andReturn(':message');
 
-        $events->shouldReceive('fire')->once()->with('notification.flash: default', array($notification, $notification->container(), $message));
+        $events->shouldReceive('fire')->once()->with('notification.flash: default', m::on(function (FlashEvent $event) use($notification,$message){
+            return $event->getNotificationBag() ==$notification->container() && $event->getMessage() ==$message;
+        }));
         $notification->container()->info($message);
     }
 
@@ -215,7 +218,9 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $message->shouldReceive('getPosition')->andReturn(null);
         $message->shouldReceive('getFormat')->andReturn(':message');
 
-        $events->shouldReceive('fire')->once()->with('notification.added: default', array($notification, $notification->container(), $message));
+        $events->shouldReceive('fire')->once()->with('notification.added: default', m::on(function (FlashEvent $event) use($notification,$message){
+            return $event->getNotificationBag() ==$notification->container() && $event->getMessage() ==$message;
+        }));
         $notification->container()->infoInstant($message);
     }
 

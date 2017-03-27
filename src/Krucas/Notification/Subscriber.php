@@ -2,6 +2,7 @@
 
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Session\Store;
+use Krucas\Notification\Event\FlashEvent;
 
 class Subscriber
 {
@@ -59,14 +60,15 @@ class Subscriber
      * @param Message $message
      * @return bool
      */
-    public function onFlash(Notification $notification, NotificationsBag $notificationBag, Message $message)
+    public function onFlash(string $event,  $flashEvent)
     {
-        $key = implode('.', [$this->key, $notificationBag->getName()]);
+        $key = implode('.', [$this->key, $flashEvent[0]->getNotificationBag()->getName()]);
 
-        $this->session->push($key, $message);
+        $this->session->push($key, $flashEvent[0]->getMessage());
 
         return true;
     }
+
 
     /**
      * Register the listeners for the subscriber.
