@@ -1,10 +1,10 @@
 <?php namespace Krucas\Notification;
 
+use Closure;
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
-use Closure;
+use Illuminate\Contracts\Validation\Validator;
 
 class NotificationsBag implements Arrayable, Jsonable, Countable
 {
@@ -133,9 +133,20 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
     }
 
     /**
+     * Get the Laravel Validation error type
+     *
+     * @return \Krucas\Notification\NotificationsBag
+     */
+    public function getLaravelValidationErrorType()
+    {
+        return $this->laravelValidationErrorType;
+    }
+
+    /**
      * Set the Laravel Validation error type
-     * 
+     *
      * @param string $type The message type of the Laravel Validation errors
+     * @return \Krucas\Notification\NotificationsBag
      */
     public function setLaravelValidationErrorType($type)
     {
@@ -377,17 +388,20 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
 
     /**
      * Add all the Laravel Validation erors to this collection.
-     * 
+     *
      * @param \Illuminate\Contracts\Validation\Validator $validator
-     * @param string            $type      Can be used to overwrite the Laravel  
-     *                                     Validation error type for this collection.
-     * @param boolean           $flash     
-     * @param string            $format    
+     * @param string            $type      Can be used to overwrite the Laravel
+     *                                     Validation error type
+     * @param boolean           $flash
+     * @param string            $format
      */
-    public function addLaravelValidationErrors(ValidatorContract $validator, $type = null, $flash = true, $format = null) {
-        if ($type === null) $type = $this->laravelValidationErrorType;
+    public function addLaravelValidationErrors(Validator $validator, $type = null, $flash = true, $format = null)
+    {
+        if ($type === null) {
+            $type = $this->laravelValidationErrorType;
+        }
 
-        foreach($validator->errors()->all() as $message) {
+        foreach ($validator->errors()->all() as $message) {
             $this->add($type, $message, $flash, $format);
         }
     }

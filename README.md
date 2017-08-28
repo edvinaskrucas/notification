@@ -70,6 +70,14 @@ Adding message to default container.
 \Krucas\Notification\Facades\Notification::warning('Warning message');
 ```
 
+### Add errors from laravel validation
+Adding errors from the Laravel validator to the default container.
+```php
+$validator = // Your validation in a controller or custom validation object
+
+\Krucas\Notification\Facades\Notification::addLaravelValidationErrors($validator);
+```
+
 ### Containers
 
 Containers allows you to set up different containers for different placeholders.

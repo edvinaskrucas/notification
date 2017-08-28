@@ -38,14 +38,14 @@ class Notification
      *
      * @var string
      */
-    protected $defaultLaravelValidationErrorType;
+    protected $laravelValidationErrorType;
 
     /**
-     * Laravel Validation error types for defined containers.
+     * Laravel Validation error types for defined containers
      *
-     * @var array
+     * @var string
      */
-    protected $laravelValidationErrorType = [];
+    protected $laravelValidationErrorTypes;
 
     /**
      * Default format for each container type.
@@ -88,6 +88,7 @@ class Notification
      * @param string $defaultContainer
      * @param array $defaultTypes
      * @param array $types
+     * @param string $laravelValidationErrorType
      * @param string $defaultFormat
      * @param array $format
      * @param array $defaultFormats
@@ -97,7 +98,6 @@ class Notification
         $defaultContainer,
         $defaultTypes,
         $types,
-        $defaultLaravelValidationErrorType,
         $laravelValidationErrorType,
         $defaultFormat,
         $format,
@@ -107,7 +107,6 @@ class Notification
         $this->defaultContainer = $defaultContainer;
         $this->defaultTypes = $defaultTypes;
         $this->types = $types;
-        $this->defaultLaravelValidationErrorType = $defaultLaravelValidationErrorType;
         $this->laravelValidationErrorType = $laravelValidationErrorType;
         $this->defaultFormat = $defaultFormat;
         $this->format = $format;
@@ -163,7 +162,7 @@ class Notification
      */
     public function setContainerLaravelValidationErrorType($container, $type)
     {
-        $this->laravelValidationErrorType[$container] = $type;
+        $this->laravelValidationErrorTypes[$container] = $type;
 
         return $this;
     }
@@ -172,15 +171,15 @@ class Notification
      * Return Laravel Validation error type for a container.
      *
      * @param $container
-     * @return array
+     * @return string
      */
     public function getContainerLaravelValidationErrorType($container)
     {
-        if (isset($this->laravelValidationErrorType[$container])) {
-            return $this->laravelValidationErrorType[$container];
+        if (isset($this->laravelValidationErrorTypes[$container])) {
+            return $this->laravelValidationErrorTypes[$container];
         }
 
-        return $this->defaultLaravelValidationErrorType;
+        return $this->laravelValidationErrorType;
     }
 
     /**
@@ -246,6 +245,7 @@ class Notification
      *
      * @param string $container
      * @param array $types
+     * @param string $laravelValidationErrorType
      * @param null $defaultFormat
      * @param array $formats
      * @return \Krucas\Notification\Notification

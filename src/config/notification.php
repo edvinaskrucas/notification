@@ -51,19 +51,7 @@ return array(
     | types that can be used by the container as well
     |
     */
-    'default_laravel_validation_error_type' => 'error',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Type for laravel validation errors for containers
-    |--------------------------------------------------------------------------
-    |
-    | Specify the type for each container separately.
-    | Take note that the types specified here have to be specified in the 
-    | types that can be used by the container as well
-    |
-    */
-    'laravel_validation_error_types'        => array(),
+    'laravel_validation_error_type' => 'error',
 
     /*
     |--------------------------------------------------------------------------

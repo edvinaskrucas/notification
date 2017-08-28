@@ -225,6 +225,7 @@ class NotificationTest extends PHPUnit_Framework_TestCase
             'default',
             ['info', 'warning', 'success', 'error'],
             [],
+            'info',
             ':type :message',
             [],
             [],
@@ -236,6 +237,7 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('test', $container->getName());
         $this->assertEquals(':type :message', $container->getDefaultFormat());
         $this->assertEquals(['info', 'warning', 'success', 'error'], $container->getTypes());
+        $this->assertEquals('info', $container->getLaravelValidationErrorType());
     }
 
     public function testCreateNewContainerFromDefined()
@@ -246,6 +248,7 @@ class NotificationTest extends PHPUnit_Framework_TestCase
             [
                 'test' => ['info']
             ],
+            null,
             ':type :message',
             [
                 'test' => ':message',
@@ -268,7 +271,7 @@ class NotificationTest extends PHPUnit_Framework_TestCase
 
     protected function getNotification()
     {
-        return new \Krucas\Notification\Notification('default', [], [], null, [], [], []);
+        return new \Krucas\Notification\Notification('default', [], [], null,null, null, [], []);
     }
 
     protected function getMessage()
