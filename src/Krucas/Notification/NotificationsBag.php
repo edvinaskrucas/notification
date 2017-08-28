@@ -321,7 +321,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      * Flashes flashable messages.
      *
      * @param $type
-     * @@param string|\Krucas\Notification\Message|\Closure $message
+     * @param string|\Krucas\Notification\Message|\Closure $message
      * @param bool $flash
      * @param null $format
      * @return \Krucas\Notification\NotificationsBag
@@ -644,6 +644,35 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
     public function count()
     {
         return count($this->notifications);
+    }
+
+    /**
+     * Check if a message is set for given type.
+     *
+     * @param $type
+     * @return bool
+     */
+    public function has($type = null)
+    {
+        if ($this->count() <= 0) {
+            return false;
+        }
+
+        if (is_null($type)) {
+            return true;
+        }
+
+        if (!$this->typeIsAvailable($type)) {
+            return false;
+        }
+
+        foreach ($this->notifications as $key => $message) {
+            if ($message->getType() == $type) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
