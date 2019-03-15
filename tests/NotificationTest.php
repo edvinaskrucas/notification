@@ -199,7 +199,7 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $message->shouldReceive('getPosition')->andReturn(null);
         $message->shouldReceive('getFormat')->andReturn(':message');
 
-        $events->shouldReceive('fire')->once()->with('notification.flash: default', array($notification, $notification->container(), $message));
+        $events->shouldReceive('dispatch')->once()->with('notification.flash: default', array($notification, $notification->container(), $message));
         $notification->container()->info($message);
     }
 
@@ -215,7 +215,7 @@ class NotificationTest extends PHPUnit_Framework_TestCase
         $message->shouldReceive('getPosition')->andReturn(null);
         $message->shouldReceive('getFormat')->andReturn(':message');
 
-        $events->shouldReceive('fire')->once()->with('notification.added: default', array($notification, $notification->container(), $message));
+        $events->shouldReceive('dispatch')->once()->with('notification.added: default', array($notification, $notification->container(), $message));
         $notification->container()->infoInstant($message);
     }
 

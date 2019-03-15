@@ -281,7 +281,7 @@ class Notification
 
         $event = "notification.{$event}: ".$notificationBag->getName();
 
-        return static::$dispatcher->fire($event, array($this, $notificationBag, $message));
+        return static::$dispatcher->dispatch($event, array($this, $notificationBag, $message));
     }
 
     /**
