@@ -23,5 +23,12 @@
             "Krucas\\Notification": "src/"
         }
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Krucas\\Notification\\NotificationServiceProvider"
+            ]
+        }
+    },
     "minimum-stability": "dev"
 }
