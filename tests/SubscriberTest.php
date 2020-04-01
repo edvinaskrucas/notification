@@ -1,13 +1,13 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-class SubscriberTest extends PHPUnit_Framework_TestCase
+class SubscriberTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
+    use MockeryPHPUnitIntegration;
+    
 
     public function testIsConstructed()
     {
