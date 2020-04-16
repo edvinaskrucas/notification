@@ -36,7 +36,13 @@ class Collection extends BaseCollection implements Renderable
      */
     public function add($item)
     {
-        $this->queue->insert($item, is_null($item->getPosition()) ? null : -$item->getPosition());
+        if (is_array($item)) {
+            $position = $item['position'];
+        } else {
+            $position = $item->getPosition();
+        }
+
+        $this->queue->insert($item, is_null($position) ? null : -$position);
 
         $this->copyQueue(clone $this->queue);
 
