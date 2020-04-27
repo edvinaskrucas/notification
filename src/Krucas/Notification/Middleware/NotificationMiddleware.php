@@ -1,4 +1,6 @@
-<?php namespace Krucas\Notification\Middleware;
+<?php 
+
+namespace Krucas\Notification\Middleware;
 
 use Closure;
 use Illuminate\Session\Store;

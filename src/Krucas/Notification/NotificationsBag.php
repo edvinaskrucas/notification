@@ -1,4 +1,6 @@
-<?php namespace Krucas\Notification;
+<?php 
+
+namespace Krucas\Notification;
 
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
