@@ -43,6 +43,17 @@ return array(
     'types'                                 => array(),
 
     /*
+    | Default type for laravel validation errors
+    |--------------------------------------------------------------------------
+    |
+    | This type will be used for new containers.
+    | Take note that the type specified here has to be specified in the 
+    | types that can be used by the container as well
+    |
+    */
+    'laravel_validation_error_type' => 'error',
+
+    /*
     |--------------------------------------------------------------------------
     | Default message format
     |--------------------------------------------------------------------------
