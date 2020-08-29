@@ -1,8 +1,8 @@
 <?php
 
-use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class CollectionTest extends PHPUnit_Framework_TestCase
+class CollectionTest extends TestCase
 {
     public function testCollectionConstructor()
     {

@@ -1,15 +1,15 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 require_once 'Mocks/NotificationsBagMock.php';
 
-class NotificationBagTest extends PHPUnit_Framework_TestCase
+class NotificationBagTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
+    use MockeryPHPUnitIntegration;
+
 
     public function testIsConstructed()
     {

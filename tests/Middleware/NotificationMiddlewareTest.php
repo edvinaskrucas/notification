@@ -1,13 +1,13 @@
 <?php
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-class NotificationMiddlewareTest extends PHPUnit_Framework_TestCase
+class NotificationMiddlewareTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
+    use MockeryPHPUnitIntegration;
+    
 
     public function testOnBoot()
     {
