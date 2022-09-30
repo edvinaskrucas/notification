@@ -1,11 +1,15 @@
 {
-    "name": "edvinaskrucas/notification",
+    "name": "rickselby/laravel-edvinaskrucas-notification",
     "keywords": ["laravel", "notifications", "messages", "flash", "instant"],
     "description": "Package for Laravel for helping to manage flash / instant notifications / messages.",
     "authors": [
         {
             "name": "Edvinas Kručas",
             "email": "edv.krucas@gmail.com"
+        },
+        {
+            "name": "Rick Selby",
+            "email": "rick@selby-family.co.uk"
         }
     ],
     "license": "MIT",
