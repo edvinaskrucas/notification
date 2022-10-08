@@ -33,6 +33,5 @@
                 "Krucas\\Notification\\NotificationServiceProvider"
             ]
         }
-    },
-    "minimum-stability": "dev"
+    }
 }
