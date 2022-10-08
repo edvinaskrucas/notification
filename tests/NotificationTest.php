@@ -1,13 +1,12 @@
 <?php
 
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 class NotificationTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
-
 
     public function testIsConstructed()
     {
@@ -25,21 +24,21 @@ class NotificationTest extends TestCase
     public function testSetContainerTypes()
     {
         $notification = $this->getNotification();
-        $this->assertEquals(array(), $notification->getContainerTypes('default'));
+        $this->assertEquals([], $notification->getContainerTypes('default'));
 
-        $notification->setContainerTypes('default', array('success', 'info'));
-        $this->assertEquals(array('success', 'info'), $notification->getContainerTypes('default'));
+        $notification->setContainerTypes('default', ['success', 'info']);
+        $this->assertEquals(['success', 'info'], $notification->getContainerTypes('default'));
     }
 
     public function testGetTypesContainerForContainer()
     {
         $notification = $this->getNotification();
-        $this->assertEquals(array(), $notification->getContainerTypes('default'));
-        $this->assertEquals(array(), $notification->getContainerTypes('test'));
+        $this->assertEquals([], $notification->getContainerTypes('default'));
+        $this->assertEquals([], $notification->getContainerTypes('test'));
 
-        $notification->setContainerTypes('default', array('success', 'info'));
-        $this->assertEquals(array('success', 'info'), $notification->getContainerTypes('default'));
-        $this->assertEquals(array(), $notification->getContainerTypes('test'));
+        $notification->setContainerTypes('default', ['success', 'info']);
+        $this->assertEquals(['success', 'info'], $notification->getContainerTypes('default'));
+        $this->assertEquals([], $notification->getContainerTypes('test'));
     }
 
     public function testSetContainerFormat()
@@ -65,21 +64,21 @@ class NotificationTest extends TestCase
     public function testSetContainerContainerFormats()
     {
         $notification = $this->getNotification();
-        $this->assertEquals(array(), $notification->getContainerFormats('default'));
+        $this->assertEquals([], $notification->getContainerFormats('default'));
 
-        $notification->setContainerFormats('default', array('info' => ':message'));
-        $this->assertEquals(array('info' => ':message'), $notification->getContainerFormats('default'));
+        $notification->setContainerFormats('default', ['info' => ':message']);
+        $this->assertEquals(['info' => ':message'], $notification->getContainerFormats('default'));
     }
 
     public function testGetContainerFormatsForContainer()
     {
         $notification = $this->getNotification();
-        $this->assertEquals(array(), $notification->getContainerFormats('default'));
-        $this->assertEquals(array(), $notification->getContainerFormats('test'));
+        $this->assertEquals([], $notification->getContainerFormats('default'));
+        $this->assertEquals([], $notification->getContainerFormats('test'));
 
-        $notification->setContainerFormats('default', array('info' => ':message'));
-        $this->assertEquals(array('info' => ':message'), $notification->getContainerFormats('default'));
-        $this->assertEquals(array(), $notification->getContainerFormats('test'));
+        $notification->setContainerFormats('default', ['info' => ':message']);
+        $this->assertEquals(['info' => ':message'], $notification->getContainerFormats('default'));
+        $this->assertEquals([], $notification->getContainerFormats('test'));
     }
 
     public function testAddContainer()
@@ -141,12 +140,12 @@ class NotificationTest extends TestCase
     public function testNotificationBagInstanceOnNonExistingContainerWithResolvedParams()
     {
         $notification = $this->getNotification();
-        $notification->setContainerTypes('test', array('success'));
+        $notification->setContainerTypes('test', ['success']);
         $notification->setContainerFormat('test', ':message');
-        $notification->setContainerFormats('test', array('success' => ':message - OK'));
+        $notification->setContainerFormats('test', ['success' => ':message - OK']);
         $container = $notification->container('test');
         $this->assertInstanceOf('Krucas\Notification\NotificationsBag', $container);
-        $this->assertEquals(array('success'), $container->getTypes());
+        $this->assertEquals(['success'], $container->getTypes());
         $this->assertEquals(':message', $container->getDefaultFormat());
         $this->assertEquals(':message - OK', $container->getFormat('success'));
     }
@@ -154,11 +153,11 @@ class NotificationTest extends TestCase
     public function testCallbackOnNotificationBag()
     {
         $notification = $this->getNotification();
-        $this->assertEquals(array(), $notification->container('default')->getTypes());
+        $this->assertEquals([], $notification->container('default')->getTypes());
         $notification->container('default', function ($container) {
             $container->addType('info');
         });
-        $this->assertEquals(array('info'), $notification->container('default')->getTypes());
+        $this->assertEquals(['info'], $notification->container('default')->getTypes());
     }
 
     public function testCreateNewEmptyMessageInstance()
@@ -190,7 +189,7 @@ class NotificationTest extends TestCase
     public function testAddFlashMessageProcess()
     {
         $notification = $this->getNotification();
-        $notification->setContainerTypes('default', array('info'));
+        $notification->setContainerTypes('default', ['info']);
         $notification->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 
         $message = $this->getMessage();
@@ -199,14 +198,14 @@ class NotificationTest extends TestCase
         $message->shouldReceive('getPosition')->andReturn(null);
         $message->shouldReceive('getFormat')->andReturn(':message');
 
-        $events->shouldReceive('dispatch')->once()->with('notification.flash: default', array($notification, $notification->container(), $message));
+        $events->shouldReceive('dispatch')->once()->with('notification.flash: default', [$notification, $notification->container(), $message]);
         $notification->container()->info($message);
     }
 
     public function testAddInstantMessageProcess()
     {
         $notification = $this->getNotification();
-        $notification->setContainerTypes('default', array('info'));
+        $notification->setContainerTypes('default', ['info']);
         $notification->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 
         $message = $this->getMessage();
@@ -215,7 +214,7 @@ class NotificationTest extends TestCase
         $message->shouldReceive('getPosition')->andReturn(null);
         $message->shouldReceive('getFormat')->andReturn(':message');
 
-        $events->shouldReceive('dispatch')->once()->with('notification.added: default', array($notification, $notification->container(), $message));
+        $events->shouldReceive('dispatch')->once()->with('notification.added: default', [$notification, $notification->container(), $message]);
         $notification->container()->infoInstant($message);
     }
 
@@ -244,7 +243,7 @@ class NotificationTest extends TestCase
             'default',
             ['info', 'warning', 'success', 'error'],
             [
-                'test' => ['info']
+                'test' => ['info'],
             ],
             ':type :message',
             [
@@ -254,7 +253,7 @@ class NotificationTest extends TestCase
             [
                 'test' => [
                     'info' => 'info :message',
-                ]
+                ],
             ]
         );
 
@@ -274,6 +273,7 @@ class NotificationTest extends TestCase
     protected function getMessage()
     {
         $message = m::mock('Krucas\Notification\Message');
+
         return $message;
     }
 }

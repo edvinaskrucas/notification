@@ -44,7 +44,7 @@ class MessageTest extends TestCase
     {
         $message = new \Krucas\Notification\Message('error', 'test message', false, ':type: :message');
 
-        $this->assertEquals('error: test message', (string)$message);
+        $this->assertEquals('error: test message', (string) $message);
     }
 
     public function testMessageRendering()
@@ -58,13 +58,13 @@ class MessageTest extends TestCase
     {
         $message = new \Krucas\Notification\Message('error', 'test message', false, ':type: :message');
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             'message' => 'test message',
             'format' => ':type: :message',
             'type' => 'error',
             'flash' => false,
-            'position' => null
-        ), $message->toArray());
+            'position' => null,
+        ], $message->toArray());
     }
 
     public function testMessageToJson()

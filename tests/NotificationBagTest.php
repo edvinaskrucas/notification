@@ -1,8 +1,8 @@
 <?php
 
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 require_once 'Mocks/NotificationsBagMock.php';
 
@@ -10,40 +10,39 @@ class NotificationBagTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-
     public function testIsConstructed()
     {
         $notificationBag = $this->getNotificationBag();
         $this->assertEquals('test', $notificationBag->getName());
-        $this->assertEquals(array(), $notificationBag->getTypes());
+        $this->assertEquals([], $notificationBag->getTypes());
         $this->assertNull($notificationBag->getDefaultFormat());
     }
 
     public function testAddType()
     {
         $notificationBag = $this->getNotificationBag();
-        $this->assertEquals(array(), $notificationBag->getTypes());
+        $this->assertEquals([], $notificationBag->getTypes());
 
         $notificationBag->addType('warning');
-        $this->assertEquals(array('warning'), $notificationBag->getTypes());
+        $this->assertEquals(['warning'], $notificationBag->getTypes());
     }
 
     public function testAddTypesArray()
     {
         $notificationBag = $this->getNotificationBag();
-        $this->assertEquals(array(), $notificationBag->getTypes());
+        $this->assertEquals([], $notificationBag->getTypes());
 
-        $notificationBag->addType(array('info', 'danger'));
-        $this->assertEquals(array('info', 'danger'), $notificationBag->getTypes());
+        $notificationBag->addType(['info', 'danger']);
+        $this->assertEquals(['info', 'danger'], $notificationBag->getTypes());
     }
 
     public function testAddTypesArrayAsIndividualParam()
     {
         $notificationBag = $this->getNotificationBag();
-        $this->assertEquals(array(), $notificationBag->getTypes());
+        $this->assertEquals([], $notificationBag->getTypes());
 
         $notificationBag->addType('info', 'danger');
-        $this->assertEquals(array('info', 'danger'), $notificationBag->getTypes());
+        $this->assertEquals(['info', 'danger'], $notificationBag->getTypes());
     }
 
     public function testAddExistingType()
@@ -51,10 +50,10 @@ class NotificationBagTest extends TestCase
         $notificationBag = $this->getNotificationBag();
 
         $notificationBag->addType('warning');
-        $this->assertEquals(array('warning'), $notificationBag->getTypes());
+        $this->assertEquals(['warning'], $notificationBag->getTypes());
 
         $notificationBag->addType('warning');
-        $this->assertEquals(array('warning'), $notificationBag->getTypes());
+        $this->assertEquals(['warning'], $notificationBag->getTypes());
     }
 
     public function testCheckIfTypeIsAvailable()
@@ -69,13 +68,13 @@ class NotificationBagTest extends TestCase
     public function testClearTypes()
     {
         $notificationBag = $this->getNotificationBag();
-        $this->assertEquals(array(), $notificationBag->getTypes());
+        $this->assertEquals([], $notificationBag->getTypes());
 
         $notificationBag->addType('warning');
-        $this->assertEquals(array('warning'), $notificationBag->getTypes());
+        $this->assertEquals(['warning'], $notificationBag->getTypes());
 
         $notificationBag->clearTypes();
-        $this->assertEquals(array(), $notificationBag->getTypes());
+        $this->assertEquals([], $notificationBag->getTypes());
     }
 
     public function testExtractType()
@@ -83,19 +82,19 @@ class NotificationBagTest extends TestCase
         $notificationBag = $this->getNotificationBag();
         $this->assertFalse($notificationBag->extractType('info'));
 
-        $notificationBag->addType(array('info', 'success'));
-        $this->assertEquals(array('info', 'add'), $notificationBag->extractType('info'));
-        $this->assertEquals(array('info', 'instant'), $notificationBag->extractType('infoInstant'));
-        $this->assertEquals(array('info', 'clear'), $notificationBag->extractType('clearInfo'));
-        $this->assertEquals(array('info', 'show'), $notificationBag->extractType('showInfo'));
-        $this->assertEquals(array('success', 'add'), $notificationBag->extractType('success'));
+        $notificationBag->addType(['info', 'success']);
+        $this->assertEquals(['info', 'add'], $notificationBag->extractType('info'));
+        $this->assertEquals(['info', 'instant'], $notificationBag->extractType('infoInstant'));
+        $this->assertEquals(['info', 'clear'], $notificationBag->extractType('clearInfo'));
+        $this->assertEquals(['info', 'show'], $notificationBag->extractType('showInfo'));
+        $this->assertEquals(['success', 'add'], $notificationBag->extractType('success'));
     }
 
     public function testExtractTypeInvalid()
     {
         $notificationBag = $this->getNotificationBag();
 
-        $notificationBag->addType(array('info', 'success'));
+        $notificationBag->addType(['info', 'success']);
         $this->assertFalse($notificationBag->extractType('ShowInfo'));
         $this->assertFalse($notificationBag->extractType('infoinstant'));
     }
@@ -120,15 +119,15 @@ class NotificationBagTest extends TestCase
     public function testSetFormatsArray()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->addType(['success', 'info']);
         $this->assertFalse($notificationBag->getFormat('success'));
         $this->assertFalse($notificationBag->getFormat('info'));
 
         $notificationBag->setFormats(
-            array(
+            [
                 'success'   => 'OK - :message',
                 'info'      => 'INFO - :message',
-            )
+            ]
         );
         $this->assertEquals('OK - :message', $notificationBag->getFormat('success'));
         $this->assertEquals('INFO - :message', $notificationBag->getFormat('info'));
@@ -155,15 +154,15 @@ class NotificationBagTest extends TestCase
     public function testClearFormat()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->addType(['success', 'info']);
         $this->assertFalse(false, $notificationBag->getFormat('success'));
         $this->assertFalse(false, $notificationBag->getFormat('info'));
 
         $notificationBag->setFormats(
-            array(
+            [
                 'success'   => 'OK - :message',
                 'info'      => 'INFO - :message',
-            )
+            ]
         );
         $this->assertEquals('OK - :message', $notificationBag->getFormat('success'));
         $this->assertEquals('INFO - :message', $notificationBag->getFormat('info'));
@@ -176,15 +175,15 @@ class NotificationBagTest extends TestCase
     public function testClearAllFormats()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->addType(['success', 'info']);
         $this->assertFalse(false, $notificationBag->getFormat('success'));
         $this->assertFalse(false, $notificationBag->getFormat('info'));
 
         $notificationBag->setFormats(
-            array(
+            [
                 'success'   => 'OK - :message',
                 'info'      => 'INFO - :message',
-            )
+            ]
         );
         $this->assertEquals('OK - :message', $notificationBag->getFormat('success'));
         $this->assertEquals('INFO - :message', $notificationBag->getFormat('info'));
@@ -197,7 +196,7 @@ class NotificationBagTest extends TestCase
     public function testAddMessageViaClosure()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('info'));
+        $notificationBag->addType(['info']);
 
         $notificationBag->add('info', function (\Krucas\Notification\Message $message) {
             $message->setMessage('test');
@@ -240,7 +239,7 @@ class NotificationBagTest extends TestCase
     public function testAddMessagesForMultipleTypes()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->addType(['success', 'info']);
         $this->assertCount(0, $notificationBag);
 
         $notificationBag->add('success', 'test', false);
@@ -251,7 +250,7 @@ class NotificationBagTest extends TestCase
     public function testAddMessagesForMultipleTypesUsingNamedMethods()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->addType(['success', 'info']);
         $this->assertCount(0, $notificationBag);
 
         $notificationBag->add('success', 'test', false);
@@ -356,7 +355,7 @@ class NotificationBagTest extends TestCase
     public function testGetInstantMessagesForGivenType()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->addType(['success', 'info']);
         $this->assertCount(0, $notificationBag);
 
         $notificationBag->successInstant('test');
@@ -370,7 +369,7 @@ class NotificationBagTest extends TestCase
     public function testGetInstantMessagesForGivenTypeWhenMessageHasPosition()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('info', 'danger'));
+        $notificationBag->addType(['info', 'danger']);
         $this->assertCount(0, $notificationBag);
 
         $message = $this->getMessage();
@@ -390,7 +389,7 @@ class NotificationBagTest extends TestCase
     public function testClearMessagesForGivenType()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->addType(['success', 'info']);
         $this->assertCount(0, $notificationBag->get('success'));
         $this->assertCount(0, $notificationBag->get('info'));
 
@@ -411,7 +410,7 @@ class NotificationBagTest extends TestCase
     public function testClearMessagesForGivenTypeUsingNamedMethod()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->addType(['success', 'info']);
         $this->assertCount(0, $notificationBag->get('success'));
         $this->assertCount(0, $notificationBag->get('info'));
 
@@ -432,7 +431,7 @@ class NotificationBagTest extends TestCase
     public function testClearAllMessages()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->addType(['success', 'info']);
         $this->assertCount(0, $notificationBag->get('success'));
         $this->assertCount(0, $notificationBag->get('info'));
 
@@ -449,7 +448,7 @@ class NotificationBagTest extends TestCase
     public function testClearAllMessageWithoutGivenType()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->addType(['success', 'info']);
         $this->assertCount(0, $notificationBag->get('success'));
         $this->assertCount(0, $notificationBag->get('info'));
 
@@ -466,7 +465,7 @@ class NotificationBagTest extends TestCase
     public function testGetAllMessages()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->addType(['success', 'info']);
         $this->assertCount(0, $notificationBag);
 
         $notificationBag->add('success', 'test', false);
@@ -477,7 +476,7 @@ class NotificationBagTest extends TestCase
     public function testGetFirstMessage()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->addType(['success', 'info']);
         $this->assertCount(0, $notificationBag);
         $this->assertNull($notificationBag->first());
 
@@ -491,7 +490,7 @@ class NotificationBagTest extends TestCase
     public function testShowMessagesForGivenType()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->addType(['success', 'info']);
         $notificationBag->setDefaultFormat(':type - :message');
         $this->assertCount(0, $notificationBag);
 
@@ -517,7 +516,7 @@ class NotificationBagTest extends TestCase
     public function testShowMessagesForGivenTypeUsingNamedMethods()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->addType(['success', 'info']);
         $notificationBag->setDefaultFormat(':type - :message');
         $this->assertCount(0, $notificationBag);
 
@@ -531,7 +530,7 @@ class NotificationBagTest extends TestCase
     public function testShowAllMessages()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->addType(['success', 'info']);
         $notificationBag->setDefaultFormat(':type - :message');
         $this->assertCount(0, $notificationBag);
 
@@ -545,45 +544,45 @@ class NotificationBagTest extends TestCase
     public function testAddTypesForGroupedRendering()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
-        $this->assertEquals(array(), $notificationBag->getGroupingForRender());
+        $notificationBag->addType(['success', 'info']);
+        $this->assertEquals([], $notificationBag->getGroupingForRender());
 
         $notificationBag->addToGrouping('success');
-        $this->assertEquals(array('success'), $notificationBag->getGroupingForRender());
+        $this->assertEquals(['success'], $notificationBag->getGroupingForRender());
 
         $notificationBag->addToGrouping('info');
-        $this->assertEquals(array('success', 'info'), $notificationBag->getGroupingForRender());
+        $this->assertEquals(['success', 'info'], $notificationBag->getGroupingForRender());
     }
 
     public function testAddAndRemoveTypesForGroupedRendering()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
-        $this->assertEquals(array(), $notificationBag->getGroupingForRender());
+        $notificationBag->addType(['success', 'info']);
+        $this->assertEquals([], $notificationBag->getGroupingForRender());
 
         $notificationBag->addToGrouping('success');
-        $this->assertEquals(array('success'), $notificationBag->getGroupingForRender());
+        $this->assertEquals(['success'], $notificationBag->getGroupingForRender());
 
         $notificationBag->addToGrouping('info');
-        $this->assertEquals(array('success', 'info'), $notificationBag->getGroupingForRender());
+        $this->assertEquals(['success', 'info'], $notificationBag->getGroupingForRender());
 
         $notificationBag->removeFromGrouping('success');
-        $this->assertEquals(array('info'), $notificationBag->getGroupingForRender());
+        $this->assertEquals(['info'], $notificationBag->getGroupingForRender());
     }
 
     public function testAddTypesForGroupedRenderingInvalidType()
     {
         $notificationBag = $this->getNotificationBag();
-        $this->assertEquals(array(), $notificationBag->getGroupingForRender());
+        $this->assertEquals([], $notificationBag->getGroupingForRender());
 
         $notificationBag->addToGrouping('success');
-        $this->assertEquals(array(), $notificationBag->getGroupingForRender());
+        $this->assertEquals([], $notificationBag->getGroupingForRender());
     }
 
     public function testShowGroupedMessages()
     {
         $notificationBag = $this->getNotificationBag();
-        $notificationBag->addType(array('success', 'info'));
+        $notificationBag->addType(['success', 'info']);
         $notificationBag->setDefaultFormat(':type - :message');
         $notificationBag->add('success', 'test', false);
         $notificationBag->add('info', 'test2', false);
@@ -618,20 +617,20 @@ class NotificationBagTest extends TestCase
         $notificationBag->add('info', 'test', false);
 
         $this->assertEquals(
-            array(
+            [
                 'container'     => 'test',
                 'format'        => ':message',
-                'types'         => array('info'),
-                'notifications' => array(
-                    array(
+                'types'         => ['info'],
+                'notifications' => [
+                    [
                         'message'   => 'test',
                         'format'    => ':message',
                         'type'      => 'info',
                         'flash'     => false,
-                        'position'  => null
-                    )
-                )
-            ),
+                        'position'  => null,
+                    ],
+                ],
+            ],
             $notificationBag->toArray()
         );
     }
@@ -645,25 +644,24 @@ class NotificationBagTest extends TestCase
 
         $this->assertEquals(
             json_encode(
-                array(
+                [
                     'container'     => 'test',
                     'format'        => ':message',
-                    'types'         => array('info'),
-                    'notifications' => array(
-                        array(
+                    'types'         => ['info'],
+                    'notifications' => [
+                        [
                             'message'   => 'test',
                             'format'    => ':message',
                             'type'      => 'info',
                             'flash'     => false,
-                            'position'  => null
-                        )
-                    )
-                )
+                            'position'  => null,
+                        ],
+                    ],
+                ]
             ),
             $notificationBag->toJson()
         );
     }
-
 
     protected function getNotificationBag()
     {
@@ -673,6 +671,7 @@ class NotificationBagTest extends TestCase
     protected function getMessage()
     {
         $message = m::mock('Krucas\Notification\Message');
+
         return $message;
     }
 }

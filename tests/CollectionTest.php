@@ -54,7 +54,7 @@ class CollectionTest extends TestCase
         $collection->add(new \Krucas\Notification\Message('warning', 'w', false, ':message'));
 
         $this->assertCount(2, $collection);
-        $this->assertEquals('error: error messagew', (string)$collection);
+        $this->assertEquals('error: error messagew', (string) $collection);
     }
 
     public function testSetAtPosition()

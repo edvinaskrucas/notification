@@ -1,0 +1,37 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [7.3, 7.4, 8.0]
+        laravel: [6.*]
+
+    name: PHP ${{ matrix.php }} Laravel ${{ matrix.laravel }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel }}" --no-update -n
+          composer install --no-suggest --prefer-dist -n -o
+
+      - name: Run tests
+        run: vendor/bin/phpunit

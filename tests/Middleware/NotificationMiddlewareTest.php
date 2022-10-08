@@ -1,13 +1,12 @@
 <?php
 
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 class NotificationMiddlewareTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
-    
 
     public function testOnBoot()
     {
@@ -23,10 +22,11 @@ class NotificationMiddlewareTest extends TestCase
         $prefix = 'notifications';
 
         $middleware = new \Krucas\Notification\Middleware\NotificationMiddleware($session, $notification, $prefix);
-        $session->shouldReceive('get')->once()->with('notifications', array())->andReturn(array('test' => $messages));
+        $session->shouldReceive('get')->once()->with('notifications', [])->andReturn(['test' => $messages]);
         $session->shouldReceive('forget')->once()->with('notifications');
 
-        $middleware->handle(m::mock('Illuminate\Http\Request'), function() {});
+        $middleware->handle(m::mock('Illuminate\Http\Request'), function () {
+        });
     }
 
     protected function getSessionStore()
