@@ -1,4 +1,6 @@
-<?php namespace Krucas\Notification;
+<?php
+
+namespace Krucas\Notification;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
@@ -16,14 +18,14 @@ class NotificationServiceProvider extends ServiceProvider
     /**
      * Bootstrap the application events.
      *
-     * @param \Illuminate\Contracts\Events\Dispatcher $dispatcher
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return void
      */
     public function boot(Dispatcher $dispatcher)
     {
-        $this->publishes(array(
-            __DIR__ . '/../../config/notification.php' => config_path('notification.php'),
-        ), 'config');
+        $this->publishes([
+            __DIR__.'/../../config/notification.php' => config_path('notification.php'),
+        ], 'config');
 
         $dispatcher->subscribe('Krucas\Notification\Subscriber');
 
@@ -45,7 +47,7 @@ class NotificationServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__ . '/../../config/notification.php', 'notification');
+        $this->mergeConfigFrom(__DIR__.'/../../config/notification.php', 'notification');
 
         $this->app->singleton('notification', function ($app) {
             $config = $app['config'];
@@ -87,10 +89,10 @@ class NotificationServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array(
+        return [
             'Krucas\Notification\Notification',
             'Krucas\Notification\Subscriber',
             'notification',
-        );
+        ];
     }
 }

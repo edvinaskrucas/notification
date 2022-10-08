@@ -1,4 +1,6 @@
-<?php namespace Krucas\Notification;
+<?php
+
+namespace Krucas\Notification;
 
 use Illuminate\Session\Store;
 
@@ -21,8 +23,8 @@ class Subscriber
     /**
      * Create new subscriber.
      *
-     * @param \Illuminate\Session\Store $session
-     * @param string $key
+     * @param  \Illuminate\Session\Store  $session
+     * @param  string  $key
      */
     public function __construct(Store $session, $key)
     {
@@ -53,16 +55,16 @@ class Subscriber
     /**
      * Execute this event to flash messages.
      *
-     * @param string $eventName
-     * @param array  $data       Event payload. Should be an array containing 3 elements:
-     *                           [ Notification, NotificationsBag, Message ]
+     * @param  string  $eventName
+     * @param  array  $data  Event payload. Should be an array containing 3 elements:
+     *                       [ Notification, NotificationsBag, Message ]
      * @return bool
      */
     public function onFlash($eventName, array $data)
     {
         $this->validateEventData($data);
 
-        list($notification, $notificationBag, $message) = $data;
+        [$notification, $notificationBag, $message] = $data;
 
         $key = implode('.', [$this->key, $notificationBag->getName()]);
 
@@ -74,7 +76,7 @@ class Subscriber
     /**
      * Register the listeners for the subscriber.
      *
-     * @param \Illuminate\Contracts\Events\Dispatcher $events
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return array
      */
     public function subscribe($events)
@@ -83,16 +85,17 @@ class Subscriber
     }
 
     /**
-     * Validates that the correct event data has been passed to self::onFlash()
+     * Validates that the correct event data has been passed to self::onFlash().
      *
      * Data array should have 3 elements with sequential keys: Notification, NotificationsBag and Message
      *
      * @param  array  $data
-     * @throws InvalidArgumentException  If the event data is invalid.
+     *
+     * @throws InvalidArgumentException If the event data is invalid.
      */
     private function validateEventData(array $data)
     {
-        if ( ! array_key_exists(0, $data) || ! array_key_exists(1, $data) || ! array_key_exists(2, $data)) {
+        if (! array_key_exists(0, $data) || ! array_key_exists(1, $data) || ! array_key_exists(2, $data)) {
             throw new \InvalidArgumentException(sprintf(
                 '%s expects 3 elements in data array, %s given.',
                 sprintf('%s::onFlash', __CLASS__),
@@ -100,11 +103,11 @@ class Subscriber
             ));
         }
 
-        if ( ! $data[0] instanceof Notification || ! $data[1] instanceof NotificationsBag || ! $data[2] instanceof Message) {
+        if (! $data[0] instanceof Notification || ! $data[1] instanceof NotificationsBag || ! $data[2] instanceof Message) {
             $expected = [Notification::class, NotificationsBag::class, Message::class];
 
             $actual = array_map(function ($element) {
-                return is_object($element) ? get_class($element) : '{' . gettype($element) . '}';
+                return is_object($element) ? get_class($element) : '{'.gettype($element).'}';
             }, $data);
 
             throw new \InvalidArgumentException(sprintf(

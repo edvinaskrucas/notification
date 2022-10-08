@@ -1,8 +1,10 @@
-<?php namespace Krucas\Notification;
+<?php
 
-use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Contracts\Support\Jsonable;
+namespace Krucas\Notification;
+
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Renderable;
 
 class Message implements Renderable, Jsonable, Arrayable
 {
@@ -49,11 +51,11 @@ class Message implements Renderable, Jsonable, Arrayable
     /**
      * Construct default message object.
      *
-     * @param null $type
-     * @param null $message
-     * @param bool $flash
-     * @param null $format
-     * @param null $position
+     * @param  null  $type
+     * @param  null  $message
+     * @param  bool  $flash
+     * @param  null  $format
+     * @param  null  $position
      */
     public function __construct($type = null, $message = null, $flash = true, $format = null, $position = null)
     {
@@ -181,7 +183,7 @@ class Message implements Renderable, Jsonable, Arrayable
 
     /**
      * Set message.
-     * Shortcut for `setMessage()`
+     * Shortcut for `setMessage()`.
      *
      * @param $message
      * @return \Krucas\Notification\Message
@@ -195,7 +197,7 @@ class Message implements Renderable, Jsonable, Arrayable
 
     /**
      * Set format.
-     * Shortcut for `setFormat()`
+     * Shortcut for `setFormat()`.
      *
      * @param $format
      * @return \Krucas\Notification\Message
@@ -209,7 +211,7 @@ class Message implements Renderable, Jsonable, Arrayable
 
     /**
      * Set message to be instant.
-     * Shortcut for `setFlash()`
+     * Shortcut for `setFlash()`.
      *
      * @return \Krucas\Notification\Message
      */
@@ -222,7 +224,7 @@ class Message implements Renderable, Jsonable, Arrayable
 
     /**
      * Set message to be flashable.
-     * Shortcut for `setFlash()`
+     * Shortcut for `setFlash()`.
      *
      * @return \Krucas\Notification\Message
      */
@@ -235,7 +237,7 @@ class Message implements Renderable, Jsonable, Arrayable
 
     /**
      * Set message position.
-     * Shortcut for `setPosition()`
+     * Shortcut for `setPosition()`.
      *
      * @param $position
      * @return \Krucas\Notification\Message
@@ -257,6 +259,7 @@ class Message implements Renderable, Jsonable, Arrayable
         if (is_null($this->getMessage())) {
             return '';
         }
+
         return str_replace([':message', ':type'], [$this->getMessage(), $this->getType()], $this->getFormat());
     }
 
