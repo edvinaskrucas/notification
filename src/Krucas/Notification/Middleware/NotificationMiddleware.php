@@ -1,4 +1,6 @@
-<?php namespace Krucas\Notification\Middleware;
+<?php
+
+namespace Krucas\Notification\Middleware;
 
 use Closure;
 use Illuminate\Session\Store;
@@ -22,9 +24,9 @@ class NotificationMiddleware
     protected $key;
 
     /**
-     * @param \Illuminate\Session\Store $session
-     * @param \Krucas\Notification\Notification $notification
-     * @param string $key
+     * @param  \Illuminate\Session\Store  $session
+     * @param  \Krucas\Notification\Notification  $notification
+     * @param  string  $key
      */
     public function __construct(Store $session, Notification $notification, $key)
     {
@@ -36,8 +38,8 @@ class NotificationMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Closure $next
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next)

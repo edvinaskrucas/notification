@@ -1,4 +1,6 @@
-<?php namespace Krucas\Notification;
+<?php
+
+namespace Krucas\Notification;
 
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -71,13 +73,13 @@ class Notification
     /**
      * Create new instance.
      *
-     * @param string $defaultContainer
-     * @param array $defaultTypes
-     * @param array $types
-     * @param string $defaultFormat
-     * @param array $format
-     * @param array $defaultFormats
-     * @param array $formats
+     * @param  string  $defaultContainer
+     * @param  array  $defaultTypes
+     * @param  array  $types
+     * @param  string  $defaultFormat
+     * @param  array  $format
+     * @param  array  $defaultFormats
+     * @param  array  $formats
      */
     public function __construct(
         $defaultContainer,
@@ -110,8 +112,8 @@ class Notification
     /**
      * Set types for a container.
      *
-     * @param string $container
-     * @param array $types
+     * @param  string  $container
+     * @param  array  $types
      * @return \Krucas\Notification\Notification
      */
     public function setContainerTypes($container, $types = [])
@@ -140,7 +142,7 @@ class Notification
      * Set format for a container.
      *
      * @param $container
-     * @param null $format
+     * @param  null  $format
      * @return \Krucas\Notification\Notification
      */
     public function setContainerFormat($container, $format = null)
@@ -169,10 +171,10 @@ class Notification
      * Set formats for a container.
      *
      * @param $container
-     * @param array $formats
+     * @param  array  $formats
      * @return \Krucas\Notification\Notification
      */
-    public function setContainerFormats($container, $formats = array())
+    public function setContainerFormats($container, $formats = [])
     {
         $this->formats[$container] = $formats;
 
@@ -197,10 +199,10 @@ class Notification
     /**
      * Add new container.
      *
-     * @param string $container
-     * @param array $types
-     * @param null $defaultFormat
-     * @param array $formats
+     * @param  string  $container
+     * @param  array  $types
+     * @param  null  $defaultFormat
+     * @param  array  $formats
      * @return \Krucas\Notification\Notification
      */
     public function addContainer($container, $types = [], $defaultFormat = null, $formats = [])
@@ -228,15 +230,15 @@ class Notification
     /**
      * Returns container instance.
      *
-     * @param null|string $container
-     * @param callable $callback
+     * @param  null|string  $container
+     * @param  callable  $callback
      * @return \Krucas\Notification\NotificationsBag
      */
     public function container($container = null, Closure $callback = null)
     {
         $container = is_null($container) ? $this->defaultContainer : $container;
 
-        if (!isset($this->containers[$container])) {
+        if (! isset($this->containers[$container])) {
             $this->addContainer(
                 $container,
                 $this->getContainerTypes($container),
@@ -255,13 +257,14 @@ class Notification
     /**
      * Create new message instance.
      *
-     * @param null $message
+     * @param  null  $message
      * @return \Krucas\Notification\Message
      */
     public function message($message = null)
     {
         $m = new Message();
         $m->setMessage($message);
+
         return $m;
     }
 
@@ -269,19 +272,19 @@ class Notification
      * Fire given event.
      *
      * @param $event
-     * @param \Krucas\Notification\NotificationsBag $notificationBag
-     * @param \Krucas\Notification\Message $message
+     * @param  \Krucas\Notification\NotificationsBag  $notificationBag
+     * @param  \Krucas\Notification\Message  $message
      * @return array|bool|null
      */
     public function fire($event, NotificationsBag $notificationBag, Message $message)
     {
-        if (!isset(static::$dispatcher)) {
+        if (! isset(static::$dispatcher)) {
             return true;
         }
 
         $event = "notification.{$event}: ".$notificationBag->getName();
 
-        return static::$dispatcher->dispatch($event, array($this, $notificationBag, $message));
+        return static::$dispatcher->dispatch($event, [$this, $notificationBag, $message]);
     }
 
     /**
@@ -297,7 +300,7 @@ class Notification
     /**
      * Set the event dispatcher instance.
      *
-     * @param \Illuminate\Contracts\Events\Dispatcher $dispatcher
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return void
      */
     public static function setEventDispatcher(Dispatcher $dispatcher)
@@ -324,6 +327,6 @@ class Notification
      */
     public function __call($name, $arguments)
     {
-        return call_user_func_array(array($this->container(null), $name), $arguments);
+        return call_user_func_array([$this->container(null), $name], $arguments);
     }
 }

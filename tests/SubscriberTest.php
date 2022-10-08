@@ -1,13 +1,12 @@
 <?php
 
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 class SubscriberTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
-    
 
     public function testIsConstructed()
     {

@@ -1,9 +1,11 @@
-<?php namespace Krucas\Notification;
+<?php
 
+namespace Krucas\Notification;
+
+use Closure;
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
-use Closure;
 
 class NotificationsBag implements Arrayable, Jsonable, Countable
 {
@@ -19,19 +21,19 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      *
      * @var array
      */
-    protected $types = array();
+    protected $types = [];
 
     /**
      * Array of matcher for extracting types.
      *
      * @var array
      */
-    protected $matcher = array(
+    protected $matcher = [
         'add'       => '{type}',
         'instant'   => '{type}Instant',
         'clear'     => 'clear{uType}',
         'show'      => 'show{uType}',
-    );
+    ];
 
     /**
      * Default format for all message types.
@@ -45,7 +47,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      *
      * @var array
      */
-    protected $formats = array();
+    protected $formats = [];
 
     /**
      * Collection to store all instant notification messages.
@@ -59,7 +61,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      *
      * @var array
      */
-    protected $groupForRender = array();
+    protected $groupForRender = [];
 
     /**
      * Notification library instance.
@@ -72,11 +74,11 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      * Creates new NotificationBag object.
      *
      * @param $container
-     * @param array $types
-     * @param null $defaultFormat
-     * @param array $formats
+     * @param  array  $types
+     * @param  null  $defaultFormat
+     * @param  array  $formats
      */
-    public function __construct($container, $types = array(), $defaultFormat = null, $formats = array())
+    public function __construct($container, $types = [], $defaultFormat = null, $formats = [])
     {
         $this->container = $container;
         $this->addType($types);
@@ -113,7 +115,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
                     $this->addType($t);
                 }
             } else {
-                if (!$this->typeIsAvailable($type)) {
+                if (! $this->typeIsAvailable($type)) {
                     $this->types[] = $type;
                 }
             }
@@ -150,7 +152,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      */
     public function clearTypes()
     {
-        $this->types = array();
+        $this->types = [];
 
         return $this;
     }
@@ -169,8 +171,8 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
 
         foreach ($this->types as $type) {
             foreach ($this->matcher as $function => $pattern) {
-                if (str_replace(array('{type}', '{uType}'), array($type, ucfirst($type)), $pattern) === $name) {
-                    return array($type, $function);
+                if (str_replace(['{type}', '{uType}'], [$type, ucfirst($type)], $pattern) === $name) {
+                    return [$type, $function];
                 }
             }
         }
@@ -240,7 +242,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      */
     public function getFormat($type)
     {
-        if (!$this->typeIsAvailable($type)) {
+        if (! $this->typeIsAvailable($type)) {
             return false;
         }
 
@@ -248,7 +250,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
             return $this->formats[$type];
         }
 
-        if (!is_null($this->getDefaultFormat())) {
+        if (! is_null($this->getDefaultFormat())) {
             return $this->getDefaultFormat();
         }
 
@@ -275,7 +277,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      */
     public function clearFormats()
     {
-        $this->formats = array();
+        $this->formats = [];
 
         return $this;
     }
@@ -284,12 +286,12 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      * Returns valid format.
      *
      * @param $format
-     * @param null $type
+     * @param  null  $type
      * @return null
      */
     protected function checkFormat($format, $type = null)
     {
-        return !is_null($format) ? $format : $this->getFormat($type);
+        return ! is_null($format) ? $format : $this->getFormat($type);
     }
 
     /**
@@ -299,14 +301,14 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      * Flashes flashable messages.
      *
      * @param $type
-     * @param string|\Krucas\Notification\Message|\Closure $message
-     * @param bool $flash
-     * @param null $format
+     * @param  string|\Krucas\Notification\Message|\Closure  $message
+     * @param  bool  $flash
+     * @param  null  $format
      * @return \Krucas\Notification\NotificationsBag
      */
     public function add($type, $message, $flash = true, $format = null)
     {
-        if (!$this->typeIsAvailable($type)) {
+        if (! $this->typeIsAvailable($type)) {
             return $this;
         }
 
@@ -321,7 +323,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
             $m = new Message($type, $message, $flash, $this->checkFormat($format, $type));
         }
 
-        if (!$m->isFlash()) {
+        if (! $m->isFlash()) {
             $this->notifications->add($m);
             $this->fireEvent('added', $m);
         } else {
@@ -334,10 +336,10 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
     /**
      * Add message by instance.
      *
-     * @param \Krucas\Notification\Message $message
-     * @param string $type
-     * @param bool $flash
-     * @param null $format
+     * @param  \Krucas\Notification\Message  $message
+     * @param  string  $type
+     * @param  bool  $flash
+     * @param  null  $format
      */
     protected function addInstance(Message $message, $type, $flash = true, $format = null)
     {
@@ -348,7 +350,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
         if (is_null($message->getFormat())) {
             $message->setFormat($this->getFormat($type));
         }
-        if (!is_null($format)) {
+        if (! is_null($format)) {
             $message->setFormat($this->checkFormat($format, $type));
         }
     }
@@ -375,7 +377,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
     /**
      * Clears message for a given type.
      *
-     * @param null $type
+     * @param  null  $type
      * @return \Krucas\Notification\NotificationsBag
      */
     public function clear($type = null)
@@ -431,21 +433,21 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
     /**
      * Returns generated output of non flash messages.
      *
-     * @param null $type
-     * @param null $format
+     * @param  null  $type
+     * @param  null  $format
      * @return string
      */
     public function show($type = null, $format = null)
     {
         $messages = $this->getMessagesForRender($type);
 
-        $this->groupForRender = array();
+        $this->groupForRender = [];
 
         $output = '';
 
         foreach ($messages as $message) {
-            if (!$message->isFlash()) {
-                if (!is_null($format)) {
+            if (! $message->isFlash()) {
+                if (! is_null($format)) {
                     $message->setFormat($format);
                 }
 
@@ -459,7 +461,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
     /**
      * Renders all messages.
      *
-     * @param null $format
+     * @param  null  $format
      * @return string
      */
     public function showAll($format = null)
@@ -470,14 +472,14 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
     /**
      * Resolves which messages should be returned for rendering.
      *
-     * @param null $type
+     * @param  null  $type
      * @return \Krucas\Notification\Collection
      */
     protected function getMessagesForRender($type = null)
     {
         if (is_null($type)) {
             if (count($this->groupForRender) > 0) {
-                $messages = array();
+                $messages = [];
 
                 foreach ($this->groupForRender as $typeToRender) {
                     $messages = array_merge($messages, $this->get($typeToRender)->all());
@@ -488,6 +490,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
 
             return $this->all();
         }
+
         return $this->get($type);
     }
 
@@ -503,7 +506,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
 
     /**
      * Set order to render types.
-     * Call this method: group('success', 'info', ...)
+     * Call this method: group('success', 'info', ...).
      *
      * @return \Krucas\Notification\NotificationsBag
      */
@@ -511,7 +514,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
     {
         if (func_num_args() > 0) {
             $types = func_get_args();
-            $this->groupForRender = array();
+            $this->groupForRender = [];
             foreach ($types as $type) {
                 $this->addToGrouping($type);
             }
@@ -528,11 +531,11 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      */
     public function addToGrouping($type)
     {
-        if (!$this->typeIsAvailable($type)) {
+        if (! $this->typeIsAvailable($type)) {
             return $this;
         }
 
-        if (!in_array($type, $this->groupForRender)) {
+        if (! in_array($type, $this->groupForRender)) {
             $this->groupForRender[] = $type;
         }
 
@@ -565,13 +568,12 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      */
     public function toArray()
     {
-        $arr = array
-        (
+        $arr = [
             'container'         => $this->container,
             'format'            => $this->getDefaultFormat(),
             'types'             => $this->getTypes(),
-            'notifications'     => $this->notifications->toArray()
-        );
+            'notifications'     => $this->notifications->toArray(),
+        ];
 
         return $arr;
     }
@@ -579,7 +581,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
     /**
      * Convert the object to its JSON representation.
      *
-     * @param  int $options
+     * @param  int  $options
      * @return string
      */
     public function toJson($options = 0)
@@ -623,7 +625,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
             return true;
         }
 
-        if (!$this->typeIsAvailable($type)) {
+        if (! $this->typeIsAvailable($type)) {
             return false;
         }
 
@@ -641,11 +643,11 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
      *
      * @param $event
      * @param $message
-     * @return boolean
+     * @return bool
      */
     protected function fireEvent($event, $message)
     {
-        if (!isset($this->notification)) {
+        if (! isset($this->notification)) {
             return true;
         }
 
@@ -655,7 +657,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
     /**
      * Set notification instance.
      *
-     * @param \Krucas\Notification\Notification $notification
+     * @param  \Krucas\Notification\Notification  $notification
      * @return void
      */
     public function setNotification(Notification $notification)
@@ -693,7 +695,7 @@ class NotificationsBag implements Arrayable, Jsonable, Countable
     public function __call($name, $arguments)
     {
         if (($extracted = $this->extractType($name)) !== false) {
-            switch($extracted[1]) {
+            switch ($extracted[1]) {
                 case 'add':
                     return $this->add(
                         $extracted[0],

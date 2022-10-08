@@ -1,4 +1,6 @@
-<?php namespace Krucas\Notification;
+<?php
+
+namespace Krucas\Notification;
 
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Collection as BaseCollection;
@@ -15,7 +17,7 @@ class Collection extends BaseCollection implements Renderable
     /**
      * Create new collection of messages.
      *
-     * @param array $items
+     * @param  array  $items
      */
     public function __construct($items = [])
     {
@@ -31,7 +33,7 @@ class Collection extends BaseCollection implements Renderable
     /**
      * Add message to collection.
      *
-     * @param Message $item
+     * @param  Message  $item
      * @return \Krucas\Notification\Collection
      */
     public function add($item)
@@ -52,7 +54,7 @@ class Collection extends BaseCollection implements Renderable
     /**
      * Copy queue items.
      *
-     * @param \SplPriorityQueue $queue
+     * @param  \SplPriorityQueue  $queue
      * @return void
      */
     protected function copyQueue(\SplPriorityQueue $queue)
