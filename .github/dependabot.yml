@@ -5,6 +5,9 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: saturday
+      time: "08:00"
+      timezone: "Europe/London"
     allow:
       - dependency-type: "direct"
 
@@ -12,3 +15,6 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+      day: saturday
+      time: "08:00"
+      timezone: "Europe/London"
